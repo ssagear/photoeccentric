@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST.in
+README.rst
+pyproject.toml
+setup.cfg
+setup.py
+metallicity.egg-info/PKG-INFO
+metallicity.egg-info/SOURCES.txt
+metallicity.egg-info/dependency_links.txt
+metallicity.egg-info/not-zip-safe
+metallicity.egg-info/requires.txt
+metallicity.egg-info/top_level.txt
+photoeccentric/__init__.py
+photoeccentric/stellardensity.py
