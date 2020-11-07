@@ -170,7 +170,7 @@ def plot_cdf(x, cdf):
 
 def iterate_stars(rho_dict):
     for key, val in rho_dict.items():
-        x, cdf = get_cdf(rho_dict[key])
+        x, cdf = get_cdf(rho_spec[key])
         sigma_minus = find_sigma(x, cdf, "-")
         sigma_plus = find_sigma(x, cdf, "+")
 
