@@ -5,6 +5,7 @@ pyproject.toml
 setup.cfg
 setup.py
 metallicity/__init__.py
+metallicity/photoeccentric.py
 metallicity/spectroscopy.py
 metallicity/stellardensity.py
 metallicity.egg-info/PKG-INFO

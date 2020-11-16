@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
-from tqdm import tqdm
+from tqdm import tqdms
 
 def get_kepID(hdul):
     """Pulls KIC IDs from Kepler-Gaia dataset.
@@ -195,7 +195,40 @@ def remove_nans(nan_indices, stellar_prop):
     return stellar_prop_nonans
 
 
-def asymmetric_gaussian(mean, sigma_minus, sigma_plus):
+# def asymmetric_gaussian(mean, sigma_minus, sigma_plus):
+#     """Generates an asymmetric Gaussian distribution based on a mean and 2 different sigmas (one (-) and one (+))
+#     Made by generating 2 symmetric Gaussians with different sigmas and sticking them together at the mean.
+#     The integral of the resulting Gaussian is 1.
+#
+#     Parameters
+#     ----------
+#     mean: float
+#         Mean of distribution
+#     sigma_minus: float
+#         Negative sigma of distribtion
+#     sigma_plus: float
+#         Positive sigma of distribtion
+#
+#     Results
+#     -------
+#     dist: np.ndarray
+#         Asymmetric Gaussian distribution, length 1200
+#     """
+#
+#     left = np.random.normal(mean, abs(sigma_minus), 1300)
+#     right = np.random.normal(mean, abs(sigma_plus), 1300)
+#     dist_left = left[left<mean]
+#     dist_right = right[right>=mean]
+#     dist = np.concatenate((dist_right, dist_left), axis=None)
+#
+#     np.random.shuffle(dist)
+#
+#     while len(dist) > 1200:
+#         dist = np.delete(dist, [np.random.randint(0, len(dist)-1)])
+#     else:
+#         return dist
+
+def asymmetric_gaussian(mean, sigma_minus, sigma_plus, nvals):
     """Generates an asymmetric Gaussian distribution based on a mean and 2 different sigmas (one (-) and one (+))
     Made by generating 2 symmetric Gaussians with different sigmas and sticking them together at the mean.
     The integral of the resulting Gaussian is 1.
@@ -208,22 +241,24 @@ def asymmetric_gaussian(mean, sigma_minus, sigma_plus):
         Negative sigma of distribtion
     sigma_plus: float
         Positive sigma of distribtion
+    nvals: int
+        Number of values
 
     Results
     -------
     dist: np.ndarray
-        Asymmetric Gaussian distribution, length 1200
+        Asymmetric Gaussian distribution, length nvals
     """
 
-    left = np.random.normal(mean, abs(sigma_minus), 1300)
-    right = np.random.normal(mean, abs(sigma_plus), 1300)
+    left = np.random.normal(mean, abs(sigma_minus), nvals+200)
+    right = np.random.normal(mean, abs(sigma_plus), nvals+200)
     dist_left = left[left<mean]
     dist_right = right[right>=mean]
     dist = np.concatenate((dist_right, dist_left), axis=None)
 
     np.random.shuffle(dist)
 
-    while len(dist) > 1200:
+    while len(dist) > nvals:
         dist = np.delete(dist, [np.random.randint(0, len(dist)-1)])
     else:
         return dist
