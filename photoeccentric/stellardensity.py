@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
-from tqdm import tqdms
+from tqdm import tqdm
 
 def get_kepID(hdul):
     """Pulls KIC IDs from Kepler-Gaia dataset.
