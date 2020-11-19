@@ -2,3 +2,4 @@
 
 from .stellardensity import *
 from .spectroscopy import *
+from .photoeccentric import *
