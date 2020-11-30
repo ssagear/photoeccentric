@@ -419,9 +419,9 @@ def find_density_dist_symmetric(ntargs, masses, masserr, radii, raderr):
         rad_temp = np.zeros(1200)
 
         #####
-        mass_temp = np.random.normal(masses[star], np.mean((abs(masserr2[star]), abs(masserr1[star]))), 1200)
+        mass_temp = np.random.normal(masses[star], masserr[star], 1200)
         #len 1200
-        rad_temp = np.random.normal(radii[star], np.mean((abs(raderr2[star]), abs(raderr1[star]))), 1200)
+        rad_temp = np.random.normal(radii[star], raderr[star], 1200)
         #len 1200
         #####
 
@@ -431,7 +431,7 @@ def find_density_dist_symmetric(ntargs, masses, masserr, radii, raderr):
         for point in range(len(mass_temp)):
             #if mass_dist[point] >= 0. and rad_dist[point] >= 0:
             if True:
-                rho_temp[point] = density(mass_temp[point], rad_temp[point], sol_density)
+                rho_temp[point] = density(mass_temp[point], rad_temp[point], sol_density())
 
         #Now rho_temp is a n-long array with this star. We want it to be 1000-long exactly
 

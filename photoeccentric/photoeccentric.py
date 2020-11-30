@@ -9,6 +9,9 @@ import PyAstronomy.pyasl as pya
 import emcee
 import corner
 
+from .stellardensity import *
+from .spectroscopy import *
+
 
 def get_T23(p, rp_earth, rs, T14, a, i):
 
@@ -246,9 +249,9 @@ def get_sigmas(dist):
     sigma_plus: float
         + sigma
     """
-    x, cdf = mt.get_cdf(dist)
-    sigma_minus = mt.find_sigma(x, cdf, "-")
-    sigma_plus = mt.find_sigma(x, cdf, "+")
+    x, cdf = get_cdf(dist)
+    sigma_minus = find_sigma(x, cdf, "-")
+    sigma_plus = find_sigma(x, cdf, "+")
 
     return sigma_minus, sigma_plus
 
