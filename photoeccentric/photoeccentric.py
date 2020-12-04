@@ -18,7 +18,7 @@ def get_T23(p, rp_earth, rs, T14, a, i):
     ing_eg = 2*pya.ingressDuration(a, rp_earth*11.2, rs, i, p)#rp needs to in jovian radii
     T23 = T14-ing_eg
 
-    return T23
+    return T23#hours
 
 def get_T23_errs(T23_dist):
 
@@ -251,7 +251,7 @@ def get_sigmas(dist):
     """
     x, cdf = get_cdf(dist)
     sigma_minus = find_sigma(x, cdf, "-")
-    sigma_plus = find_sigma(x, cdf, "+")
+    sigma_plus = ph.find_sigma(x, cdf, "+")
 
     return sigma_minus, sigma_plus
 
