@@ -4,30 +4,193 @@ import pandas as pd
 
 import scipy.constants as c
 from tqdm import tqdm
-import PyAstronomy.pyasl as pya
-
-import emcee
-import corner
+import batman
 
 from .stellardensity import *
 from .spectroscopy import *
 
+def get_T14(p, rprs, a, i, ecc_prior=False, e=None, w=None):
+    """
+    Calculates T14 (total transit duration, 1st to 4th contact).
+    Assumes a circular orbit (e=0, w=0) if ecc_prior=False.
+    If ecc_prior=True, e and w are required. T14 is multiplied by an eccentricity factor.
 
-def get_T23(p, rp_earth, rs, T14, a, i):
+    Parameters
+    ----------
+    p: float
+        Period (seconds)
+    rprs: float
+        Planet radius/stellar radius
+    a: float
+        Semi-major axis (in stellar radii) (a/Rs)
+    i: floar
+        Inclination (degrees)
+    ecc: boolean
+        Eccentricity taken into account? Default False
+    e: float
+        Eccentricity if ecc=True, default None
+    w: float
+        Longitude of periastron (degrees) if ecc=True, default None
 
-    ing_eg = 2*pya.ingressDuration(a, rp_earth*11.2, rs, i, p)#rp needs to in jovian radii
-    T23 = T14-ing_eg
+    Returns
+    -------
+    T14: float
+        Total transit duration (seconds)
+    """
 
-    return T23#hours
+    rs_a = 1./a                   # Rs/a - rstar in units of semimajor axis
+    b = a*np.cos(i*(np.pi/180))   # convert i to radians
 
-def get_T23_errs(T23_dist):
+    T14 = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1+rprs)**2)-b**2))/np.sin(i*(np.pi/180))) #Equation 14 in exoplanet textbook
 
-    x, cdf = mt.get_cdf(T23_dist)
-    T23_sigma_minus = mt.find_sigma(x, cdf, "-")
-    T23_sigma_plus = mt.find_sigma(x, cdf, "+")
+    if ecc_prior==True:
+        chidot = np.sqrt(1-e**2)/(1+e*np.sin(w*(np.pi/180.))) #Equation 16 in exoplanet textbook
+        return T14*chidot
 
-    return T23_sigma_minus, T23_sigma_plus
+    return T14
 
+
+def get_T23(p, rprs, a, i, ecc_prior=False, e=None, w=None):
+    """
+    Calculates T23 (full transit duration, 1st to 4th contact).
+    Assumes a circular orbit (e=0, w=0) if ecc_prior=False.
+    If ecc_prior=True, e and w are required. T23 is multiplied by an eccentricity factor.
+
+
+    Parameters
+    ----------
+    p: float
+        Period (seconds)
+    rprs: float
+        Planet radius/stellar radius
+    a: float
+        Semi-major axis (in stellar radii) (a/Rs)
+    i: floar
+        Inclination (degrees)
+    ecc: boolean
+        Eccentricity taken into account? Default False
+    e: float
+        Eccentricity if ecc=True, default None
+    w: float
+        Longitude of periastron (degrees) if ecc=True, default None
+
+    Returns
+    -------
+    T23: float
+        Full transit time (seconds)
+    """
+
+    rs_a = 1./a                    #Rs/a - rstar in units of semimajor axis
+    b = a*np.cos(i*(np.pi/180))    #convert i to radians
+
+    T23 = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1-rprs)**2)-b**2))/np.sin(i*(np.pi/180))) #Equation 15 in exoplanet textbook
+
+    if ecc_prior==True:
+        chidot = np.sqrt(1-e**2)/(1+e*np.sin(w*(np.pi/180.))) #Equation 16 in exoplanet textbook
+        return T23*chidot
+
+    return T23
+
+def density(mass, radius):
+    """Get density of sphere given mass and radius.
+
+    Parameters
+    ----------
+    mass: float
+        Mass of sphere (kg)
+    radius: float
+        Radius of sphere (m)
+
+    Returns
+    rho: float
+        Density of sphere (kg*m^-3)
+    """
+
+    rho = mass/((4.0/3.0)*np.pi*radius**3)
+    return rho
+
+def find_density_dist_symmetric(ntargs, masses, masserr, radii, raderr):
+    """Gets symmetric stellar density distribution for stars.
+    Symmetric stellar density distribution = Gaussian with same sigma on each end.
+
+    Parameters
+    ----------
+    ntargs: int
+        Number of stars to get distribution for
+    masses: np.ndarray
+        Array of stellar masses (solar mass)
+    masserr: np.ndarray
+        Array of sigma_mass (solar mass)
+    radii: np.ndarray
+        Array of stellar radii (solar radii)
+    raderr: np.ndarray
+        Array of sigma_radius (solar radii)
+
+    Returns
+    -------
+    rho_dist: np.ndarray
+        Array of density distributions for each star in kg/m^3
+        Each element length 1000
+    mass_dist: np.ndarray
+        Array of symmetric Gaussian mass distributions for each star in kg
+        Each element length 1000
+    rad_dist: np.ndarray
+        Array of symmetric Gaussian radius distributions for each star in m
+        Each element length 1000
+    """
+
+    smass_kg = 1.9885e30  # Solar mass (kg)
+    srad_m = 696.34e6     # Solar radius (m)
+
+    rho_dist = np.zeros((ntargs, 1000))
+    mass_dist = np.zeros((ntargs, 1000))
+    rad_dist = np.zeros((ntargs, 1000))
+
+    for star in tqdm(range(ntargs)):
+
+        rho_temp = np.zeros(1000)
+        mass_temp = np.zeros(1000)
+        rad_temp = np.zeros(1000)
+
+        mass_temp = np.random.normal(masses[star]*smass_kg, masserr[star]*smass_kg, 1000)
+        rad_temp = np.random.normal(radii[star]*srad_m, raderr[star]*srad_m, 1000)
+
+        #Add each density point to rho_temp (for each star)
+        for point in range(len(mass_temp)):
+            rho_temp[point] = density(mass_temp[point], rad_temp[point])
+
+        rho_dist[star] = rho_temp
+        mass_dist[star] = mass_temp
+        rad_dist[star] = rad_temp
+
+
+    return rho_dist, mass_dist, rad_dist
+
+def get_rho_circ(rprs, T14, T23, p):
+    """Returns stellar density, assuming a perfectly circular planetary orbit.
+
+    Parameters
+    ----------
+    rprs: float
+        Planet radius/stellar radii
+    T14: float
+        Total transit time - first to fourth contact (seconds)
+    T23: float
+        Full transit time - second to third contact (seconds)
+    p: float
+        Orbital period (seconds)
+
+    Returns
+    -------
+    rho_circ: float
+        Stellar density, assuming a circular orbit (kg/m^3)
+    """
+
+    delta = rprs**2
+
+    rho_circ = (((2*(delta**(1/4)))/np.sqrt(T14**2-T23**2))**3)*((3*p)/(c.G*(c.pi**2)))
+
+    return rho_circ
 
 def get_planet_params(p, T14, T23):
     """Returns planet parameters in correct units.
@@ -64,40 +227,6 @@ def get_planet_params(p, T14, T23):
     T23_seconds = T23*3600
 
     return p_seconds, T14_seconds, T23_seconds
-
-
-def get_rho_circ(rprs, T14, T23, p):
-    """Returns stellar density, assuming a perfectly circular planetary orbit.
-
-    Parameters
-    ----------
-    rprs: float
-        Planet radius (stellar host radii)
-    T14: float
-        Total transit time - first to fourth contact (seconds)
-    T23: float
-        Full transit time - second to third contact (seconds)
-    p: float
-        Orbital period (seconds)
-
-    Returns
-    -------
-    rho_circ: float
-        Stellar density, assuming a circular orbit (kg/m^3)
-    """
-
-    delta = rprs**2
-    num1 = 2*(delta**(0.25))
-    den1 = np.sqrt((T14**2)-(T23**2))
-    term1 = (num1/den1)**3
-
-    num2 = 3*p
-    den2 = c.G*(c.pi**2)
-    term2 = num2/den2
-
-    rho_circ = term1*term2
-
-    return rho_circ
 
 
 def get_g(rho_circ, rho_star):
@@ -175,15 +304,30 @@ def row_to_top(df, index):
     return df_cp
 
 
-def get_g_distribution(row, n_rhos):
+
+def get_g_distribution(rhos, p, perr, rprs, rprserr, a, i, T14, T14err, T23, T23err):
     """Gets g distribution for a KOI.
 
     Parameters
     ----------
-    row: int
-        Row in pandas.dataframe of info from Exoplanet Archive. (change this to take KIC/KOI)
-    n_rhos: int
-        Number of values in distribution
+    rhos: array
+        Density histogram
+    p: float
+        Best-fit period (seconds)
+    perr: float
+        Sigma of period
+    rprs: float
+        Best-fit rp/rs
+    rorserr: float
+        Sigma of rprs
+    a: float
+        Best-fit semi-major axis (in stellar radii)
+    i: float
+        Best-fit inclination (degrees)
+    T14: float
+        Total transit duration (seconds) calculated from best-fit planet parameters
+    T23: float
+        Full transit duration (seconds) calculated from best-fit planet parameters
 
     Returns
     -------
@@ -191,48 +335,133 @@ def get_g_distribution(row, n_rhos):
         g distribution for star/planet.
     """
 
-    targ = spectplanets.iloc[row]
-    print('KIC: ', targ.kepid)
-
-    rhos = rho_lum[str(targ.kepid)].dropna()
-    rhos = np.array(rhos)
-
-    while len(rhos) > n_rhos:
-        rhos = np.delete(rhos, [np.random.randint(0, len(rhos))])
-
-    #ws = np.arange(-90., 300., 1.)
-
     gs = np.zeros((len(rhos)))
-    #es = np.zeros(len(rhos))
-    #es = np.zeros((len(ws), len(rhos)))
 
     rho_circ = np.zeros(len(rhos))
     rho_ratios = np.zeros(len(rhos))
     T23_dist = np.zeros((len(rhos)))
 
-    per_dist = mt.asymmetric_gaussian(targ.koi_period, targ.koi_period_err1, targ.koi_period_err2, len(rhos))
+    per_dist = np.random.normal(p, perr, size=1000)
+    rprs_dist = np.random.normal(rprs, rprserr, size=1000)
 
-    rs_dist = mt.asymmetric_gaussian(targ.koi_srad, targ.koi_srad_err1, targ.koi_srad_err2, len(rhos))
-    rp_earth_dist = mt.asymmetric_gaussian(targ.koi_prad, targ.koi_prad_err1, targ.koi_prad_err2, len(rhos))
-    rprs_dist = mt.asymmetric_gaussian(targ.koi_ror, targ.koi_ror_err1, targ.koi_ror_err2, len(rhos))
+    T14_dist = np.random.normal(T14, T14err, size=1000)
+    T23_dist = np.random.normal(T23, T23err, size=1000)
 
-    T14_dist = mt.asymmetric_gaussian(targ.koi_duration, targ.koi_duration_err1, targ.koi_duration_err2, len(rhos))
+    #for element in histogram for star:
+    for j in tqdm(range(len(rhos))):
 
-    a = targ.koi_sma
-    i = targ.koi_incl
+        rho_circ[j] = get_rho_circ(rprs_dist[j], T14_dist[j], T23_dist[j], per_dist[j])
 
-    for j in tqdm(range(len(rhos))): #for element in histogram for star:
-        T23_dist[j] = get_T23(per_dist[j], rp_earth_dist[j], rs_dist[j], T14_dist[j], a, i)
-
-        p_seconds, T14_seconds, T23_seconds = get_planet_params(per_dist[j], T14_dist[j], T23_dist[j])
-        rho_circ[j] = get_rho_circ(rprs_dist[j], T14_seconds, T23_seconds, p_seconds)
-
-        rho_ratios[j] = rho_circ[j]/rhos[j]
         g = get_g(rho_circ[j], rhos[j])
         gs[j] = g
 
-    return gs
 
+
+    return gs, rho_circ, rhos, T14_dist, T23_dist
+
+def get_inclination(b, a_rs):
+    """Get inclination (in degrees) from an impact parameter and semi-major axis (on stellar radius).
+
+    Parameters
+    ----------
+    b: float
+        Impact parameter
+    a_rs: float
+        Ratio of semi-major axis to stellar radius (a/Rs)
+
+    Returns
+    -------
+    i: float
+        Inclination (degrees)
+    """
+
+    i_radians = np.arccos(b*(1./a_rs))
+    i = i_radians*(180./np.pi)
+    return i
+
+def stellar_params_from_archive(df, kep_name):
+    """Get stellar parameters for the host of a KOI from exoplanet archive (downloaded data).
+
+    Parameters
+    ----------
+    df: pandas.DataFrame
+        dataframe of exop. archive downloaded data
+    kep_name: str
+        Kepler name of planet
+
+    Returns
+    -------
+    smass: float
+        Stellar mass (solar mass)
+    srad: float
+        Stellar radius (solar radius)
+    limbdark_mod: str
+        Limb darkening model
+    ldm_c1: float
+        Limb darkening coefficient 1
+    ldm_c2: float
+        Limb darkening coefficient 2
+
+    """
+    smass = float(df.loc[df['kepler_name'] == kep_name].koi_smass) #stellar mass (/solar mass)
+    smass_uerr = float(df.loc[df['kepler_name'] == kep_name].koi_smass_err1) #stellar mass upper error
+    smass_lerr = float(df.loc[df['kepler_name'] == kep_name].koi_smass_err2) #stellar mass lower error
+
+    srad = float(df.loc[df['kepler_name'] == kep_name].koi_srad) #stellar radius (/solar radius)
+    srad_uerr = float(df.loc[df['kepler_name'] == kep_name].koi_srad_err1) #stellar radius upper error
+    srad_lerr = float(df.loc[df['kepler_name'] == kep_name].koi_srad_err2) #stellar radius lower error
+
+    limbdark_mod = str(df.loc[df['kepler_name'] == kep_name].koi_limbdark_mod) #LDM Model
+    ldm_c2 = float(df.loc[df['kepler_name'] == kep_name].koi_ldm_coeff2) #LDM coef 2
+    ldm_c1 = float(df.loc[df['kepler_name'] == kep_name].koi_ldm_coeff1) #LDM coef 1
+
+    return smass, smass_uerr, smass_lerr, srad, srad_uerr, srad_lerr, limbdark_mod, ldm_c1, ldm_c2
+
+def planet_params_from_archive(df, kep_name):
+    """Get stellar parameters for the host of a KOI from exoplanet archive (downloaded data).
+
+    Parameters
+    ----------
+    df: pandas.DataFrame
+        dataframe of exop. archive downloaded data
+    kep_name: str
+        Kepler name of planet
+
+    Returns
+    -------
+    period: float
+        Orbital period (days)
+    rprs: float
+        Planet radius (stellar radii)
+    a: float
+        Semi-major axis (stellar radii)
+    e: float
+        Eccentricity
+    w: float
+        Longitude of periastron (degrees)
+    i: float
+        Inclination (degrees)
+
+    """
+
+    period = float(df.loc[df['kepler_name'] == kep_name].koi_period) #period (days)
+    period_uerr = float(df.loc[df['kepler_name'] == kep_name].koi_period_err1) #period upper error (days)
+    period_lerr = float(df.loc[df['kepler_name'] == kep_name].koi_period_err2) #period lower error (days)
+
+    rprs = float(df.loc[df['kepler_name'] == kep_name].koi_ror) #planet rad/stellar rad
+    rprs_uerr = float(df.loc[df['kepler_name'] == kep_name].koi_ror_err1) #planet rad upper error (days)
+    rprs_lerr = float(df.loc[df['kepler_name'] == kep_name].koi_ror_err2) #planet rad lower error (days)
+
+    a_rs = float(df.loc[df['kepler_name'] == kep_name].koi_dor) #semi-major axis/r_star (a on Rstar)
+    a_rs_uerr = float(df.loc[df['kepler_name'] == kep_name].koi_dor_err1) #semi-major axis/r_star upper error
+    a_rs_lerr = float(df.loc[df['kepler_name'] == kep_name].koi_dor_err2) #semi-major axis/r_star upper error
+
+    i = float(df.loc[df['kepler_name'] == kep_name].koi_incl) #inclination (degrees)
+
+    e = float(df.loc[df['kepler_name'] == kep_name].koi_eccen) #eccentricity (assumed 0)
+    w = float(df.loc[df['kepler_name'] == kep_name].koi_longp) #longtitude of periastron (assumed 0)
+
+    return period, period_uerr, period_uerr, rprs, rprs_uerr, rprs_lerr, a_rs, a_rs_uerr, a_rs_lerr, i, e, w
 
 def get_sigmas(dist):
     """Gets + and - sigmas from a distribution (gaussian or not) through a cdf
@@ -251,12 +480,12 @@ def get_sigmas(dist):
     """
     x, cdf = get_cdf(dist)
     sigma_minus = find_sigma(x, cdf, "-")
-    sigma_plus = ph.find_sigma(x, cdf, "+")
+    sigma_plus = find_sigma(x, cdf, "+")
 
     return sigma_minus, sigma_plus
 
 def get_e_from_def(g, w):
-    """Gets eccentricity from definition (eqn 4, not really the definition tho)
+    """Gets eccentricity from definition (eqn 4)
 
     Parameters
     ----------
@@ -276,6 +505,32 @@ def get_e_from_def(g, w):
     e = num/den
     return e
 
+def planetlc_fitter(time, per, rp, a, inc):
+    """Always assumes e=0.
+    w is not a free parameter."""
+
+    params = batman.TransitParams()       #object to store transit parameters
+    params.t0 = 0.                        #time of inferior conjunction
+    params.per = per                      #orbital period
+    params.rp = rp                        #planet radius (in units of stellar radii)
+    params.a = a                          #semi-major axis (in units of stellar radii)
+    params.inc = inc                      #orbital inclination (in degrees)
+    params.ecc = 0.0                      #eccentricity
+    params.w = 0.0                        #longitude of periastron (in degrees)
+    params.limb_dark = "linear"
+    params.u = [0.3]
+    #params.limb_dark = "quadratic"
+    #params.u = [0.1, 0.3]
+    #params.limb_dark = "uniform"
+    #params.u = []
+
+    #times to calculate light curve
+    m = batman.TransitModel(params, time)
+
+    flux = m.light_curve(params)
+
+    return flux
+
 
 def log_likelihood(theta, g, gerr):
     """Log of likelihood
@@ -283,10 +538,9 @@ def log_likelihood(theta, g, gerr):
     gerr = sigma of g distribution
     """
     w, e = theta
-    model = (1+e*np.sin(w))/np.sqrt(1-e**2)
+    model = (1+e*np.sin(w*(np.pi/180.)))/np.sqrt(1-e**2)
     sigma2 = gerr ** 2
     return -0.5 * np.sum((g - model) ** 2 / sigma2 + np.log(sigma2))
-
 
 def log_prior(theta):
     """Log of prior
@@ -297,7 +551,6 @@ def log_prior(theta):
     if 0.0 < e < 1.0 and -90.0 < w < 300.0:
         return 0.0
     return -np.inf
-
 
 def log_probability(theta, g, gerr):
     """Log of probability
