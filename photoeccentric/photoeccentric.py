@@ -38,13 +38,15 @@ def get_T14(p, rprs, a, i, ecc_prior=False, e=None, w=None):
         Total transit duration (seconds)
     """
 
-    rs_a = 1./a                   # Rs/a - rstar in units of semimajor axis
-    b = a*np.cos(i*(np.pi/180))   # convert i to radians
+    rs_a = 1.0/a                  # Rs/a - rstar in units of semimajor axis
+    b = a*np.cos(i*(np.pi/180.0))   # convert i to radians
+    #print('b', b)
+    #print('i', i)
 
-    T14 = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1+rprs)**2)-b**2))/np.sin(i*(np.pi/180))) #Equation 14 in exoplanet textbook
+    T14 = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1+rprs)**2)-b**2))/np.sin(i*(np.pi/180.0))) #Equation 14 in exoplanet textbook
 
     if ecc_prior==True:
-        chidot = np.sqrt(1-e**2)/(1+e*np.sin(w*(np.pi/180.))) #Equation 16 in exoplanet textbook
+        chidot = np.sqrt(1-e**2)/(1+e*np.sin(w*(np.pi/180.0))) #Equation 16 in exoplanet textbook
         return T14*chidot
 
     return T14
@@ -81,9 +83,9 @@ def get_T23(p, rprs, a, i, ecc_prior=False, e=None, w=None):
     """
 
     rs_a = 1./a                    #Rs/a - rstar in units of semimajor axis
-    b = a*np.cos(i*(np.pi/180))    #convert i to radians
+    b = a*np.cos(i*(np.pi/180.))    #convert i to radians
 
-    T23 = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1-rprs)**2)-b**2))/np.sin(i*(np.pi/180))) #Equation 15 in exoplanet textbook
+    T23 = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1-rprs)**2)-b**2))/np.sin(i*(np.pi/180.))) #Equation 15 in exoplanet textbook
 
     if ecc_prior==True:
         chidot = np.sqrt(1-e**2)/(1+e*np.sin(w*(np.pi/180.))) #Equation 16 in exoplanet textbook
@@ -118,13 +120,13 @@ def find_density_dist_symmetric(ntargs, masses, masserr, radii, raderr):
     ntargs: int
         Number of stars to get distribution for
     masses: np.ndarray
-        Array of stellar masses (solar mass)
+        Average of stellar masses (solar mass)
     masserr: np.ndarray
-        Array of sigma_mass (solar mass)
+        Sigma of mass (solar mass)
     radii: np.ndarray
-        Array of stellar radii (solar radii)
+        Average of stellar radii (solar radii)
     raderr: np.ndarray
-        Array of sigma_radius (solar radii)
+        Sigma of radius (solar radii)
 
     Returns
     -------
@@ -188,7 +190,7 @@ def get_rho_circ(rprs, T14, T23, p):
 
     delta = rprs**2
 
-    rho_circ = (((2*(delta**(1/4)))/np.sqrt(T14**2-T23**2))**3)*((3*p)/(c.G*(c.pi**2)))
+    rho_circ = (((2*(delta**(0.25)))/np.sqrt(T14**2-T23**2))**3)*((3*p)/(c.G*(c.pi**2)))
 
     return rho_circ
 
@@ -461,7 +463,7 @@ def planet_params_from_archive(df, kep_name):
     e = float(df.loc[df['kepler_name'] == kep_name].koi_eccen) #eccentricity (assumed 0)
     w = float(df.loc[df['kepler_name'] == kep_name].koi_longp) #longtitude of periastron (assumed 0)
 
-    return period, period_uerr, period_uerr, rprs, rprs_uerr, rprs_lerr, a_rs, a_rs_uerr, a_rs_lerr, i, e, w
+    return period, period_uerr, period_lerr, rprs, rprs_uerr, rprs_lerr, a_rs, a_rs_uerr, a_rs_lerr, i, e, w
 
 def get_sigmas(dist):
     """Gets + and - sigmas from a distribution (gaussian or not) through a cdf
@@ -517,10 +519,10 @@ def planetlc_fitter(time, per, rp, a, inc):
     params.inc = inc                      #orbital inclination (in degrees)
     params.ecc = 0.0                      #eccentricity
     params.w = 0.0                        #longitude of periastron (in degrees)
-    params.limb_dark = "linear"
-    params.u = [0.3]
-    #params.limb_dark = "quadratic"
-    #params.u = [0.1, 0.3]
+    #params.limb_dark = "linear"
+    #params.u = [0.3]
+    params.limb_dark = "quadratic"
+    params.u = [0.1, 0.3]
     #params.limb_dark = "uniform"
     #params.u = []
 
