@@ -41,3 +41,7 @@ Thumbs.db
 photoeccentric.egg-info/*
 dist/*
 build/*
+
+# Data Files #
+##############
+*.csv
