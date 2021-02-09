@@ -278,24 +278,6 @@ def solar_density():
     sol_density = ((1.*1.989e30)/((4./3.)*np.pi*1.**3*696.34e6**3))
     return sol_density
 
-def density(mass, radius, norm_to=None):
-    """Get density of sphere given mass and radius.
-
-    Parameters
-    ----------
-    mass: float
-        Mass of sphere (kg)
-    radius: float
-        Radius of sphere (m)
-    norm: float, default None
-        Value to normalize to (kg m^-3)
-    """
-
-    if norm==None:
-        return ((mass*1.989e30)/((4./3.)*np.pi*radius**3*696.34e6**3))
-    else:
-        return ((mass*1.989e30)/((4./3.)*np.pi*radius**3*696.34e6**3))/float(norm)
-
 
 def find_density_dist_asymmetric(ntargs, masses, masserr1, masserr2, radii, raderr1, raderr2, logg):
     """Gets asymmetric stellar density distribution for stars, based on asymmetric mass and radius errorbars.
@@ -372,77 +354,5 @@ def find_density_dist_asymmetric(ntargs, masses, masserr1, masserr2, radii, rade
             mass_dist[star] = mass_temp
             rad_dist[star] = rad_temp
 
-
-    return rho_dist, mass_dist, rad_dist
-
-
-def find_density_dist_symmetric(ntargs, masses, masserr, radii, raderr):
-    """Gets symmetric stellar density distribution for stars.
-    Symmetric stellar density distribution = Gaussian with same sigma on each end.
-
-    Parameters
-    ----------
-    ntargs: int
-        Number of stars to get distribution for
-    masses: np.ndarray
-        Array of stellar masses (solar mass)
-    masserr: np.ndarray
-        Array of sigma_mass (solar mass)
-    radii: np.ndarray
-        Array of stellar radii (solar radii)
-    raderr: np.ndarray
-        Array of sigma_radius (solar radii)
-
-    Returns
-    -------
-    rho_dist: np.ndarray
-        Array of density distributions for each star
-        Each element length 1000
-    mass_dist: np.ndarray
-        Array of symmetric Gaussian mass distributions for each star
-        Each element length 1000
-    rad_dist: np.ndarray
-        Array of symmetric Gaussian radius distributions for each star
-        Each element length 1000
-    """
-
-    rho_dist = np.zeros((ntargs, 1000))
-    mass_dist = np.zeros((ntargs, 1000))
-    rad_dist = np.zeros((ntargs, 1000))
-
-    #star: indexing star
-    #point: indexing PDF point for star
-    for star in tqdm(range(ntargs)):
-
-        rho_temp = np.zeros(1200)
-        mass_temp = np.zeros(1200)
-        rad_temp = np.zeros(1200)
-
-        #####
-        mass_temp = np.random.normal(masses[star], masserr[star], 1200)
-        #len 1200
-        rad_temp = np.random.normal(radii[star], raderr[star], 1200)
-        #len 1200
-        #####
-
-        #for j from 0 to 1200
-        #for each point in individual star PDF
-        #Adding each density point to rho_temp (specific to this star)
-        for point in range(len(mass_temp)):
-            #if mass_dist[point] >= 0. and rad_dist[point] >= 0:
-            if True:
-                rho_temp[point] = density(mass_temp[point], rad_temp[point], sol_density())
-
-        #Now rho_temp is a n-long array with this star. We want it to be 1000-long exactly
-
-        while len(rho_temp) > 1000:
-            temp_ind = np.random.randint(0, len(rho_temp)-1)
-            rho_temp = np.delete(rho_temp, temp_ind)
-            mass_temp = np.delete(mass_temp, temp_ind)
-            rad_temp = np.delete(rad_temp, temp_ind)
-        else:
-            rho_dist[star] = rho_temp
-            mass_dist[star] = mass_temp
-            rad_dist[star] = rad_temp
 
     return rho_dist, mass_dist, rad_dist

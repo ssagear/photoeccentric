@@ -9,7 +9,7 @@ import batman
 from .stellardensity import *
 from .spectroscopy import *
 
-def get_T14(p, rprs, a, i, ecc_prior=False, e=None, w=None):
+def get_T14(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
     """
     Calculates T14 (total transit duration, 1st to 4th contact).
     Assumes a circular orbit (e=0, w=0) if ecc_prior=False.
@@ -21,7 +21,7 @@ def get_T14(p, rprs, a, i, ecc_prior=False, e=None, w=None):
         Period (seconds)
     rprs: float
         Planet radius/stellar radius
-    a: float
+    a_rs: float
         Semi-major axis (in stellar radii) (a/Rs)
     i: floar
         Inclination (degrees)
@@ -38,10 +38,8 @@ def get_T14(p, rprs, a, i, ecc_prior=False, e=None, w=None):
         Total transit duration (seconds)
     """
 
-    rs_a = 1.0/a                  # Rs/a - rstar in units of semimajor axis
-    b = a*np.cos(i*(np.pi/180.0))   # convert i to radians
-    #print('b', b)
-    #print('i', i)
+    rs_a = 1.0/a_rs                  # Rs/a - rstar in units of semimajor axis
+    b = a_rs*np.cos(i*(np.pi/180.0))   # convert i to radians
 
     T14 = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1+rprs)**2)-b**2))/np.sin(i*(np.pi/180.0))) #Equation 14 in exoplanet textbook
 
@@ -93,6 +91,38 @@ def get_T23(p, rprs, a, i, ecc_prior=False, e=None, w=None):
 
     return T23
 
+def calc_a(period, smass, srad):
+    """Calculates semi-major axis from planet period and stellar mass
+    Kepler's 3rd law
+
+    Parameters
+    ----------
+    period: float
+        Planet period (SECONDS)
+    smass: float
+        Stellar mass (KG)
+    srad: float
+        Stellar radius (METERS)
+
+    Returns
+    -------
+    a: float
+        a/Rs: Semi-major axis of planet's orbit (units of stellar radii)
+    """
+
+    # p_yr = period/365.0
+    #
+    #
+    # a_cube = (p_yr**2)*smass
+    # a_au = np.cbrt(a_cube)     #a in AU
+    # a_solr = a_au*215.032      #a in solar radii
+    #
+    # a = a_solr/srad            #a in stellar radii
+
+    a = np.cbrt((period**2*c.G*smass)/(4*np.pi**2*srad**3)) # a on rstar
+
+    return a
+
 def density(mass, radius):
     """Get density of sphere given mass and radius.
 
@@ -111,20 +141,75 @@ def density(mass, radius):
     rho = mass/((4.0/3.0)*np.pi*radius**3)
     return rho
 
-def find_density_dist_symmetric(ntargs, masses, masserr, radii, raderr):
+# def find_density_dist_symmetric(ntargs, masses, masserr, radii, raderr):
+#     """Gets symmetric stellar density distribution for stars.
+#     Symmetric stellar density distribution = Gaussian with same sigma on each end.
+#
+#     Parameters
+#     ----------
+#     ntargs: int
+#         Number of stars to get distribution for
+#     masses: np.ndarray
+#         Average of stellar masses (solar mass)
+#     masserr: np.ndarray
+#         Sigma of mass (solar mass)
+#     radii: np.ndarray
+#         Average of stellar radii (solar radii)
+#     raderr: np.ndarray
+#         Sigma of radius (solar radii)
+#
+#     Returns
+#     -------
+#     rho_dist: np.ndarray
+#         Array of density distributions for each star in kg/m^3
+#         Each element length 1000
+#     mass_dist: np.ndarray
+#         Array of symmetric Gaussian mass distributions for each star in kg
+#         Each element length 1000
+#     rad_dist: np.ndarray
+#         Array of symmetric Gaussian radius distributions for each star in m
+#         Each element length 1000
+#     """
+#
+#     smass_kg = 1.9885e30  # Solar mass (kg)
+#     srad_m = 696.34e6     # Solar radius (m)
+#
+#     rho_dist = np.zeros((ntargs, 1000))
+#     mass_dist = np.zeros((ntargs, 1000))
+#     rad_dist = np.zeros((ntargs, 1000))
+#
+#     for star in tqdm(range(ntargs)):
+#
+#         rho_temp = np.zeros(1000)
+#         mass_temp = np.zeros(1000)
+#         rad_temp = np.zeros(1000)
+#
+#         mass_temp = np.random.normal(masses[star]*smass_kg, masserr[star]*smass_kg, 1000)
+#         rad_temp = np.random.normal(radii[star]*srad_m, raderr[star]*srad_m, 1000)
+#
+#         #Add each density point to rho_temp (for each star)
+#         for point in range(len(mass_temp)):
+#             rho_temp[point] = density(mass_temp[point], rad_temp[point])
+#
+#         rho_dist[star] = rho_temp
+#         mass_dist[star] = mass_temp
+#         rad_dist[star] = rad_temp
+#
+#
+#     return rho_dist, mass_dist, rad_dist
+
+def find_density_dist_symmetric(mass, masserr, radius, raderr):
     """Gets symmetric stellar density distribution for stars.
     Symmetric stellar density distribution = Gaussian with same sigma on each end.
 
     Parameters
     ----------
-    ntargs: int
-        Number of stars to get distribution for
-    masses: np.ndarray
-        Average of stellar masses (solar mass)
+    mass: float
+        Mean stellar mass (solar mass)
     masserr: np.ndarray
         Sigma of mass (solar mass)
-    radii: np.ndarray
-        Average of stellar radii (solar radii)
+    radius: float
+        Mean stellar radius (solar radii)
     raderr: np.ndarray
         Sigma of radius (solar radii)
 
@@ -132,38 +217,26 @@ def find_density_dist_symmetric(ntargs, masses, masserr, radii, raderr):
     -------
     rho_dist: np.ndarray
         Array of density distributions for each star in kg/m^3
-        Each element length 1000
+        Length 1000
     mass_dist: np.ndarray
         Array of symmetric Gaussian mass distributions for each star in kg
-        Each element length 1000
+        Length 1000
     rad_dist: np.ndarray
         Array of symmetric Gaussian radius distributions for each star in m
-        Each element length 1000
+        Length 1000
     """
 
     smass_kg = 1.9885e30  # Solar mass (kg)
     srad_m = 696.34e6     # Solar radius (m)
 
-    rho_dist = np.zeros((ntargs, 1000))
-    mass_dist = np.zeros((ntargs, 1000))
-    rad_dist = np.zeros((ntargs, 1000))
+    rho_dist = np.zeros(1000)
 
-    for star in tqdm(range(ntargs)):
+    mass_dist = np.random.normal(mass*smass_kg, masserr*smass_kg, 1000)
+    rad_dist = np.random.normal(radius*srad_m, raderr*srad_m, 1000)
 
-        rho_temp = np.zeros(1000)
-        mass_temp = np.zeros(1000)
-        rad_temp = np.zeros(1000)
-
-        mass_temp = np.random.normal(masses[star]*smass_kg, masserr[star]*smass_kg, 1000)
-        rad_temp = np.random.normal(radii[star]*srad_m, raderr[star]*srad_m, 1000)
-
-        #Add each density point to rho_temp (for each star)
-        for point in range(len(mass_temp)):
-            rho_temp[point] = density(mass_temp[point], rad_temp[point])
-
-        rho_dist[star] = rho_temp
-        mass_dist[star] = mass_temp
-        rad_dist[star] = rad_temp
+    #Add each density point to rho_temp (for each star)
+    for point in range(len(mass_dist)):
+        rho_dist[point] = density(mass_dist[point], rad_dist[point])
 
 
     return rho_dist, mass_dist, rad_dist
@@ -307,7 +380,7 @@ def row_to_top(df, index):
 
 
 
-def get_g_distribution(rhos, p, perr, rprs, rprserr, a, i, T14, T14err, T23, T23err):
+def get_g_distribution(rhos, p, perr, rprs, rprserr, T14, T14err, T23, T23err):
     """Gets g distribution for a KOI.
 
     Parameters
@@ -322,10 +395,6 @@ def get_g_distribution(rhos, p, perr, rprs, rprserr, a, i, T14, T14err, T23, T23
         Best-fit rp/rs
     rorserr: float
         Sigma of rprs
-    a: float
-        Best-fit semi-major axis (in stellar radii)
-    i: float
-        Best-fit inclination (degrees)
     T14: float
         Total transit duration (seconds) calculated from best-fit planet parameters
     T23: float
@@ -338,10 +407,7 @@ def get_g_distribution(rhos, p, perr, rprs, rprserr, a, i, T14, T14err, T23, T23
     """
 
     gs = np.zeros((len(rhos)))
-
     rho_circ = np.zeros(len(rhos))
-    rho_ratios = np.zeros(len(rhos))
-    T23_dist = np.zeros((len(rhos)))
 
     per_dist = np.random.normal(p, perr, size=1000)
     rprs_dist = np.random.normal(rprs, rprserr, size=1000)
@@ -507,7 +573,7 @@ def get_e_from_def(g, w):
     e = num/den
     return e
 
-def planetlc_fitter(time, per, rp, a, inc):
+def planetlc_fitter(time, per, rp, a, inc, w):
     """Always assumes e=0.
     w is not a free parameter."""
 
@@ -518,13 +584,13 @@ def planetlc_fitter(time, per, rp, a, inc):
     params.a = a                          #semi-major axis (in units of stellar radii)
     params.inc = inc                      #orbital inclination (in degrees)
     params.ecc = 0.0                      #eccentricity
-    params.w = 0.0                        #longitude of periastron (in degrees)
+    params.w = w                        #longitude of periastron (in degrees)
     #params.limb_dark = "linear"
     #params.u = [0.3]
-    params.limb_dark = "quadratic"
-    params.u = [0.1, 0.3]
-    #params.limb_dark = "uniform"
-    #params.u = []
+    #params.limb_dark = "quadratic"
+    #params.u = [0.1, 0.3]
+    params.limb_dark = "uniform"
+    params.u = []
 
     #times to calculate light curve
     m = batman.TransitModel(params, time)
