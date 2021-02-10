@@ -575,7 +575,7 @@ def get_e_from_def(g, w):
 
 def planetlc_fitter(time, per, rp, a, inc, w):
     """Always assumes e=0.
-    w is not a free parameter."""
+    w is a free parameter."""
 
     params = batman.TransitParams()       #object to store transit parameters
     params.t0 = 0.                        #time of inferior conjunction

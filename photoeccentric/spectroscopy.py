@@ -6,84 +6,42 @@ from tqdm import tqdm
 import glob
 
 
-def fit_isochrone(data, isochrones):
-    """Pulls isochrones where effective temperature, mass, and radius fall within 1-sigma errorbars from an observed star.
-
-       Parameters
-       ----------
-       data: pd.DataFrame
-            Spectroscopic data + Kepler/Gaia data for n stars in one table. (`muirhead_comb`)
-       isochrones: pd.DataFrame
-            Table of isochrones (models). (`isochrones`)
-
-       Returns
-       -------
-       iso_fits_final: list of pd.DataFrame
-            Each element of list returend is a table of the isochrones that fit this star (index matches) based ONLY on spectroscopy.
-       """
-
-    iso_fits_final = list()
-
-    #test each star in spectroscopy sample:
-    for i in tqdm(range(len(muirhead_comb))):
-
-        iso_fits = pd.DataFrame()
-
-        Teff_range = [data.Teff[i]-data.eTeff[i], data.Teff[i]+data.ETeff[i]]
-        Mstar_range = [data.Mstar[i]-data.e_Mstar[i], data.Mstar[i]+data.e_Mstar[i]]
-        Rstar_range = [data.Rstar[i]-data.e_Rstar[i], data.Rstar[i]+data.e_Rstar[i]]
-
-        #test each stellar model to see if it falls within error bars:
-        for j in range(len(isochrones)):
-            if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1]:
-                iso_fits = iso_fits.append(isochrones.loc[[j]])
-
-        iso_fits['KIC'] = muirhead_comb['KIC'][i]
-        iso_fits['KOI'] = muirhead_comb['KOI'][i]
-
-        iso_fits_final.append(iso_fits)
-
-    return iso_fits_final
-
-
-def fit_isochrone_lum(data, isochrones):
+def fit_isochrone_lum(data, stellarobs, isochrones, gaia_lum=True):
     """Pulls isochrones where effective temperature, mass, radius, and luminosity fall within 1-sigma errorbars from an observed star.
 
-       Parameters
-       ----------
-       data: pd.DataFrame
-            Spectroscopic data + Kepler/Gaia data for n stars in one table. (`muirhead_comb`)
-       isochrones: pd.DataFrame
-            Table of isochrones (models). (`isochrones`)
+   Parameters
+   ----------
+   data: pandas.DataFrame
+       Spectroscopic data + Kepler/Gaia for n stars in one table. (muirhead_comb)
+   isochrones: pandas.DataFrame
+       Isochrones table. (isochrones)
 
-       Returns
-       -------
-       iso_fits_final: list of pd.DataFrame
-            Each element of list returend is a table of the isochrones that fit this star (index matches) based on spectroscopy AND Gaia luminosity.
-       """
+   Returns
+   -------
+   iso_fits_final: pandas.DataFrame()
+       All isochrones that are consistent with this star based on spectroscopy and Gaia luminosity.
+   """
 
-    iso_fits_final = list()
+    iso_fits = pd.DataFrame()
 
-    #for i in tqdm(range(len(muirhead_comb))):
-    for i in range(1):
+    Teff_range = [float(data.Teff)-float(data.eTeff), float(data.Teff)+float(data.ETeff)]
+    Mstar_range = [float(data.Mstar)-float(data.e_Mstar), float(data.Mstar)+float(data.e_Mstar)]
+    Rstar_range = [float(data.Rstar)-float(data.e_Rstar), float(data.Rstar)+float(data.e_Rstar)]
+    lum_range = [float(data.lum_val)-float(data.lum_percentile_lower), float(data.lum_val)+float(data.lum_percentile_lower)]
 
-        iso_fits = pd.DataFrame()
-
-        Teff_range = [data.Teff[i]-data.eTeff[i], data.Teff[i]+data.ETeff[i]]
-        Mstar_range = [data.Mstar[i]-data.e_Mstar[i], data.Mstar[i]+data.e_Mstar[i]]
-        Rstar_range = [data.Rstar[i]-data.e_Rstar[i], data.Rstar[i]+data.e_Rstar[i]]
-        lum_range = [data.lum_val[i]-data.lum_percentile_lower[i], data.lum_val[i]+data.lum_percentile_lower[i]]
-
-        for j in range(len(isochrones)):
+    for j in tqdm(range(len(isochrones))):
+        if gaia_lum==True:
             if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1] and lum_range[0] < 10**isochrones.logl_ls[j] < lum_range[1]:
                 iso_fits = iso_fits.append(isochrones.loc[[j]])
 
-        iso_fits['KIC'] = muirhead_comb['KIC'][i]
-        iso_fits['KOI'] = muirhead_comb['KOI'][i]
+        if gaia_lum==False:
+            if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1]:
+                iso_fits = iso_fits.append(isochrones.loc[[j]])
 
-        iso_fits_final.append(iso_fits)
+    iso_fits['KIC'] = stellarobs['KIC']
+    iso_fits['KOI'] = stellarobs['KOI']
 
-    return iso_fits_final
+    return iso_fits
 
 
 
