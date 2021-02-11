@@ -45,3 +45,4 @@ build/*
 # Data Files #
 ##############
 *.csv
+notebooks/MAST_2021-02-10T1313/*
