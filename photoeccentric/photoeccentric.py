@@ -17,13 +17,13 @@ def get_T14(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
 
     Parameters
     ----------
-    p: float
-        Period (seconds)
-    rprs: float
+    p: np.array
+        Period (days)
+    rprs: np.array
         Planet radius/stellar radius
-    a_rs: float
+    a_rs: np.array
         Semi-major axis (in stellar radii) (a/Rs)
-    i: floar
+    i: np.array
         Inclination (degrees)
     ecc: boolean
         Eccentricity taken into account? Default False
@@ -37,35 +37,43 @@ def get_T14(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
     T14: float
         Total transit duration (seconds)
     """
+    nf = len(p)
 
-    rs_a = 1.0/a_rs                  # Rs/a - rstar in units of semimajor axis
-    b = a_rs*np.cos(i*(np.pi/180.0))   # convert i to radians
+    T14 = np.zeros(nf)
+    rs_a = np.zeros(nf)
+    b = np.zeros(nf)
 
-    T14 = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1+rprs)**2)-b**2))/np.sin(i*(np.pi/180.0))) #Equation 14 in exoplanet textbook
+    chidot = np.zeros(nf)
 
-    if ecc_prior==True:
-        chidot = np.sqrt(1-e**2)/(1+e*np.sin(w*(np.pi/180.0))) #Equation 16 in exoplanet textbook
-        return T14*chidot
+    for j in range(nf):
+
+        p[j] = p[j]*86400
+
+        rs_a[j] = 1.0/a_rs[j]                  # Rs/a - rstar in units of semimajor axis
+        b[j] = a_rs[j]*np.cos(i[j]*(np.pi/180.0))   # convert i to radians
+
+        T14[j] = (p[j]/np.pi)*np.arcsin(rs_a[j]*(np.sqrt(((1+rprs[j])**2)-b[j]**2))/np.sin(i[j]*(np.pi/180.0))) #Equation 14 in exoplanet textbook
+
+        if ecc_prior==True:
+            chidot[j] = np.sqrt(1-e[j]**2)/(1+e[j]*np.sin(w[j]*(np.pi/180.0))) #Equation 16 in exoplanet textbook
+            return T14[j]*chidot[j]
 
     return T14
 
 
-def get_T23(p, rprs, a, i, ecc_prior=False, e=None, w=None):
+def get_T23(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
     """
     Calculates T23 (full transit duration, 1st to 4th contact).
     Assumes a circular orbit (e=0, w=0) if ecc_prior=False.
     If ecc_prior=True, e and w are required. T23 is multiplied by an eccentricity factor.
 
-
-    Parameters
-    ----------
-    p: float
-        Period (seconds)
-    rprs: float
+    p: np.array
+        Period (days)
+    rprs: np.array
         Planet radius/stellar radius
-    a: float
+    a_rs: np.array
         Semi-major axis (in stellar radii) (a/Rs)
-    i: floar
+    i: np.array
         Inclination (degrees)
     ecc: boolean
         Eccentricity taken into account? Default False
@@ -80,16 +88,29 @@ def get_T23(p, rprs, a, i, ecc_prior=False, e=None, w=None):
         Full transit time (seconds)
     """
 
-    rs_a = 1./a                    #Rs/a - rstar in units of semimajor axis
-    b = a*np.cos(i*(np.pi/180.))    #convert i to radians
+    nf = len(p)
 
-    T23 = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1-rprs)**2)-b**2))/np.sin(i*(np.pi/180.))) #Equation 15 in exoplanet textbook
+    T23 = np.zeros(nf)
+    rs_a = np.zeros(nf)
+    b = np.zeros(nf)
 
-    if ecc_prior==True:
-        chidot = np.sqrt(1-e**2)/(1+e*np.sin(w*(np.pi/180.))) #Equation 16 in exoplanet textbook
-        return T23*chidot
+    chidot = np.zeros(nf)
+
+    for j in range(nf):
+
+        p[j] = p[j]#*86400
+
+        rs_a[j] = 1.0/a_rs[j]                  # Rs/a - rstar in units of semimajor axis
+        b[j] = a_rs[j]*np.cos(i[j]*(np.pi/180.0))   # convert i to radians
+
+        T23[j] = (p[j]/np.pi)*np.arcsin(rs_a[j]*(np.sqrt(((1-rprs[j])**2)-b[j]**2))/np.sin(i[j]*(np.pi/180.0))) #Equation 14 in exoplanet textbook
+
+        if ecc_prior==True:
+            chidot[j] = np.sqrt(1-e[j]**2)/(1+e[j]*np.sin(w[j]*(np.pi/180.0))) #Equation 16 in exoplanet textbook
+            return T23[j]*chidot[j]
 
     return T23
+
 
 def calc_a(period, smass, srad):
     """Calculates semi-major axis from planet period and stellar mass
@@ -198,7 +219,7 @@ def density(mass, radius):
 #
 #     return rho_dist, mass_dist, rad_dist
 
-def find_density_dist_symmetric(mass, masserr, radius, raderr):
+def find_density_dist_symmetric(mass, masserr, radius, raderr, npoints):
     """Gets symmetric stellar density distribution for stars.
     Symmetric stellar density distribution = Gaussian with same sigma on each end.
 
@@ -212,27 +233,28 @@ def find_density_dist_symmetric(mass, masserr, radius, raderr):
         Mean stellar radius (solar radii)
     raderr: np.ndarray
         Sigma of radius (solar radii)
+    npoints: int
 
     Returns
     -------
     rho_dist: np.ndarray
         Array of density distributions for each star in kg/m^3
-        Length 1000
+        Length npoints
     mass_dist: np.ndarray
         Array of symmetric Gaussian mass distributions for each star in kg
-        Length 1000
+        Length npoints
     rad_dist: np.ndarray
         Array of symmetric Gaussian radius distributions for each star in m
-        Length 1000
+        Length 100npoints0
     """
 
     smass_kg = 1.9885e30  # Solar mass (kg)
     srad_m = 696.34e6     # Solar radius (m)
 
-    rho_dist = np.zeros(1000)
+    rho_dist = np.zeros(npoints)
 
-    mass_dist = np.random.normal(mass*smass_kg, masserr*smass_kg, 1000)
-    rad_dist = np.random.normal(radius*srad_m, raderr*srad_m, 1000)
+    mass_dist = np.random.normal(mass*smass_kg, masserr*smass_kg, npoints)
+    rad_dist = np.random.normal(radius*srad_m, raderr*srad_m, npoints)
 
     #Add each density point to rho_temp (for each star)
     for point in range(len(mass_dist)):
@@ -263,7 +285,10 @@ def get_rho_circ(rprs, T14, T23, p):
 
     delta = rprs**2
 
-    rho_circ = (((2*(delta**(0.25)))/np.sqrt(T14**2-T23**2))**3)*((3*p)/(c.G*(c.pi**2)))
+    if T14 >= T23:
+        rho_circ = (((2*(delta**(0.25)))/np.sqrt(T14**2-T23**2))**3)*((3*p)/(c.G*(c.pi**2)))
+    else:
+        rho_circ = np.nan
 
     return rho_circ
 
@@ -380,24 +405,20 @@ def row_to_top(df, index):
 
 
 
-def get_g_distribution(rhos, p, perr, rprs, rprserr, T14, T14err, T23, T23err):
+def get_g_distribution(rhos, per_dist, rprs_dist, T14_dist, T23_dist):
     """Gets g distribution for a KOI.
 
     Parameters
     ----------
-    rhos: array
+    rhos: np.array
         Density histogram
-    p: float
-        Best-fit period (seconds)
-    perr: float
-        Sigma of period
-    rprs: float
+    per_dist: np.array
+        Best-fit period (days)
+    rprs_dist: np.array
         Best-fit rp/rs
-    rorserr: float
-        Sigma of rprs
-    T14: float
+    T14_dist: np.array
         Total transit duration (seconds) calculated from best-fit planet parameters
-    T23: float
+    T23_dist: np.array
         Full transit duration (seconds) calculated from best-fit planet parameters
 
     Returns
@@ -409,14 +430,10 @@ def get_g_distribution(rhos, p, perr, rprs, rprserr, T14, T14err, T23, T23err):
     gs = np.zeros((len(rhos)))
     rho_circ = np.zeros(len(rhos))
 
-    per_dist = np.random.normal(p, perr, size=1000)
-    rprs_dist = np.random.normal(rprs, rprserr, size=1000)
-
-    T14_dist = np.random.normal(T14, T14err, size=1000)
-    T23_dist = np.random.normal(T23, T23err, size=1000)
-
     #for element in histogram for star:
-    for j in tqdm(range(len(rhos))):
+    for j in range(len(rhos)):
+
+        per_dist[j] = per_dist[j]#*86400.
 
         rho_circ[j] = get_rho_circ(rprs_dist[j], T14_dist[j], T23_dist[j], per_dist[j])
 
@@ -425,7 +442,7 @@ def get_g_distribution(rhos, p, perr, rprs, rprserr, T14, T14err, T23, T23err):
 
 
 
-    return gs, rho_circ, rhos, T14_dist, T23_dist
+    return gs, rho_circ, rhos
 
 def get_inclination(b, a_rs):
     """Get inclination (in degrees) from an impact parameter and semi-major axis (on stellar radius).
