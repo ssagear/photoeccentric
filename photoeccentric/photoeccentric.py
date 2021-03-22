@@ -548,8 +548,9 @@ def planet_params_from_archive(df, kep_name):
 
     return period, period_uerr, period_lerr, rprs, rprs_uerr, rprs_lerr, a_rs, a_rs_uerr, a_rs_lerr, i, e, w
 
+
 def get_sigmas(dist):
-    """Gets + and - sigmas from a distribution (gaussian or not) through a cdf
+    """Gets + and - sigmas from a distribution (gaussian or not). Ignores nan values.
 
     Parameters
     ----------
@@ -563,9 +564,9 @@ def get_sigmas(dist):
     sigma_plus: float
         + sigma
     """
-    x, cdf = get_cdf(dist)
-    sigma_minus = find_sigma(x, cdf, "-")
-    sigma_plus = find_sigma(x, cdf, "+")
+
+    sigma_minus = np.nanpercentile(dist, 50)-np.nanpercentile(dist, 16)
+    sigma_plus = np.nanpercentile(dist, 84)-np.nanpercentile(dist, 50)
 
     return sigma_minus, sigma_plus
 
