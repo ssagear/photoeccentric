@@ -194,39 +194,24 @@ def remove_nans(nan_indices, stellar_prop):
     stellar_prop_nonans = np.delete(stellar_prop, nan_i)
     return stellar_prop_nonans
 
+def density(mass, radius):
+    """Get density of sphere given mass and radius.
 
-# def asymmetric_gaussian(mean, sigma_minus, sigma_plus):
-#     """Generates an asymmetric Gaussian distribution based on a mean and 2 different sigmas (one (-) and one (+))
-#     Made by generating 2 symmetric Gaussians with different sigmas and sticking them together at the mean.
-#     The integral of the resulting Gaussian is 1.
-#
-#     Parameters
-#     ----------
-#     mean: float
-#         Mean of distribution
-#     sigma_minus: float
-#         Negative sigma of distribtion
-#     sigma_plus: float
-#         Positive sigma of distribtion
-#
-#     Results
-#     -------
-#     dist: np.ndarray
-#         Asymmetric Gaussian distribution, length 1200
-#     """
-#
-#     left = np.random.normal(mean, abs(sigma_minus), 1300)
-#     right = np.random.normal(mean, abs(sigma_plus), 1300)
-#     dist_left = left[left<mean]
-#     dist_right = right[right>=mean]
-#     dist = np.concatenate((dist_right, dist_left), axis=None)
-#
-#     np.random.shuffle(dist)
-#
-#     while len(dist) > 1200:
-#         dist = np.delete(dist, [np.random.randint(0, len(dist)-1)])
-#     else:
-#         return dist
+    Parameters
+    ----------
+    mass: float
+        Mass of sphere (kg)
+    radius: float
+        Radius of sphere (m)
+
+    Returns
+    rho: float
+        Density of sphere (kg*m^-3)
+    """
+
+    rho = mass/((4.0/3.0)*np.pi*radius**3)
+    return rho
+
 
 def asymmetric_gaussian(mean, sigma_minus, sigma_plus, nvals):
     """Generates an asymmetric Gaussian distribution based on a mean and 2 different sigmas (one (-) and one (+))
@@ -277,6 +262,52 @@ def solar_density():
     """
     sol_density = ((1.*1.989e30)/((4./3.)*np.pi*1.**3*696.34e6**3))
     return sol_density
+
+
+def find_density_dist_symmetric(mass, masserr, radius, raderr, npoints):
+    """Gets symmetric stellar density distribution for stars.
+    Symmetric stellar density distribution = Gaussian with same sigma on each end.
+
+    Parameters
+    ----------
+    mass: float
+        Mean stellar mass (solar mass)
+    masserr: np.ndarray
+        Sigma of mass (solar mass)
+    radius: float
+        Mean stellar radius (solar radii)
+    raderr: np.ndarray
+        Sigma of radius (solar radii)
+    npoints: int
+
+    Returns
+    -------
+    rho_dist: np.ndarray
+        Array of density distributions for each star in kg/m^3
+        Length npoints
+    mass_dist: np.ndarray
+        Array of symmetric Gaussian mass distributions for each star in kg
+        Length npoints
+    rad_dist: np.ndarray
+        Array of symmetric Gaussian radius distributions for each star in m
+        Length 100npoints0
+    """
+
+    smass_kg = 1.9885e30  # Solar mass (kg)
+    srad_m = 696.34e6     # Solar radius (m)
+
+    rho_dist = np.zeros(npoints)
+
+    mass_dist = np.random.normal(mass*smass_kg, masserr*smass_kg, npoints)
+    rad_dist = np.random.normal(radius*srad_m, raderr*srad_m, npoints)
+
+    #Add each density point to rho_temp (for each star)
+    for point in range(len(mass_dist)):
+        rho_dist[point] = density(mass_dist[point], rad_dist[point])
+
+
+    return rho_dist, mass_dist, rad_dist
+
 
 
 def find_density_dist_asymmetric(ntargs, masses, masserr1, masserr2, radii, raderr1, raderr2, logg):

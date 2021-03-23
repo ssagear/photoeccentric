@@ -6,8 +6,37 @@ import scipy.constants as c
 from tqdm import tqdm
 import batman
 
+import emcee
+import corner
+
 from .stellardensity import *
 from .spectroscopy import *
+
+def bls(time, nflux):
+    """Applies astropy Box Least-Squares to light curve to fit period
+
+    Parameters
+    ----------
+    time: np.array
+        Time array
+    nflux: np.array
+        Flux array
+
+
+    Returns
+    -------
+    per_guess: float
+        Period fit from BLS
+    """
+
+    from astropy.timeseries import BoxLeastSquares
+    import astropy.units as u
+
+    mod = BoxLeastSquares(time*u.day, nflux, dy=0.01)
+    periodogram = mod.autopower(0.2, objective="snr")
+    per_guess = np.asarray(periodogram.period)[int(np.median(np.argmax(periodogram.power)))]
+
+    return per_guess
 
 def get_T14(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
     """
@@ -131,137 +160,10 @@ def calc_a(period, smass, srad):
         a/Rs: Semi-major axis of planet's orbit (units of stellar radii)
     """
 
-    # p_yr = period/365.0
-    #
-    #
-    # a_cube = (p_yr**2)*smass
-    # a_au = np.cbrt(a_cube)     #a in AU
-    # a_solr = a_au*215.032      #a in solar radii
-    #
-    # a = a_solr/srad            #a in stellar radii
-
     a = np.cbrt((period**2*c.G*smass)/(4*np.pi**2*srad**3)) # a on rstar
 
     return a
 
-def density(mass, radius):
-    """Get density of sphere given mass and radius.
-
-    Parameters
-    ----------
-    mass: float
-        Mass of sphere (kg)
-    radius: float
-        Radius of sphere (m)
-
-    Returns
-    rho: float
-        Density of sphere (kg*m^-3)
-    """
-
-    rho = mass/((4.0/3.0)*np.pi*radius**3)
-    return rho
-
-# def find_density_dist_symmetric(ntargs, masses, masserr, radii, raderr):
-#     """Gets symmetric stellar density distribution for stars.
-#     Symmetric stellar density distribution = Gaussian with same sigma on each end.
-#
-#     Parameters
-#     ----------
-#     ntargs: int
-#         Number of stars to get distribution for
-#     masses: np.ndarray
-#         Average of stellar masses (solar mass)
-#     masserr: np.ndarray
-#         Sigma of mass (solar mass)
-#     radii: np.ndarray
-#         Average of stellar radii (solar radii)
-#     raderr: np.ndarray
-#         Sigma of radius (solar radii)
-#
-#     Returns
-#     -------
-#     rho_dist: np.ndarray
-#         Array of density distributions for each star in kg/m^3
-#         Each element length 1000
-#     mass_dist: np.ndarray
-#         Array of symmetric Gaussian mass distributions for each star in kg
-#         Each element length 1000
-#     rad_dist: np.ndarray
-#         Array of symmetric Gaussian radius distributions for each star in m
-#         Each element length 1000
-#     """
-#
-#     smass_kg = 1.9885e30  # Solar mass (kg)
-#     srad_m = 696.34e6     # Solar radius (m)
-#
-#     rho_dist = np.zeros((ntargs, 1000))
-#     mass_dist = np.zeros((ntargs, 1000))
-#     rad_dist = np.zeros((ntargs, 1000))
-#
-#     for star in tqdm(range(ntargs)):
-#
-#         rho_temp = np.zeros(1000)
-#         mass_temp = np.zeros(1000)
-#         rad_temp = np.zeros(1000)
-#
-#         mass_temp = np.random.normal(masses[star]*smass_kg, masserr[star]*smass_kg, 1000)
-#         rad_temp = np.random.normal(radii[star]*srad_m, raderr[star]*srad_m, 1000)
-#
-#         #Add each density point to rho_temp (for each star)
-#         for point in range(len(mass_temp)):
-#             rho_temp[point] = density(mass_temp[point], rad_temp[point])
-#
-#         rho_dist[star] = rho_temp
-#         mass_dist[star] = mass_temp
-#         rad_dist[star] = rad_temp
-#
-#
-#     return rho_dist, mass_dist, rad_dist
-
-def find_density_dist_symmetric(mass, masserr, radius, raderr, npoints):
-    """Gets symmetric stellar density distribution for stars.
-    Symmetric stellar density distribution = Gaussian with same sigma on each end.
-
-    Parameters
-    ----------
-    mass: float
-        Mean stellar mass (solar mass)
-    masserr: np.ndarray
-        Sigma of mass (solar mass)
-    radius: float
-        Mean stellar radius (solar radii)
-    raderr: np.ndarray
-        Sigma of radius (solar radii)
-    npoints: int
-
-    Returns
-    -------
-    rho_dist: np.ndarray
-        Array of density distributions for each star in kg/m^3
-        Length npoints
-    mass_dist: np.ndarray
-        Array of symmetric Gaussian mass distributions for each star in kg
-        Length npoints
-    rad_dist: np.ndarray
-        Array of symmetric Gaussian radius distributions for each star in m
-        Length 100npoints0
-    """
-
-    smass_kg = 1.9885e30  # Solar mass (kg)
-    srad_m = 696.34e6     # Solar radius (m)
-
-    rho_dist = np.zeros(npoints)
-
-    mass_dist = np.random.normal(mass*smass_kg, masserr*smass_kg, npoints)
-    rad_dist = np.random.normal(radius*srad_m, raderr*srad_m, npoints)
-
-    #Add each density point to rho_temp (for each star)
-    for point in range(len(mass_dist)):
-        rho_dist[point] = density(mass_dist[point], rad_dist[point])
-
-
-    return rho_dist, mass_dist, rad_dist
 
 def get_rho_circ(rprs, T14, T23, p):
     """Returns stellar density, assuming a perfectly circular planetary orbit.
@@ -425,6 +327,8 @@ def get_g_distribution(rhos, per_dist, rprs_dist, T14_dist, T23_dist):
     -------
     gs: np.array
         g distribution for star/planet.
+    rho_circ: np.array
+        Density distribution assuming a circular orbit
     """
 
     gs = np.zeros((len(rhos)))
@@ -440,9 +344,7 @@ def get_g_distribution(rhos, per_dist, rprs_dist, T14_dist, T23_dist):
         g = get_g(rho_circ[j], rhos[j])
         gs[j] = g
 
-
-
-    return gs, rho_circ, rhos
+    return gs, rho_circ
 
 def get_inclination(b, a_rs):
     """Get inclination (in degrees) from an impact parameter and semi-major axis (on stellar radius).
@@ -645,3 +547,138 @@ def log_probability(theta, g, gerr):
     if not np.isfinite(lp):
         return -np.inf
     return lp + log_likelihood(theta, g, gerr)
+
+    
+
+def tfit_log_likelihood(theta, time, flux, flux_err):
+    """
+    Transit fit emcee function
+
+    model = ph.planetlc_fitter()
+    gerr = sigma of g distribution
+
+    """
+    per, rp, a, inc = theta
+    model = planetlc_fitter(time, per, rp, a, inc, 0.0)
+    sigma2 = flux_err ** 2
+    return -0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2))
+
+
+
+def tfit_log_prior(theta):
+    """
+    Transit fit emcee function
+
+    e must be between 0 and 1
+    w must be between -90 and 300
+
+    """
+    per, rp, a, inc = theta
+    if 0.0 < rp < 1.0 and 0.0 < inc < 90.0:
+        return 0.0
+    return -np.inf
+
+def tfit_log_probability(theta, time, flux, flux_err):
+    """
+    Transit fit emcee function
+    """
+    lp = tfit_log_prior(theta)
+    if not np.isfinite(lp):
+        return -np.inf
+    return lp + tfit_log_likelihood(theta, time, flux, flux_err)
+
+
+
+
+
+def mcmc_fitter(guess_transit, time, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True):
+    """One-step MCMC transit fitting with `photoeccentric`.
+
+    NB: (nsteps-ndiscard)*nwalkers must equal the length of rho_star.
+
+    Parameters
+    ----------
+    guess_transit: np.array
+        Initial guess: [period (days), Rp/Rs, a/Rs, i (deg)]
+    time: np.array
+        Time axis of light curve to fit
+    nflux: np.array
+        Flux of light curve to fit
+    flux_err: np.array
+        Flux errors of light curve to fit
+    nwalkers: int
+        Number of `emcee` walkers
+    nsteps: int
+        Number of `emcee` steps to run
+    ndiscard: int
+        Number of `emcee` steps to discard (after burn-in)
+    e: float
+        True eccentricity (just to name directory)
+    w: float
+        True longitude of periastron (just to name directory)
+    directory: str
+        Full directory path to save plots
+    plot_Tburnin: boolean, default True
+        Plot burn-in and save to directory
+    plot_Tcorner: boolean, default True
+        Plot corner plot and save to directory
+
+    Returns
+    -------
+    results: list
+        Fit results [period, Rp/Rs, a/Rs, i]
+    results_errs: list
+        Fit results errors [period err, Rp/Rs err, a/Rs err, i err]
+    per_dist: np.array
+        MCMC period distribution
+    rprs_dist: np.array
+        MCMC Rp/Rs distribution
+    ars_dist: np.array
+        MCMC a/Rs distribution
+    i_dist: np.array
+        MCMC i distribution
+
+    """
+
+    solnx = (guess_transit[0], guess_transit[1], guess_transit[2], guess_transit[3])
+    pos = solnx + 1e-4 * np.random.randn(nwalk, 4)
+    nwalkers, ndim = pos.shape
+
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, tfit_log_probability, args=(time, nflux, flux_err), threads=4)
+    sampler.run_mcmc(pos, nsteps, progress=True);
+    samples = sampler.get_chain()
+
+    if plot_Tburnin==True:
+        fig, axes = plt.subplots(4, figsize=(10, 7), sharex=True)
+        labels = ["period", "rprs", "a/Rs", "i"]
+        for i in range(ndim):
+            ax = axes[i]
+            ax.plot(samples[:, :, i], "k", alpha=0.3)
+            ax.set_xlim(0, len(samples))
+            ax.set_ylabel(labels[i])
+            ax.yaxis.set_label_coords(-0.1, 0.5)
+
+        axes[-1].set_xlabel("step number");
+        fig.savefig(directory + 'lcfit_burnin.png')
+        plt.close(fig)
+
+    flat_samples = sampler.get_chain(discard=ndiscard, thin=1, flat=True)
+
+    if plot_Tcorner==True:
+        fig = corner.corner(flat_samples, labels=labels);
+        fig.savefig(directory + 'transit_corner.png')
+        plt.close(fig)
+
+    results = []
+    results_errs = []
+
+    for i in range(ndim):
+        results.append(np.percentile(flat_samples[:,i], 50))
+        results_errs.append(np.mean((np.percentile(flat_samples[:,i], 16), np.percentile(flat_samples[:,i], 84))))
+
+    per_dist = flat_samples[:,0]
+    rprs_dist = flat_samples[:,1]
+    ars_dist = flat_samples[:,2]
+    i_dist = flat_samples[:,3]
+
+    return results, results_errs, per_dist, rprs_dist, ars_dist, i_dist
