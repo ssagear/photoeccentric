@@ -960,7 +960,8 @@ def photo_fit(time, nflux, flux_err, guess_transit, guess_ew, rho_star, e, w, di
         plt.close()
 
     print('Fit params:')
-    print('Period (days): ', p_f, 'Rp/Rs: ', rprs_f)
+    print('Period (days): ', p_f)
+    print('Rp/Rs: ', rprs_f)
     print('a/Rs: ', a_f)
     print('i (deg): ', i_f)
 
@@ -982,7 +983,6 @@ def photo_fit(time, nflux, flux_err, guess_transit, guess_ew, rho_star, e, w, di
     nwalkers, ndim = pos.shape
 
     sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, args=(g_mean, np.nanmean(g_sigmas)), threads=4)
-    print(g_mean)
 
     print('-------MCMC------')
     sampler.run_mcmc(pos, 5000, progress=True);
