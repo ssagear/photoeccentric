@@ -42,7 +42,7 @@ photoeccentric.egg-info/*
 dist/*
 build/*
 
-# Data Files #
+# Random Stuff Files #
 ##############
-*.csv
-notebooks/MAST_2021-02-10T1313/*
+notebooks/plots/*
+sensitivity_test_results/*
