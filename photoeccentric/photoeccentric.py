@@ -96,6 +96,8 @@ def get_T23(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
     Assumes a circular orbit (e=0, w=0) if ecc_prior=False.
     If ecc_prior=True, e and w are required. T23 is multiplied by an eccentricity factor.
 
+    Parameters
+    ----------
     p: np.array
         Period (days)
     rprs: np.array
@@ -586,102 +588,6 @@ def tfit_log_probability(theta, time, flux, flux_err):
     if not np.isfinite(lp):
         return -np.inf
     return lp + tfit_log_likelihood(theta, time, flux, flux_err)
-
-
-
-
-
-def mcmc_fitter(guess_transit, time, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True):
-    """One-step MCMC transit fitting with `photoeccentric`.
-
-    NB: (nsteps-ndiscard)*nwalkers must equal the length of rho_star.
-
-    Parameters
-    ----------
-    guess_transit: np.array
-        Initial guess: [period (days), Rp/Rs, a/Rs, i (deg)]
-    time: np.array
-        Time axis of light curve to fit
-    nflux: np.array
-        Flux of light curve to fit
-    flux_err: np.array
-        Flux errors of light curve to fit
-    nwalkers: int
-        Number of `emcee` walkers
-    nsteps: int
-        Number of `emcee` steps to run
-    ndiscard: int
-        Number of `emcee` steps to discard (after burn-in)
-    e: float
-        True eccentricity (just to name directory)
-    w: float
-        True longitude of periastron (just to name directory)
-    directory: str
-        Full directory path to save plots
-    plot_Tburnin: boolean, default True
-        Plot burn-in and save to directory
-    plot_Tcorner: boolean, default True
-        Plot corner plot and save to directory
-
-    Returns
-    -------
-    results: list
-        Fit results [period, Rp/Rs, a/Rs, i]
-    results_errs: list
-        Fit results errors [period err, Rp/Rs err, a/Rs err, i err]
-    per_dist: np.array
-        MCMC period distribution
-    rprs_dist: np.array
-        MCMC Rp/Rs distribution
-    ars_dist: np.array
-        MCMC a/Rs distribution
-    i_dist: np.array
-        MCMC i distribution
-
-    """
-
-    solnx = (guess_transit[0], guess_transit[1], guess_transit[2], guess_transit[3])
-    pos = solnx + 1e-4 * np.random.randn(nwalk, 4)
-    nwalkers, ndim = pos.shape
-
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, tfit_log_probability, args=(time, nflux, flux_err), threads=4)
-    sampler.run_mcmc(pos, nsteps, progress=True);
-    samples = sampler.get_chain()
-
-    if plot_Tburnin==True:
-        fig, axes = plt.subplots(4, figsize=(10, 7), sharex=True)
-        labels = ["period", "rprs", "a/Rs", "i"]
-        for i in range(ndim):
-            ax = axes[i]
-            ax.plot(samples[:, :, i], "k", alpha=0.3)
-            ax.set_xlim(0, len(samples))
-            ax.set_ylabel(labels[i])
-            ax.yaxis.set_label_coords(-0.1, 0.5)
-
-        axes[-1].set_xlabel("step number");
-        fig.savefig(directory + 'lcfit_burnin.png')
-        plt.close(fig)
-
-    flat_samples = sampler.get_chain(discard=ndiscard, thin=1, flat=True)
-
-    if plot_Tcorner==True:
-        fig = corner.corner(flat_samples, labels=labels);
-        fig.savefig(directory + 'transit_corner.png')
-        plt.close(fig)
-
-    results = []
-    results_errs = []
-
-    for i in range(ndim):
-        results.append(np.percentile(flat_samples[:,i], 50))
-        results_errs.append(np.mean((np.percentile(flat_samples[:,i], 16), np.percentile(flat_samples[:,i], 84))))
-
-    per_dist = flat_samples[:,0]
-    rprs_dist = flat_samples[:,1]
-    ars_dist = flat_samples[:,2]
-    i_dist = flat_samples[:,3]
-
-    return results, results_errs, per_dist, rprs_dist, ars_dist, i_dist
 
 
 def zscore(dat, mean, sigma):
