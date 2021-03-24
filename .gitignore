@@ -42,7 +42,8 @@ photoeccentric.egg-info/*
 dist/*
 build/*
 
-# Random Stuff Files #
+# Large Files #
 ##############
 notebooks/plots/*
-sensitivity_test_results/*
+notebooks/sensitivity_test_results/*
+notebooks/datafiles/Kepler-Gaia/*
