@@ -49,3 +49,4 @@ notebooks/sensitivity_test_results/*
 notebooks/datafiles/Kepler-Gaia/*
 notebooks/datafiles/isochrones_ignore/*
 notebooks/datafiles/Muirhead2013_isochrones/isochrones_sdss_spitzer_lowmass.dat
+notebooks/datafiles/MAST*

@@ -859,7 +859,7 @@ def photo_fit(time, nflux, flux_err, guess_transit, guess_ew, rho_star, e, w, di
         plt.cla()
         plt.plot(time, nflux, c='blue', alpha=0.5, label='Original LC')
         plt.plot(time, fit, c='red', alpha=1.0, label='Fit LC')
-        plt.xlim(-0.1, 0.1)
+        #plt.xlim(-0.1, 0.1)
         plt.legend()
 
         plt.savefig(directory + 'lightcurve_fitp' + str(p_f) + '_fitrprs' + str(rprs_f) + '_fitars' + str(a_f) + '_fiti' + str(i_f) + '.png')
