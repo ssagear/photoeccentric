@@ -76,7 +76,7 @@ def get_T14(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
 
     for j in range(nf):
 
-        p[j] = p[j]*86400
+        p[j] = p[j]#*86400
 
         rs_a[j] = 1.0/a_rs[j]                  # Rs/a - rstar in units of semimajor axis
         b[j] = a_rs[j]*np.cos(i[j]*(np.pi/180.0))   # convert i to radians
@@ -188,6 +188,10 @@ def get_rho_circ(rprs, T14, T23, p):
     """
 
     delta = rprs**2
+
+    p = p*86400.
+    T14 = T14*86400.
+    T23 = T23*86400.
 
     if T14 >= T23:
         rho_circ = (((2*(delta**(0.25)))/np.sqrt(T14**2-T23**2))**3)*((3*p)/(c.G*(c.pi**2)))
@@ -521,6 +525,18 @@ def planetlc_fitter(time, per, rp, a, inc, w):
 
     return flux
 
+def divide_chunks(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
+
+
+def array_integrated(arr, nint):
+
+    arr = list(divide_chunks(arr, nint))
+    del arr[-1]
+    arr = np.average(np.array(arr), axis=1)
+
+    return arr
 
 def log_likelihood(theta, g, gerr):
     """Log of likelihood
@@ -560,9 +576,15 @@ def tfit_log_likelihood(theta, time, flux, flux_err):
     gerr = sigma of g distribution
 
     """
+
     per, rp, a, inc = theta
-    model = planetlc_fitter(time, per, rp, a, inc, 0.0)
+
+    exptime = np.linspace(min(time), max(time), len(time)*30+1)
+    model = array_integrated(planetlc_fitter(exptime, per, rp, a, inc, 0.0), 30)
+
+    #model = planetlc_fitter(time, per, rp, a, inc, 0.0)
     sigma2 = flux_err ** 2
+
     return -0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2))
 
 
@@ -576,7 +598,7 @@ def tfit_log_prior(theta):
 
     """
     per, rp, a, inc = theta
-    if 0.0 < rp < 1.0 and 0.0 < inc < 90.0:
+    if 0.0 < rp < 1.0 and 0.0 < inc < 90.0 and a > 0 and per > 0:
         return 0.0
     return -np.inf
 
