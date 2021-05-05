@@ -504,8 +504,8 @@ def planetlc_fitter(time, per, rp, a, inc, w):
     w is a free parameter."""
 
     params = batman.TransitParams()       #object to store transit parameters
-    params.t0 = 0.                        #time of inferior conjunction
-    params.per = per                      #orbital period
+    params.t0 = 0                        #time of inferior conjunction
+    params.per = per                     #orbital period
     params.rp = rp                        #planet radius (in units of stellar radii)
     params.a = a                          #semi-major axis (in units of stellar radii)
     params.inc = inc                      #orbital inclination (in degrees)
@@ -514,7 +514,7 @@ def planetlc_fitter(time, per, rp, a, inc, w):
     #params.limb_dark = "linear"
     #params.u = [0.3]
     params.limb_dark = "quadratic"
-    params.u = [0.1, 0.3]
+    params.u = [0.5, 0.2]
     #params.limb_dark = "uniform"
     #params.u = []
 
@@ -533,10 +533,51 @@ def divide_chunks(l, n):
 def array_integrated(arr, nint):
 
     arr = list(divide_chunks(arr, nint))
-    del arr[-1]
-    arr = np.average(np.array(arr), axis=1)
+    arr = np.sum(np.array(arr)/nint, axis=1)
 
     return arr
+
+def get_ptime(time, mid, num):
+
+    eti = []
+
+    for i in range(len(time)):
+        ettemp = np.linspace(time[i]-mid, time[i]+mid, num, endpoint=True)
+        ettemp = list(ettemp)
+
+        eti.append(ettemp)
+
+    ptime = np.array([item for sublist in eti for item in sublist])
+
+    return ptime
+
+
+def integrate_lcfitter(time, per, rp, ars, inc, w):
+
+    params = batman.TransitParams()       #object to store transit parameters
+    params.t0 = 0                        #time of inferior conjunction
+    params.per = per                      #orbital period
+    params.rp = rp                        #planet radius (in units of stellar radii)
+    params.a = ars                          #semi-major axis (in units of stellar radii)
+    params.inc = inc                      #orbital inclination (in degrees)
+    params.ecc = 0.0                      #eccentricity
+    params.w = w                       #longitude of periastron (in degrees)
+    #params.limb_dark = "linear"
+    #params.u = [0.3]
+    params.limb_dark = "quadratic"
+    params.u = [0.5, 0.2]
+    #params.limb_dark = "uniform"
+    #params.u = []
+
+    #times to calculate light curve
+    ptime = get_ptime(time, 0.010217133909463882, 29)
+
+    m = batman.TransitModel(params, ptime)
+
+    pflux = m.light_curve(params)
+    flux = array_integrated(pflux, 29)
+
+    return flux
 
 def log_likelihood(theta, g, gerr):
     """Log of likelihood
@@ -568,7 +609,7 @@ def log_probability(theta, g, gerr):
 
 
 
-def tfit_log_likelihood(theta, time, flux, flux_err):
+def tfit_log_likelihood(theta, time, ptime, flux, flux_err):
     """
     Transit fit emcee function
 
@@ -579,12 +620,12 @@ def tfit_log_likelihood(theta, time, flux, flux_err):
 
     per, rp, a, inc = theta
 
-    exptime = np.linspace(min(time), max(time), len(time)*30+1)
-    model = array_integrated(planetlc_fitter(exptime, per, rp, a, inc, 0.0), 30)
-
+    #model = array_integrated(planetlc_fitter(ptime, rp, a, inc, 0.0), 29)
     #model = planetlc_fitter(time, per, rp, a, inc, 0.0)
+    model = integrate_lcfitter(time, per, rp, a, inc, 0.0)
     sigma2 = flux_err ** 2
 
+    #print(-0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2)))
     return -0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2))
 
 
@@ -598,18 +639,18 @@ def tfit_log_prior(theta):
 
     """
     per, rp, a, inc = theta
-    if 0.0 < rp < 1.0 and 0.0 < inc < 90.0 and a > 0 and per > 0:
+    if 0.0 < rp < 0.1 and 87.0 < inc < 90.0 and 0.0 < a < 200:
         return 0.0
     return -np.inf
 
-def tfit_log_probability(theta, time, flux, flux_err):
+def tfit_log_probability(theta, time, ptime, flux, flux_err):
     """
     Transit fit emcee function
     """
     lp = tfit_log_prior(theta)
     if not np.isfinite(lp):
         return -np.inf
-    return lp + tfit_log_likelihood(theta, time, flux, flux_err)
+    return lp + tfit_log_likelihood(theta, time, ptime, flux, flux_err)
 
 
 def zscore(dat, mean, sigma):
@@ -723,7 +764,7 @@ def photo_init(time, per, rp, a, e, inc, w, noise=0.000005):
     return nflux, flux_err
 
 
-def mcmc_fitter(guess_transit, time, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True):
+def mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True):
     """One-step MCMC transit fitting with `photoeccentric`.
 
     NB: (nsteps-ndiscard)*nwalkers must equal the length of rho_star.
@@ -731,7 +772,7 @@ def mcmc_fitter(guess_transit, time, nflux, flux_err, nwalk, nsteps, ndiscard, e
     Parameters
     ----------
     guess_transit: np.array
-        Initial guess: [period (days), Rp/Rs, a/Rs, i (deg)]
+        Initial guess: [Rp/Rs, a/Rs, i (deg)]
     time: np.array
         Time axis of light curve to fit
     nflux: np.array
@@ -776,13 +817,13 @@ def mcmc_fitter(guess_transit, time, nflux, flux_err, nwalk, nsteps, ndiscard, e
     pos = solnx + 1e-4 * np.random.randn(nwalk, 4)
     nwalkers, ndim = pos.shape
 
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, tfit_log_probability, args=(time, nflux, flux_err), threads=4)
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, tfit_log_probability, args=(time, ptime, nflux, flux_err), threads=4)
     sampler.run_mcmc(pos, nsteps, progress=True);
     samples = sampler.get_chain()
 
     if plot_Tburnin==True:
         fig, axes = plt.subplots(4, figsize=(10, 7), sharex=True)
-        labels = ["period", "rprs", "a/Rs", "i"]
+        labels = ["per", "rprs", "a/Rs", "i"]
         for i in range(ndim):
             ax = axes[i]
             ax.plot(samples[:, :, i], "k", alpha=0.3)
@@ -815,7 +856,7 @@ def mcmc_fitter(guess_transit, time, nflux, flux_err, nwalk, nsteps, ndiscard, e
 
     return results, results_errs, per_dist, rprs_dist, ars_dist, i_dist
 
-def photo_fit(time, nflux, flux_err, guess_transit, guess_ew, rho_star, e, w, directory, nwalk, nsteps, ndiscard, plot_transit=True, plot_burnin=True, plot_corner=True, plot_Tburnin=True, plot_Tcorner=True, ):
+def photo_fit(time, ptime, nflux, flux_err, guess_transit, guess_ew, rho_star, e, w, directory, nwalk, nsteps, ndiscard, plot_transit=True, plot_burnin=True, plot_corner=True, plot_Tburnin=True, plot_Tcorner=True, ):
 
     """Fit eccentricity for a planet.
 
@@ -867,7 +908,7 @@ def photo_fit(time, nflux, flux_err, guess_transit, guess_ew, rho_star, e, w, di
     """
 
     # EMCEE Transit Model Fitting
-    _, _, pdist, rdist, adist, idist = mcmc_fitter(guess_transit, time, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
+    _, _, pdist, rdist, adist, idist = mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
 
     p_f, perr_f = np.mean(pdist), get_sigmas(pdist)
     rprs_f, rprserr_f = np.mean(rdist), get_sigmas(rdist)
