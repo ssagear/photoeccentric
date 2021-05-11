@@ -11,32 +11,8 @@ import corner
 
 from .stellardensity import *
 from .spectroscopy import *
+from .lcfitter import *
 
-def bls(time, nflux):
-    """Applies astropy Box Least-Squares to light curve to fit period
-
-    Parameters
-    ----------
-    time: np.array
-        Time array
-    nflux: np.array
-        Flux array
-
-
-    Returns
-    -------
-    per_guess: float
-        Period fit from BLS
-    """
-
-    from astropy.timeseries import BoxLeastSquares
-    import astropy.units as u
-
-    mod = BoxLeastSquares(time*u.day, nflux, dy=0.01)
-    periodogram = mod.autopower(0.2, objective="snr")
-    per_guess = np.asarray(periodogram.period)[int(np.median(np.argmax(periodogram.power)))]
-
-    return per_guess
 
 def get_T14(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
     """
@@ -88,7 +64,6 @@ def get_T14(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
             return T14[j]*chidot[j]
 
     return T14
-
 
 def get_T23(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
     """
@@ -142,7 +117,6 @@ def get_T23(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
 
     return T23
 
-
 def calc_a(period, smass, srad):
     """Calculates semi-major axis from planet period and stellar mass
     Kepler's 3rd law
@@ -165,7 +139,6 @@ def calc_a(period, smass, srad):
     a = np.cbrt((period**2*c.G*smass)/(4*np.pi**2*srad**3)) # a on rstar
 
     return a
-
 
 def get_rho_circ(rprs, T14, T23, p):
     """Returns stellar density, assuming a perfectly circular planetary orbit.
@@ -236,7 +209,6 @@ def get_planet_params(p, T14, T23):
 
     return p_seconds, T14_seconds, T23_seconds
 
-
 def get_g(rho_circ, rho_star):
     """Gets g
 
@@ -272,7 +244,6 @@ def get_g_from_def(e, w):
     """
     g = (1+e*np.sin(w))/np.sqrt(1-e**2)
     return g
-
 
 def get_e(g, w):
     """Gets eccentricity (from photoeccentric effect)
@@ -310,8 +281,6 @@ def row_to_top(df, index):
     """
     df_cp = pd.concat([df.iloc[[index],:], df.drop(index, axis=0)], axis=0)
     return df_cp
-
-
 
 def get_g_distribution(rhos, per_dist, rprs_dist, T14_dist, T23_dist):
     """Gets g distribution for a KOI.
@@ -456,7 +425,6 @@ def planet_params_from_archive(df, kep_name):
 
     return period, period_uerr, period_lerr, rprs, rprs_uerr, rprs_lerr, a_rs, a_rs_uerr, a_rs_lerr, i, e, w
 
-
 def get_sigmas(dist):
     """Gets + and - sigmas from a distribution (gaussian or not). Ignores nan values.
 
@@ -499,140 +467,6 @@ def get_e_from_def(g, w):
     e = num/den
     return e
 
-def planetlc_fitter(time, per, rp, a, inc, w):
-    """Always assumes e=0.
-    w is a free parameter."""
-
-    params = batman.TransitParams()       #object to store transit parameters
-    params.t0 = 0                        #time of inferior conjunction
-    params.per = per                     #orbital period
-    params.rp = rp                        #planet radius (in units of stellar radii)
-    params.a = a                          #semi-major axis (in units of stellar radii)
-    params.inc = inc                      #orbital inclination (in degrees)
-    params.ecc = 0.0                      #eccentricity
-    params.w = w                        #longitude of periastron (in degrees)
-    #params.limb_dark = "linear"
-    #params.u = [0.3]
-    #params.limb_dark = "quadratic"
-    #params.u = [0.5, 0.2]
-    params.limb_dark = "uniform"
-    params.u = []
-
-    #times to calculate light curve
-    m = batman.TransitModel(params, time)
-
-    flux = m.light_curve(params)
-
-    return flux
-
-
-def get_mid(time):
-    """Gets approximately 1/2 of cadence time."""
-
-    return (time[1]-time[0])/2.
-
-
-def get_transit_cutout(transitmid, ncadences, time, flux, flux_err):
-
-    """Gets cutout with n cadences before and after transit.
-    transitmid and time have same units.
-
-    Parameters
-    ----------
-    transitmid: float
-        Transit mid-time
-    ncadences: int
-        Number of cadences before and after transit mid-time.
-    time: np.array
-        Time
-    flux: np.array
-        Flux
-
-    Returns
-    -------
-    t1: np.array
-        Cutout time
-    f1: np.array
-        Cutout flux
-    fe1: np.array
-        Cutout flux error
-
-    """
-
-
-    tindex = int(np.where(time == find_nearest(time, transitmid))[0])
-
-    n = 20
-
-    t1 = time[tindex-n:tindex+n] - transitmid
-    f1 = flux[tindex-n:tindex+n]
-    fe1 = flux_err[tindex-n:tindex+n]
-
-    return t1, f1, fe1
-
-
-def divide_chunks(l, n):
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
-
-
-def array_integrated(arr, nint):
-
-    arr = list(divide_chunks(arr, nint))
-    arr = np.mean(np.array(arr), axis=1)
-
-    return arr
-
-
-def get_ptime(time, mid, num):
-    """Time, get_mid, number of vals"""
-
-    eti = []
-
-    for i in range(len(time)):
-        ettemp = np.linspace(time[i]-mid, time[i]+mid, num, endpoint=True)
-        ettemp = list(ettemp)
-
-        eti.append(ettemp)
-
-    ptime = np.array([item for sublist in eti for item in sublist])
-
-    return ptime
-
-
-def find_nearest(array, value):
-    array = np.asarray(array)
-    idx = np.nanargmin((np.abs(array - value)))
-    return array[idx]
-
-
-def integrate_lcfitter(time, per, rp, ars, inc, w):
-
-    params = batman.TransitParams()       #object to store transit parameters
-    params.t0 = 0                        #time of inferior conjunction
-    params.per = per                      #orbital period
-    params.rp = rp                        #planet radius (in units of stellar radii)
-    params.a = ars                          #semi-major axis (in units of stellar radii)
-    params.inc = inc                      #orbital inclination (in degrees)
-    params.ecc = 0.0                      #eccentricity
-    params.w = w                       #longitude of periastron (in degrees)
-    #params.limb_dark = "linear"
-    #params.u = [0.3]
-    #params.limb_dark = "quadratic"
-    #params.u = [0.5, 0.2]
-    params.limb_dark = "uniform"
-    params.u = []
-
-    #times to calculate light curve
-    ptime = get_ptime(time, 0.010217133909463882, 29)
-
-    m = batman.TransitModel(params, ptime)
-
-    pflux = m.light_curve(params)
-    flux = array_integrated(pflux, 29)
-
-    return flux
-
 def log_likelihood(theta, g, gerr):
     """Log of likelihood
     model = g(e,w)
@@ -660,51 +494,6 @@ def log_probability(theta, g, gerr):
     if not np.isfinite(lp):
         return -np.inf
     return lp + log_likelihood(theta, g, gerr)
-
-
-
-def tfit_log_likelihood(theta, time, ptime, flux, flux_err, per):
-    """
-    Transit fit emcee function
-
-    model = ph.planetlc_fitter()
-    gerr = sigma of g distribution
-
-    """
-
-    rp, a, inc = theta
-
-    #model = array_integrated(planetlc_fitter(ptime, rp, a, inc, 0.0), 29)
-    #model = planetlc_fitter(time, per, rp, a, inc, 0.0)
-    model = integrate_lcfitter(time, per, rp, a, inc, 0.0)
-    sigma2 = flux_err ** 2
-
-    #print(-0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2)))
-    return -0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2))
-
-
-def tfit_log_prior(theta):
-    """
-    Transit fit emcee function
-
-    e must be between 0 and 1
-    w must be between -90 and 300
-
-    """
-    rp, a, inc = theta
-    if 0.0 < rp < 1.0 and 0.0 < inc < 90.0:
-        return 0.0
-    return -np.inf
-
-def tfit_log_probability(theta, time, ptime, flux, flux_err, per):
-    """
-    Transit fit emcee function
-    """
-    lp = tfit_log_prior(theta)
-    if not np.isfinite(lp):
-        return -np.inf
-    return lp + tfit_log_likelihood(theta, time, ptime, flux, flux_err, per)
-
 
 def zscore(dat, mean, sigma):
     """Calculates zscore of a data point in (or outside of) a dataset
@@ -750,30 +539,6 @@ def get_a_rs(rhos, periods):
 
     return a_rs
 
-def planetlc(time, period, rprs, a_rs, e, inc, w):
-    params = batman.TransitParams()       #object to store transit parameters
-    params.t0 = 0.                        #time of inferior conjunction
-    params.per = period                      #orbital period
-    params.rp = rprs                        #planet radius (in units of stellar radii)
-    params.a = a_rs                          #semi-major axis (in units of stellar radii)
-    params.inc = inc                      #orbital inclination (in degrees)
-    params.ecc = e
-    params.w = w                          #longitude of periastron (in degrees)
-    #params.limb_dark = "linear"
-    #params.u = [0.3]
-    params.limb_dark = "quadratic"
-    params.u = [0.1, 0.3]
-    #params.limb_dark = "uniform"
-    #params.u = []
-
-    #times to calculate light curve
-    m = batman.TransitModel(params, time)
-
-    flux = m.light_curve(params)
-
-    return flux
-
-
 def photo_init(time, per, rp, a, e, inc, w, noise=0.000005):
     """Creates fake transit based on input planet parameters.
 
@@ -806,7 +571,7 @@ def photo_init(time, per, rp, a, e, inc, w, noise=0.000005):
     """
 
     # Calculate flux from transit model
-    flux = planetlc(time, per, rp, a, e, inc, w)
+    flux = integratedlc(time, per, rp, a, e, inc, w)
 
     # Adding some gaussian noise
     noise = np.random.normal(0,noise,len(time))
@@ -816,337 +581,23 @@ def photo_init(time, per, rp, a, e, inc, w, noise=0.000005):
 
     return nflux, flux_err
 
-
-def mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, pdist, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True):
-    """One-step MCMC transit fitting with `photoeccentric`.
-
-    NB: (nsteps-ndiscard)*nwalkers must equal the length of rho_star.
-
-    Parameters
-    ----------
-    guess_transit: np.array
-        Initial guess: [Rp/Rs, a/Rs, i (deg)]
-    time: np.array
-        Time axis of light curve to fit
-    nflux: np.arrayss
-        Flux of light curve to fit
-    flux_err: np.array
-        Flux errors of light curve to fit
-    nwalk: int
-        Number of `emcee` walkers
-    nsteps: int
-        Number of `emcee` steps to run
-    ndiscard: int
-        Number of `emcee` steps to discard (after burn-in)
-    e: float
-        True eccentricity (just to name directory)
-    w: float
-        True longitude of periastron (just to name directory)
-    directory: str
-        Full directory path to save plots
-    plot_Tburnin: boolean, default True
-        Plot burn-in and save to directory
-    plot_Tcorner: boolean, default True
-        Plot corner plot and save to directory
-
-    Returns
-    -------
-    results: list
-        Fit results [period, Rp/Rs, a/Rs, i]
-    results_errs: list
-        Fit results errors [period err, Rp/Rs err, a/Rs err, i err]
-    rprs_dist: np.array
-        MCMC Rp/Rs distribution
-    ars_dist: np.array
-        MCMC a/Rs distributions
-    i_dist: np.array
-        MCMC i distribution
-
-    """
-
-    solnx = (guess_transit[0], guess_transit[1], guess_transit[2])
-    pos = solnx + 1e-4 * np.random.randn(nwalk, 3)
-    nwalkers, ndim = pos.shape
-
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, tfit_log_probability, args=(time, ptime, nflux, flux_err, np.median(pdist)), threads=4)
-    sampler.run_mcmc(pos, nsteps, progress=True);
-    samples = sampler.get_chain()
-
-    if plot_Tburnin==True:
-        fig, axes = plt.subplots(3, figsize=(10, 7), sharex=True)
-        labels = ["rprs", "a/Rs", "i"]
-        for i in range(ndim):
-            ax = axes[i]
-            ax.plot(samples[:, :, i], "k", alpha=0.3)
-            ax.set_xlim(0, len(samples))
-            ax.set_ylabel(labels[i])
-            ax.yaxis.set_label_coords(-0.1, 0.5)
-
-        axes[-1].set_xlabel("step number");
-        fig.savefig(directory + 'lcfit_burnin.png')
-        plt.close(fig)
-
-    flat_samples = sampler.get_chain(discard=ndiscard, thin=1, flat=True)
-
-    if plot_Tcorner==True:
-        fig = corner.corner(flat_samples, labels=labels);
-        fig.savefig(directory + 'transit_corner.png')
-        plt.close(fig)
-
-    results = []
-    results_errs = []
-
-    for i in range(ndim):
-        results.append(np.percentile(flat_samples[:,i], 50))
-        results_errs.append(np.mean((np.percentile(flat_samples[:,i], 16), np.percentile(flat_samples[:,i], 84))))
-
-    rprs_dist = flat_samples[:,0]
-    ars_dist = flat_samples[:,1]
-    i_dist = flat_samples[:,2]
-
-    return results, results_errs, rprs_dist, ars_dist, i_dist
-
-def photo_fit(time, ptime, nflux, flux_err, pdist, guess_transit, guess_ew, rho_star, e, w, directory, nwalk, nsteps, ndiscard, plot_transit=True, plot_burnin=True, plot_corner=True, plot_Tburnin=True, plot_Tcorner=True, ):
-
-    """Fit eccentricity for a planet.
-
-    Parameters
-    ----------
-    time: np.array
-        Light curve time
-    nflux: np.array
-        Light curve flux
-    flux_err: np.array
-        Light curve flux errors
-    guess_transit: np.array (length 4)
-        Initial guess for MCMC transit fitting. Passed into mcmc_fitter().
-    guess_ew: np.array (length 2)
-        Initial guess for MCMC e and w fitting. [e guess, w guess]
-    rho_star: np.array
-        "True" stellar density distribution
-    e: float
-        True eccentricity (just to name plots)
-    w: float
-        True longitude of periastron (just to name plots)
-    directory: str
-        Directory to save plots
-    nwalk: int
-        Number of walkers
-    nsteps: int
-        Number of steps to run in MCMC. Passed into mcmc_fitter().
-    ndiscard: int
-        Number of steps to discard in MCMC. Passed into mcmc_fitter().
-    plot_transit: boolean, default True
-        Save transit light curve plot + fit in specified directory.
-
-    Returns
-    -------
-    fite: float
-        Best-fit eccentricity (mean of MCMC distribution)
-    fitw: float
-        Best-fit longitude of periastron (mean of MCMC distribution)
-    gs: np.array
-        "g" distribution for planet
-    g_mean: float
-        Mean of g distribution
-    g_sigmas: list (length 2)
-        [(-) sigma, (+) sigma] of g distribution
-    zsc: list (length 2)
-        Number of sigmas away [fit e, fit w] are from true [e, w]
-
-
-    """
-
-    # EMCEE Transit Model Fitting
-    _, _, rdist, adist, idist = mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, np.median(pdist), nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
-
-    rprs_f, rprserr_f = np.mean(rdist), get_sigmas(rdist)
-    a_f, aerr_f = np.mean(adist), get_sigmas(adist)
-    i_f, ierr_f = np.mean(idist), get_sigmas(idist)
-
-    # Create a light curve with the fit parameters
-    fit = planetlc_fitter(time, np.median(pdist), rprs_f, a_f, i_f, 0.0)
-
-    if plot_transit==True:
-        plt.cla()
-        plt.plot(time, nflux, c='blue', alpha=0.5, label='Original LC')
-        plt.plot(time, fit, c='red', alpha=1.0, label='Fit LC')
-        #plt.xlim(-0.1, 0.1)
-        plt.legend()
-
-        plt.savefig(directory + 'lightcurve_fitp' + str(p_f) + '_fitrprs' + str(rprs_f) + '_fitars' + str(a_f) + '_fiti' + str(i_f) + '.png')
-        plt.close()
-
-    print('Fit params:')
-    print('Period (days): ', p_f)
-    print('Rp/Rs: ', rprs_f)
-    print('a/Rs: ', a_f)
-    print('i (deg): ', i_f)
-
-    T14dist = get_T14(pdist, rdist, adist, idist)
-    T23dist = get_T23(pdist, rdist, adist, idist)
-
-    gs, rho_c = get_g_distribution(rho_star, pdist, rdist, T14dist, T23dist)
-
-    g_mean = np.nanmean(gs)
-    g_sigma_min, g_sigma_plus = get_sigmas(gs)
-    g_sigmas = [g_sigma_min, g_sigma_plus]
-
-    #Guesses
-    w_guess = guess_ew[1]
-    e_guess = guess_ew[0]
-
-    solnx = (w_guess, e_guess)
-    pos = solnx + 1e-4 * np.random.randn(32, 2)
-    nwalkers, ndim = pos.shape
-
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, args=(g_mean, np.nanmean(g_sigmas)), threads=4)
-
-    print('-------MCMC------')
-    sampler.run_mcmc(pos, 5000, progress=True);
-    flat_samples_e = sampler.get_chain(discard=1000, thin=15, flat=True)
-
-    if plot_burnin==True:
-
-        fig, axes = plt.subplots(2, figsize=(10, 7), sharex=True)
-        samples = sampler.get_chain()
-        labels = ["w", "e"]
-
-        for i in range(ndim):
-            ax = axes[i]
-            ax.plot(samples[:, :, i], "k", alpha=0.3)
-            ax.set_xlim(0, len(samples))
-            ax.set_ylabel(labels[i])
-            ax.yaxis.set_label_coords(-0.1, 0.5)
-
-        axes[-1].set_xlabel("step number");
-
-        fig.savefig(directory + 'e_g_burnin.png')
-        plt.close(fig)
-
-    edist = flat_samples_e[:,1]
-    wdist = flat_samples_e[:,0]
-
-    fite = np.percentile(edist, 50)
-    fitw = np.percentile(wdist, 50)
-
-    mcmc_e = np.percentile(edist, [16, 50, 84])
-    q_e = np.diff(mcmc_e)
-
-    mcmc_w = np.percentile(wdist, [16, 50, 84])
-    q_w = np.diff(mcmc_w)
-
-    zsc_e = zscore(e, mcmc_e[1], np.mean(q_e))
-    zsc_w = zscore(w, mcmc_w[1], np.mean(q_w))
-    zsc = [zsc_e, zsc_w]
-
-    if plot_corner==True:
-
-        fig = corner.corner(flat_samples_e, labels=labels, show_titles=True, title_kwargs={"fontsize": 12}, truths=[w, e], quantiles=[0.16, 0.5, 0.84], plot_contours=True);
-        fig.savefig(directory + 'corner_fit_e' + str(fite) + '_fit_w' + str(fitw) + '_fit_g' + str(g_mean) + '.png')
-        plt.close(fig)
-
-    return fite, fitw, edist, wdist, gs, g_mean, g_sigmas, zsc
-
-
-
-def mode(dist):
-
-    """Gets mode of a histogram.
-
-    Parameters
-    ----------
-    dist: array
-        Distribution
-
-    Returns
-    -------
-    mode: float
-        Mode
-    """
-
-    n, bins = np.histogram(dist, bins=np.linspace(np.min(dist), np.max(dist), 100))
-    mode = bins[np.argmax(n)]
-    return mode
-
-
-######################################################################################################################################################
-
-
-
-def planetlc_fitter_P(time, per, rp, a, inc):
-    """Always assumes e=0.
-    w is NOT a free parameter."""
-
-    params = batman.TransitParams()       #object to store transit parameters
-    params.t0 = 0                        #time of inferior conjunction
-    params.per = per                     #orbital period
-    params.rp = rp                        #planet radius (in units of stellar radii)
-    params.a = a                          #semi-major axis (in units of stellar radii)
-    params.inc = inc                      #orbital inclination (in degrees)
-    params.ecc = 0.0                      #eccentricity
-    params.w = 0.0                        #longitude of periastron (in degrees)
-    #params.limb_dark = "linear"
-    #params.u = [0.3]
-    #params.limb_dark = "quadratic"
-    #params.u = [0.5, 0.2]
-    params.limb_dark = "uniform"
-    params.u = []
-
-    #times to calculate light curve
-    m = batman.TransitModel(params, time)
-
-    flux = m.light_curve(params)
-
-    return flux
-
-
-def integrate_lcfitter_P(time, per, rp, ars, inc):
-
-    params = batman.TransitParams()       #object to store transit parameters
-    params.t0 = 0                        #time of inferior conjunction
-    params.per = per                      #orbital period
-    params.rp = rp                        #planet radius (in units of stellar radii)
-    params.a = ars                          #semi-major axis (in units of stellar radii)
-    params.inc = inc                      #orbital inclination (in degrees)
-    params.ecc = 0.0                      #eccentricity
-    params.w = 0.0                       #longitude of periastron (in degrees)
-    #params.limb_dark = "linear"
-    #params.u = [0.3]
-    #params.limb_dark = "quadratic"
-    #params.u = [0.5, 0.2]
-    params.limb_dark = "uniform"
-    params.u = []
-
-    #times to calculate light curve
-    ptime = get_ptime(time, get_mid(time), 29)
-
-    m = batman.TransitModel(params, ptime)
-
-    pflux = m.light_curve(params)
-    flux = array_integrated(pflux, 29)
-
-    return flux
-
-
-def tfit_log_likelihood_P(theta, time, ptime, flux, flux_err, per):
+def tfit_log_likelihood(theta, time, ptime, flux, flux_err):
     """
     Transit fit emcee function
 
-    model = ph.planetlc_fitter()
+    model = ph.integratedlc_fitter()
     gerr = sigma of g distribution
 
     """
 
-    rp, a, inc = theta
+    per, rp, a, inc = theta
 
-    model = integrate_lcfitter_P(time, per, rp, a, inc)
+    model = integratedlc_fitter(time, per, rp, a, inc)
     sigma2 = flux_err ** 2
 
     return -0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2))
 
-
-def tfit_log_prior_P(theta):
+def tfit_log_prior(theta):
     """
     Transit fit emcee function
 
@@ -1154,23 +605,21 @@ def tfit_log_prior_P(theta):
     w must be between -90 and 300
 
     """
-    rp, a, inc = theta
-    if 0.0 < rp < 1.0 and 0.0 < inc < 90.0:
+    per, rp, a, inc = theta
+    if 0.0 < rp < 1.0 and 0.0 < inc < 90.0 and a > 0.0:
         return 0.0
     return -np.inf
 
-def tfit_log_probability_P(theta, time, ptime, flux, flux_err, per):
+def tfit_log_probability(theta, time, ptime, flux, flux_err):
     """
     Transit fit emcee function
     """
-    lp = tfit_log_prior_P(theta)
+    lp = tfit_log_prior(theta)
     if not np.isfinite(lp):
         return -np.inf
-    return lp + tfit_log_likelihood_P(theta, time, ptime, flux, flux_err, per)
+    return lp + tfit_log_likelihood(theta, time, ptime, flux, flux_err)
 
-
-
-def mcmc_fitter_P(guess_transit, time, ptime, nflux, flux_err, pdist, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True):
+def mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True):
     """One-step MCMC transit fitting with `photoeccentric`.
 
     NB: (nsteps-ndiscard)*nwalkers must equal the length of rho_star.
@@ -1217,17 +666,17 @@ def mcmc_fitter_P(guess_transit, time, ptime, nflux, flux_err, pdist, nwalk, nst
 
     """
 
-    solnx = (guess_transit[0], guess_transit[1], guess_transit[2])
-    pos = solnx + 1e-4 * np.random.randn(nwalk, 3)
+    solnx = (guess_transit[0], guess_transit[1], guess_transit[2], guess_transit[3])
+    pos = solnx + 1e-4 * np.random.randn(nwalk, 4)
     nwalkers, ndim = pos.shape
 
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, tfit_log_probability_P, args=(time, ptime, nflux, flux_err, np.median(pdist)), threads=4)
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, tfit_log_probability, args=(time, ptime, nflux, flux_err), threads=4)
     sampler.run_mcmc(pos, nsteps, progress=True);
     samples = sampler.get_chain()
 
     if plot_Tburnin==True:
-        fig, axes = plt.subplots(3, figsize=(10, 7), sharex=True)
-        labels = ["rprs", "a/Rs", "i"]
+        fig, axes = plt.subplots(4, figsize=(10, 7), sharex=True)
+        labels = ["period", "rprs", "a/Rs", "i"]
         for i in range(ndim):
             ax = axes[i]
             ax.plot(samples[:, :, i], "k", alpha=0.3)
@@ -1253,13 +702,14 @@ def mcmc_fitter_P(guess_transit, time, ptime, nflux, flux_err, pdist, nwalk, nst
         results.append(np.percentile(flat_samples[:,i], 50))
         results_errs.append(np.mean((np.percentile(flat_samples[:,i], 16), np.percentile(flat_samples[:,i], 84))))
 
-    rprs_dist = flat_samples[:,0]
-    ars_dist = flat_samples[:,1]
-    i_dist = flat_samples[:,2]
+    per_dist = flat_samples[:,0]
+    rprs_dist = flat_samples[:,1]
+    ars_dist = flat_samples[:,2]
+    i_dist = flat_samples[:,3]
 
-    return results, results_errs, rprs_dist, ars_dist, i_dist
+    return results, results_errs, per_dist, rprs_dist, ars_dist, i_dist
 
-def photo_fit_P(time, ptime, nflux, flux_err, pdist, guess_transit, guess_ew, rho_star, e, w, directory, nwalk, nsteps, ndiscard, plot_transit=True, plot_burnin=True, plot_corner=True, plot_Tburnin=True, plot_Tcorner=True, ):
+def photo_fit(time, ptime, nflux, flux_err, guess_transit, guess_ew, rho_star, e, w, directory, nwalk, nsteps, ndiscard, plot_transit=True, plot_burnin=True, plot_corner=True, plot_Tburnin=True, plot_Tcorner=True):
 
     """Fit eccentricity for a planet.
 
@@ -1311,18 +761,21 @@ def photo_fit_P(time, ptime, nflux, flux_err, pdist, guess_transit, guess_ew, rh
     """
 
     # EMCEE Transit Model Fitting
-    _, _, rdist, adist, idist = mcmc_fitter_P(guess_transit, time, ptime, nflux, flux_err, np.median(pdist), nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
+    _, _, pdist, rdist, adist, idist = mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
 
-    rprs_f, rprserr_f = np.mean(rdist), get_sigmas(rdist)
-    a_f, aerr_f = np.mean(adist), get_sigmas(adist)
-    i_f, ierr_f = np.mean(idist), get_sigmas(idist)
+    p_f, perr_f = mode(pdist), get_sigmas(pdist)
+    rprs_f, rprserr_f = mode(rdist), get_sigmas(rdist)
+    a_f, aerr_f = mode(adist), get_sigmas(adist)
+    i_f, ierr_f = mode(idist), get_sigmas(idist)
 
     # Create a light curve with the fit parameters
-    fit = planetlc_fitter_P(time, np.median(pdist), rprs_f, a_f, i_f)
+    # Boobooboo
+    fit = integratedlc_fitter(time, p_f, rprs_f, a_f, i_f)
 
     if plot_transit==True:
         plt.cla()
-        plt.plot(time, nflux, c='blue', alpha=0.5, label='Original LC')
+        plt.errorbar(time, nflux, yerr=flux_err, c='blue', fmt='o', alpha=0.5, label='Original LC')
+        plt.scatter(time, fit, c='red', alpha=1.0)
         plt.plot(time, fit, c='red', alpha=1.0, label='Fit LC')
         #plt.xlim(-0.1, 0.1)
         plt.legend()
@@ -1341,7 +794,7 @@ def photo_fit_P(time, ptime, nflux, flux_err, pdist, guess_transit, guess_ew, rh
 
     gs, rho_c = get_g_distribution(rho_star, pdist, rdist, T14dist, T23dist)
 
-    g_mean = np.nanmean(gs)
+    g_mean = mode(gs)
     g_sigma_min, g_sigma_plus = get_sigmas(gs)
     g_sigmas = [g_sigma_min, g_sigma_plus]
 
