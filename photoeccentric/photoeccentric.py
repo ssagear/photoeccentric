@@ -852,4 +852,4 @@ def photo_fit(time, ptime, nflux, flux_err, guess_transit, guess_ew, rho_star, e
         fig.savefig(directory + 'corner_fit_e' + str(fite) + '_fit_w' + str(fitw) + '_fit_g' + str(g_mean) + '.png')
         plt.close(fig)
 
-    return fite, fitw, edist, wdist, gs, g_mean, g_sigmas, zsc
+    return p_f, rprs_f, a_f, i_f, fite, fitw, edist, wdist, gs, g_mean, g_sigmas, zsc
