@@ -6,15 +6,17 @@ from tqdm import tqdm
 import glob
 
 
-def fit_isochrone_lum(data, stellarobs, isochrones, gaia_lum=True):
+def fit_isochrone_lum(data, stellarobs, isochrones, gaia_lum=True, source='Muirhead'):
     """Pulls isochrones where effective temperature, mass, radius, and luminosity fall within 1-sigma errorbars from an observed star.
 
    Parameters
    ----------
    data: pandas.DataFrame
-       Spectroscopic data + Kepler/Gaia for n stars in one table. (muirhead_comb)
+       Spectroscopic data + Kepler/Gaia for n stars in one table. (muirhead_comb or muirhead_lamost)
    isochrones: pandas.DataFrame
        Isochrones table. (isochrones)
+   source: 'Muirhead' or 'LAMOST' (default 'Muirhead')
+       Source for Teffs
 
    Returns
    -------
@@ -24,7 +26,11 @@ def fit_isochrone_lum(data, stellarobs, isochrones, gaia_lum=True):
 
     iso_fits = pd.DataFrame()
 
-    Teff_range = [float(data.Teff)-float(data.eTeff), float(data.Teff)+float(data.ETeff)]
+    if source=='Muirhead':
+        Teff_range = [float(data.Teff)-float(data.eTeff), float(data.Teff)+float(data.ETeff)]
+    elif source=='LAMOST':
+        Teff_range = [float(data.TEFF_AP)-float(data.TEFF_AP_ERR), float(data.TEFF_AP)+float(data.TEFF_AP_ERR)]
+
     Mstar_range = [float(data.Mstar)-float(data.e_Mstar), float(data.Mstar)+float(data.e_Mstar)]
     Rstar_range = [float(data.Rstar)-float(data.e_Rstar), float(data.Rstar)+float(data.e_Rstar)]
     lum_range = [float(data.lum_val)-float(data.lum_percentile_lower), float(data.lum_val)+float(data.lum_percentile_lower)]
