@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import scipy.constants as c
+import scipy.special as sc
 from tqdm import tqdm
 import batman
 
@@ -495,6 +496,48 @@ def log_probability(theta, g, gerr):
         return -np.inf
     return lp + log_likelihood(theta, g, gerr)
 
+
+# Bayesian Prior emcee functions
+#################################################################################
+
+def ewbprior(alpha, beta, e, w):
+    gamma1 = sc.hyp2f1(1, alpha, alpha+beta-1, -1)
+    t1 = ((beta-1)/(2*np.pi*gamma1*sc.gamma(alpha+beta)))
+    t2 = (1+(e*np.sin(w*(np.pi/180))))/(1-e**2)
+    t3 = ((1-e)**(beta-1)*e**(alpha-1))/sc.beta(alpha, beta)
+
+    return t1*t2*t3
+
+def bprior_log_likelihood(theta, g, gerr):
+    """Log of likelihood
+    model = g(e,w)
+    gerr = sigma of g distribution
+    """
+    w, e = theta
+    model = (1+e*np.sin(w*(np.pi/180.)))/np.sqrt(1-e**2)
+    sigma2 = gerr ** 2
+    return -0.5 * np.sum((g - model) ** 2 / sigma2 + np.log(sigma2))
+
+def bprior_log_prior(theta):
+    """Log of prior
+    e between 0 and 1
+    w between -90 and 300
+    """
+    w, e = theta
+    if 0.0 < e < 1.0 and -90.0 < w < 300.0:
+        return ewbprior(0.867, 3.03, e, w)
+    return -np.inf
+
+def bprior_log_probability(theta, g, gerr):
+    """Log of probability
+    """
+    lp = bprior_log_prior(theta)
+    if not np.isfinite(lp):
+        return -np.inf
+    return lp + log_likelihood(theta, g, gerr)
+
+#################################################################################
+
 def zscore(dat, mean, sigma):
     """Calculates zscore of a data point in (or outside of) a dataset
     zscore: how many sigmas away is a value from the mean of a dataset?
@@ -618,6 +661,8 @@ def tfit_log_probability(theta, time, ptime, flux, flux_err):
     if not np.isfinite(lp):
         return -np.inf
     return lp + tfit_log_likelihood(theta, time, ptime, flux, flux_err)
+
+
 
 def mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True):
     """One-step MCMC transit fitting with `photoeccentric`.
@@ -1137,3 +1182,153 @@ def photo_fit_noper(per, time, ptime, nflux, flux_err, guess_transit, guess_ew, 
         plt.close(fig)
 
     return per, rprs_f, a_f, i_f, fite, fitw, edist, wdist, gs, g_mean, g_sigmas, zsc
+
+
+###################################################################################################################
+
+def photo_fit_bprior(time, ptime, nflux, flux_err, guess_transit, guess_ew, rho_star, e, w, directory, nwalk, nsteps, ndiscard, plot_transit=True, plot_burnin=True, plot_corner=True, plot_Tburnin=True, plot_Tcorner=True):
+
+    """Fit eccentricity for a planet.
+
+    Applies Bayesian beta-dist prior from Kipping 2014
+
+    Parameters
+    ----------
+    time: np.array
+        Light curve time
+    nflux: np.array
+        Light curve flux
+    flux_err: np.array
+        Light curve flux errors
+    guess_transit: np.array (length 4)
+        Initial guess for MCMC transit fitting. Passed into mcmc_fitter().
+    guess_ew: np.array (length 2)
+        Initial guess for MCMC e and w fitting. [e guess, w guess]
+    rho_star: np.array
+        "True" stellar density distribution
+    e: float
+        True eccentricity (just to name plots)
+    w: float
+        True longitude of periastron (just to name plots)
+    directory: str
+        Directory to save plots
+    nwalk: int
+        Number of walkers
+    nsteps: int
+        Number of steps to run in MCMC. Passed into mcmc_fitter().
+    ndiscard: int
+        Number of steps to discard in MCMC. Passed into mcmc_fitter().
+    plot_transit: boolean, default True
+        Save transit light curve plot + fit in specified directory.
+
+    Returns
+    -------
+    fite: float
+        Best-fit eccentricity (mean of MCMC distribution)
+    fitw: float
+        Best-fit longitude of periastron (mean of MCMC distribution)
+    gs: np.array
+        "g" distribution for planet
+    g_mean: float
+        Mean of g distribution
+    g_sigmas: list (length 2)
+        [(-) sigma, (+) sigma] of g distribution
+    zsc: list (length 2)
+        Number of sigmas away [fit e, fit w] are from true [e, w]
+
+
+    """
+
+    # EMCEE Transit Model Fitting
+    _, _, pdist, rdist, adist, idist = mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
+
+    p_f, perr_f = mode(pdist), get_sigmas(pdist)
+    rprs_f, rprserr_f = mode(rdist), get_sigmas(rdist)
+    a_f, aerr_f = mode(adist), get_sigmas(adist)
+    i_f, ierr_f = mode(idist), get_sigmas(idist)
+
+    # Create a light curve with the fit parameters
+    # Boobooboo
+    fit = integratedlc_fitter(time, p_f, rprs_f, a_f, i_f)
+
+    if plot_transit==True:
+        plt.cla()
+        plt.errorbar(time, nflux, yerr=flux_err, c='blue', fmt='o', alpha=0.5, label='Original LC')
+        plt.scatter(time, fit, c='red', alpha=1.0)
+        plt.plot(time, fit, c='red', alpha=1.0, label='Fit LC')
+        #plt.xlim(-0.1, 0.1)
+        plt.legend()
+
+        plt.savefig(directory + 'lightcurve_fitp' + str(p_f) + '_fitrprs' + str(rprs_f) + '_fitars' + str(a_f) + '_fiti' + str(i_f) + '.png')
+        plt.close()
+
+    print('Fit params:')
+    print('Period (days): ', p_f)
+    print('Rp/Rs: ', rprs_f)
+    print('a/Rs: ', a_f)
+    print('i (deg): ', i_f)
+
+    T14dist = get_T14(pdist, rdist, adist, idist)
+    T23dist = get_T23(pdist, rdist, adist, idist)
+
+    gs, rho_c = get_g_distribution(rho_star, pdist, rdist, T14dist, T23dist)
+
+    g_mean = mode(gs)
+    g_sigma_min, g_sigma_plus = get_sigmas(gs)
+    g_sigmas = [g_sigma_min, g_sigma_plus]
+
+    #Guesses
+    w_guess = guess_ew[1]
+    e_guess = guess_ew[0]
+
+    solnx = (w_guess, e_guess)
+    pos = solnx + 1e-4 * np.random.randn(32, 2)
+    nwalkers, ndim = pos.shape
+
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, bprior_log_probability, args=(g_mean, np.nanmean(g_sigmas)), threads=4)
+
+    print('-------MCMC------')
+    sampler.run_mcmc(pos, 5000, progress=True);
+    flat_samples_e = sampler.get_chain(discard=1000, thin=15, flat=True)
+
+    if plot_burnin==True:
+
+        fig, axes = plt.subplots(2, figsize=(10, 7), sharex=True)
+        samples = sampler.get_chain()
+        labels = ["w", "e"]
+
+        for i in range(ndim):
+            ax = axes[i]
+            ax.plot(samples[:, :, i], "k", alpha=0.3)
+            ax.set_xlim(0, len(samples))
+            ax.set_ylabel(labels[i])
+            ax.yaxis.set_label_coords(-0.1, 0.5)
+
+        axes[-1].set_xlabel("step number");
+
+        fig.savefig(directory + 'e_g_burnin.png')
+        plt.close(fig)
+
+    edist = flat_samples_e[:,1]
+    wdist = flat_samples_e[:,0]
+
+    fite = np.percentile(edist, 50)
+    fitw = np.percentile(wdist, 50)
+
+    mcmc_e = np.percentile(edist, [16, 50, 84])
+    q_e = np.diff(mcmc_e)
+
+    mcmc_w = np.percentile(wdist, [16, 50, 84])
+    q_w = np.diff(mcmc_w)
+
+    zsc_e = zscore(e, mcmc_e[1], np.mean(q_e))
+    zsc_w = zscore(w, mcmc_w[1], np.mean(q_w))
+    zsc = [zsc_e, zsc_w]
+
+    if plot_corner==True:
+
+        fig = corner.corner(flat_samples_e, labels=labels, show_titles=True, title_kwargs={"fontsize": 12}, truths=[w, e], quantiles=[0.16, 0.5, 0.84], plot_contours=True);
+        fig.savefig(directory + 'corner_fit_e' + str(fite) + '_fit_w' + str(fitw) + '_fit_g' + str(g_mean) + '.png')
+        plt.close(fig)
+
+    return p_f, rprs_f, a_f, i_f, fite, fitw, edist, wdist, gs, g_mean, g_sigmas, zsc

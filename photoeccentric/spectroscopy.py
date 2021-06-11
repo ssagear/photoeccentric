@@ -28,6 +28,7 @@ def fit_isochrone_lum(data, stellarobs, isochrones, gaia_lum=True, source='Muirh
 
     if source=='Muirhead':
         Teff_range = [float(data.Teff)-float(data.eTeff), float(data.Teff)+float(data.ETeff)]
+        #print(Teff_range)
     elif source=='LAMOST':
         Teff_range = [float(data.TEFF_AP)-float(data.TEFF_AP_ERR), float(data.TEFF_AP)+float(data.TEFF_AP_ERR)]
 
@@ -39,6 +40,7 @@ def fit_isochrone_lum(data, stellarobs, isochrones, gaia_lum=True, source='Muirh
         if gaia_lum==True:
             if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1] and lum_range[0] < 10**isochrones.logl_ls[j] < lum_range[1]:
                 iso_fits = iso_fits.append(isochrones.loc[[j]])
+                #print(isochrones.loc[[j]])
 
         if gaia_lum==False:
             if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1]:
