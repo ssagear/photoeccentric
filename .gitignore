@@ -54,3 +54,5 @@ notebooks/datafiles/katie_sample/*
 notebooks/datafiles/sample_LCs/*
 notebooks/plots_hpg/*
 notebooks/*.png
+notebooks/all_new_heatmaps/*
+notebooks/segfits/*

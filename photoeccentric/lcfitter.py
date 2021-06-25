@@ -143,10 +143,10 @@ def integratedlc(time, per, rp, ars, e, inc, w):
 
     return flux
 
-def integratedlc_fitter(time, per, rp, ars, inc):
+def integratedlc_fitter(time, per, rp, ars, inc, t0):
 
     params = batman.TransitParams()       #object to store transit parameters
-    params.t0 = 0                        #time of inferior conjunction
+    params.t0 = t0                        #time of inferior conjunction
     params.per = per                      #orbital period
     params.rp = rp                        #planet radius (in units of stellar radii)
     params.a = ars                          #semi-major axis (in units of stellar radii)
@@ -288,7 +288,7 @@ def array_integrated(arr, nint):
 
     return arr
 
-def mode(dist):
+def mode(dist, bins=500):
 
     """Gets mode of a histogram.
 
@@ -303,6 +303,7 @@ def mode(dist):
         Mode
     """
 
-    n, bins = np.histogram(dist, bins=np.linspace(np.nanmin(dist), np.nanmax(dist), 100))
+    #n, bins = np.histogram(dist, bins=np.linspace(np.nanmin(dist), np.nanmax(dist), 100))
+    n, bins = np.histogram(dist, bins=np.linspace(np.nanmin(dist), np.nanmax(dist), bins))
     mode = bins[np.nanargmax(n)]
     return mode

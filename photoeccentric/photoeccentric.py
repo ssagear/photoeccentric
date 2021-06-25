@@ -484,7 +484,7 @@ def log_prior(theta):
     w between -90 and 300
     """
     w, e = theta
-    if 0.0 < e < 1.0 and -90.0 < w < 300.0:
+    if 0.0 < e < 1.0 and -90.0 < w < 270.0:
         return 0.0
     return -np.inf
 
@@ -524,8 +524,8 @@ def bprior_log_prior(theta):
     w between -90 and 300
     """
     w, e = theta
-    if 0.0 < e < 1.0 and -90.0 < w < 300.0:
-        return ewbprior(0.867, 3.03, e, w)
+    if 0.0 < e < 1.0 and -90.0 < w < 270.0:
+        return np.log(ewbprior(0.867, 3.03, e, w))
     return -np.inf
 
 def bprior_log_probability(theta, g, gerr):
@@ -534,7 +534,37 @@ def bprior_log_probability(theta, g, gerr):
     lp = bprior_log_prior(theta)
     if not np.isfinite(lp):
         return -np.inf
-    return lp + log_likelihood(theta, g, gerr)
+    return lp + bprior_log_likelihood(theta, g, gerr)
+
+#################################################################################
+
+def extprior_log_likelihood(theta, g, gerr):
+    """Log of likelihood
+    model = g(e,w)
+    gerr = sigma of g distribution
+    """
+    w, e = theta
+    model = (1+e*np.sin(w*(np.pi/180.)))/np.sqrt(1-e**2)
+    sigma2 = gerr ** 2
+    return -0.5 * np.sum((g - model) ** 2 / sigma2 + np.log(sigma2))
+
+def extprior_log_prior(theta):
+    """Log of prior
+    e between 0 and 1
+    w between -90 and 300
+    """
+    w, e = theta
+    if 0.0 < e < 0.1 and -90.0 < w < 270.0:
+        return 0.0
+    return -np.inf
+
+def extprior_log_probability(theta, g, gerr):
+    """Log of probability
+    """
+    lp = extprior_log_prior(theta)
+    if not np.isfinite(lp):
+        return -np.inf
+    return lp + extprior_log_likelihood(theta, g, gerr)
 
 #################################################################################
 
@@ -633,10 +663,13 @@ def tfit_log_likelihood(theta, time, ptime, flux, flux_err):
 
     """
 
-    per, rp, a, inc = theta
+    per, rp, a, inc, t0 = theta
 
-    model = integratedlc_fitter(time, per, rp, a, inc)
+    model = integratedlc_fitter(time, per, rp, a, inc, t0)
     sigma2 = flux_err ** 2
+
+
+    print(-0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2)))
 
     return -0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2))
 
@@ -648,7 +681,7 @@ def tfit_log_prior(theta):
     w must be between -90 and 300
 
     """
-    per, rp, a, inc = theta
+    per, rp, a, inc, t0 = theta
     if 0.0 < rp < 1.0 and 0.0 < inc < 90.0 and a > 0.0:
         return 0.0
     return -np.inf
@@ -711,8 +744,8 @@ def mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndis
 
     """
 
-    solnx = (guess_transit[0], guess_transit[1], guess_transit[2], guess_transit[3])
-    pos = solnx + 1e-4 * np.random.randn(nwalk, 4)
+    solnx = (guess_transit[0], guess_transit[1], guess_transit[2], guess_transit[3], guess_transit[4])
+    pos = solnx + 1e-4 * np.random.randn(nwalk, 5)
     nwalkers, ndim = pos.shape
 
     sampler = emcee.EnsembleSampler(nwalkers, ndim, tfit_log_probability, args=(time, ptime, nflux, flux_err), threads=4)
@@ -720,8 +753,8 @@ def mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndis
     samples = sampler.get_chain()
 
     if plot_Tburnin==True:
-        fig, axes = plt.subplots(4, figsize=(10, 7), sharex=True)
-        labels = ["period", "rprs", "a/Rs", "i"]
+        fig, axes = plt.subplots(5, figsize=(10, 7), sharex=True)
+        labels = ["period", "rprs", "a/Rs", "i", "t0"]
         for i in range(ndim):
             ax = axes[i]
             ax.plot(samples[:, :, i], "k", alpha=0.3)
@@ -751,8 +784,9 @@ def mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndis
     rprs_dist = flat_samples[:,1]
     ars_dist = flat_samples[:,2]
     i_dist = flat_samples[:,3]
+    t0_dist = flat_samples[:,4]
 
-    return results, results_errs, per_dist, rprs_dist, ars_dist, i_dist
+    return results, results_errs, per_dist, rprs_dist, ars_dist, i_dist, t0_dist
 
 def photo_fit(time, ptime, nflux, flux_err, guess_transit, guess_ew, rho_star, e, w, directory, nwalk, nsteps, ndiscard, plot_transit=True, plot_burnin=True, plot_corner=True, plot_Tburnin=True, plot_Tcorner=True):
 
@@ -806,16 +840,17 @@ def photo_fit(time, ptime, nflux, flux_err, guess_transit, guess_ew, rho_star, e
     """
 
     # EMCEE Transit Model Fitting
-    _, _, pdist, rdist, adist, idist = mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
+    _, _, pdist, rdist, adist, idist, t0dist = mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
 
     p_f, perr_f = mode(pdist), get_sigmas(pdist)
     rprs_f, rprserr_f = mode(rdist), get_sigmas(rdist)
     a_f, aerr_f = mode(adist), get_sigmas(adist)
     i_f, ierr_f = mode(idist), get_sigmas(idist)
+    t0_f, t0err_f = mode(t0dist), get_sigmas(t0dist)
 
     # Create a light curve with the fit parameters
     # Boobooboo
-    fit = integratedlc_fitter(time, p_f, rprs_f, a_f, i_f)
+    fit = integratedlc_fitter(time, p_f, rprs_f, a_f, i_f, t0_f)
 
     if plot_transit==True:
         plt.cla()
@@ -912,9 +947,9 @@ def tfit_noper_log_likelihood(theta, per, time, ptime, flux, flux_err):
 
     """
 
-    rp, a, inc = theta
+    rp, a, inc, t0 = theta
 
-    model = integratedlc_fitter(time, per, rp, a, inc)
+    model = integratedlc_fitter(time, per, rp, a, inc, t0)
     sigma2 = flux_err ** 2
 
     return -0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2))
@@ -927,9 +962,10 @@ def tfit_noper_log_prior(theta):
     w must be between -90 and 300
 
     """
-    rp, a, inc = theta
+    rp, a, inc, t0 = theta
     if 0.0 < rp < 1.0 and 0.0 < inc < 90.0 and a > 0.0:
-        return 0.0
+        if -0.2 < t0 < 0.2:
+            return 0.0
     return -np.inf
 
 def tfit_noper_log_probability(theta, per, time, ptime, flux, flux_err):
@@ -941,6 +977,7 @@ def tfit_noper_log_probability(theta, per, time, ptime, flux, flux_err):
         return -np.inf
     return lp + tfit_noper_log_likelihood(theta, per, time, ptime, flux, flux_err)
 
+##############################################################################################
 
 def mcmc_fitter_noper(guess_transit, per, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True):
     """One-step MCMC transit fitting with `photoeccentric`, does not fit orbital period.
@@ -952,7 +989,7 @@ def mcmc_fitter_noper(guess_transit, per, time, ptime, nflux, flux_err, nwalk, n
     Parameters
     ----------
     guess_transit: np.array
-        Initial guess: [Rp/Rs, a/Rs, i (deg)]
+        Initial guess: [Rp/Rs, a/Rs, i (deg), t0]
     per: float
         Known period (days)
     time: np.array
@@ -993,8 +1030,8 @@ def mcmc_fitter_noper(guess_transit, per, time, ptime, nflux, flux_err, nwalk, n
 
     """
 
-    solnx = (guess_transit[0], guess_transit[1], guess_transit[2])
-    pos = solnx + 1e-4 * np.random.randn(nwalk, 3)
+    solnx = (guess_transit[0], guess_transit[1], guess_transit[2], guess_transit[3])
+    pos = solnx + 1e-4 * np.random.randn(nwalk, 4)
     nwalkers, ndim = pos.shape
 
     sampler = emcee.EnsembleSampler(nwalkers, ndim, tfit_noper_log_probability, args=(per, time, ptime, nflux, flux_err), threads=4)
@@ -1002,8 +1039,8 @@ def mcmc_fitter_noper(guess_transit, per, time, ptime, nflux, flux_err, nwalk, n
     samples = sampler.get_chain()
 
     if plot_Tburnin==True:
-        fig, axes = plt.subplots(3, figsize=(10, 7), sharex=True)
-        labels = ["rprs", "a/Rs", "i"]
+        fig, axes = plt.subplots(4, figsize=(10, 7), sharex=True)
+        labels = ["rprs", "a/Rs", "i", "t0"]
         for i in range(ndim):
             ax = axes[i]
             ax.plot(samples[:, :, i], "k", alpha=0.3)
@@ -1032,8 +1069,9 @@ def mcmc_fitter_noper(guess_transit, per, time, ptime, nflux, flux_err, nwalk, n
     rprs_dist = flat_samples[:,0]
     ars_dist = flat_samples[:,1]
     i_dist = flat_samples[:,2]
+    t0_dist = flat_samples[:,3]
 
-    return results, results_errs, rprs_dist, ars_dist, i_dist
+    return results, results_errs, rprs_dist, ars_dist, i_dist, t0_dist
 
 def photo_fit_noper(per, time, ptime, nflux, flux_err, guess_transit, guess_ew, rho_star, e, w, directory, nwalk, nsteps, ndiscard, plot_transit=True, plot_burnin=True, plot_corner=True, plot_Tburnin=True, plot_Tcorner=True):
 
@@ -1090,14 +1128,15 @@ def photo_fit_noper(per, time, ptime, nflux, flux_err, guess_transit, guess_ew, 
     """
 
     # EMCEE Transit Model Fitting
-    _, _, rdist, adist, idist = mcmc_fitter(guess_transit, per, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
+    _, _, rdist, adist, idist, t0dist = mcmc_fitter(guess_transit, per, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
 
     rprs_f, rprserr_f = mode(rdist), get_sigmas(rdist)
     a_f, aerr_f = mode(adist), get_sigmas(adist)
     i_f, ierr_f = mode(idist), get_sigmas(idist)
+    t0_f, t0err_f = mode(t0dist), get_sigmas(t0dist)
 
     # Create a light curve with the fit parameters
-    fit = integratedlc_fitter(time, per, rprs_f, a_f, i_f)
+    fit = integratedlc_fitter(time, per, rprs_f, a_f, i_f, t0_f)
 
     if plot_transit==True:
         plt.cla()
@@ -1115,6 +1154,7 @@ def photo_fit_noper(per, time, ptime, nflux, flux_err, guess_transit, guess_ew, 
     print('Rp/Rs: ', rprs_f)
     print('a/Rs: ', a_f)
     print('i (deg): ', i_f)
+    print('t0: ', t0_f)
 
     pdist = np.array([per]*len(rdist))
 
@@ -1240,16 +1280,17 @@ def photo_fit_bprior(time, ptime, nflux, flux_err, guess_transit, guess_ew, rho_
     """
 
     # EMCEE Transit Model Fitting
-    _, _, pdist, rdist, adist, idist = mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
+    _, _, pdist, rdist, adist, idist, t0dist = mcmc_fitter(guess_transit, time, ptime, nflux, flux_err, nwalk, nsteps, ndiscard, e, w, directory, plot_Tburnin=True, plot_Tcorner=True)
 
     p_f, perr_f = mode(pdist), get_sigmas(pdist)
     rprs_f, rprserr_f = mode(rdist), get_sigmas(rdist)
     a_f, aerr_f = mode(adist), get_sigmas(adist)
     i_f, ierr_f = mode(idist), get_sigmas(idist)
+    t0_f, t0err_f = mode(t0dist), get_sigmas(t0dist)
 
     # Create a light curve with the fit parameters
     # Boobooboo
-    fit = integratedlc_fitter(time, p_f, rprs_f, a_f, i_f)
+    fit = integratedlc_fitter(time, p_f, rprs_f, a_f, i_f, t0_f)
 
     if plot_transit==True:
         plt.cla()
