@@ -921,17 +921,13 @@ def photo_fit(time, ptime, nflux, flux_err, guess_transit, guess_ew, rho_star, e
     mcmc_w = np.percentile(wdist, [16, 50, 84])
     q_w = np.diff(mcmc_w)
 
-    zsc_e = zscore(e, mcmc_e[1], np.mean(q_e))
-    zsc_w = zscore(w, mcmc_w[1], np.mean(q_w))
-    zsc = [zsc_e, zsc_w]
-
     if plot_corner==True:
 
         fig = corner.corner(flat_samples_e, labels=labels, show_titles=True, title_kwargs={"fontsize": 12}, truths=[w, e], quantiles=[0.16, 0.5, 0.84], plot_contours=True);
         fig.savefig(directory + 'corner_fit_e' + str(fite) + '_fit_w' + str(fitw) + '_fit_g' + str(g_mean) + '.png')
         plt.close(fig)
 
-    return p_f, rprs_f, a_f, i_f, fite, fitw, edist, wdist, gs, g_mean, g_sigmas, zsc
+    return p_f, rprs_f, a_f, i_f, fite, fitw, edist, wdist, gs, g_mean, g_sigmas, T14dist, T23dist
 
 
 
@@ -1210,17 +1206,13 @@ def photo_fit_noper(per, time, ptime, nflux, flux_err, guess_transit, guess_ew, 
     mcmc_w = np.percentile(wdist, [16, 50, 84])
     q_w = np.diff(mcmc_w)
 
-    zsc_e = zscore(e, mcmc_e[1], np.mean(q_e))
-    zsc_w = zscore(w, mcmc_w[1], np.mean(q_w))
-    zsc = [zsc_e, zsc_w]
-
     if plot_corner==True:
 
         fig = corner.corner(flat_samples_e, labels=labels, show_titles=True, title_kwargs={"fontsize": 12}, truths=[w, e], quantiles=[0.16, 0.5, 0.84], plot_contours=True);
         fig.savefig(directory + 'corner_fit_e' + str(fite) + '_fit_w' + str(fitw) + '_fit_g' + str(g_mean) + '.png')
         plt.close(fig)
 
-    return per, rprs_f, a_f, i_f, fite, fitw, edist, wdist, gs, g_mean, g_sigmas, zsc
+    return per, rprs_f, a_f, i_f, fite, fitw, edist, wdist, gs, g_mean, g_sigmas, T14dist, T23dist
 
 
 ###################################################################################################################
@@ -1361,14 +1353,10 @@ def photo_fit_bprior(time, ptime, nflux, flux_err, guess_transit, guess_ew, rho_
     mcmc_w = np.percentile(wdist, [16, 50, 84])
     q_w = np.diff(mcmc_w)
 
-    zsc_e = zscore(e, mcmc_e[1], np.mean(q_e))
-    zsc_w = zscore(w, mcmc_w[1], np.mean(q_w))
-    zsc = [zsc_e, zsc_w]
-
     if plot_corner==True:
 
         fig = corner.corner(flat_samples_e, labels=labels, show_titles=True, title_kwargs={"fontsize": 12}, truths=[w, e], quantiles=[0.16, 0.5, 0.84], plot_contours=True);
         fig.savefig(directory + 'corner_fit_e' + str(fite) + '_fit_w' + str(fitw) + '_fit_g' + str(g_mean) + '.png')
         plt.close(fig)
 
-    return p_f, rprs_f, a_f, i_f, fite, fitw, edist, wdist, gs, g_mean, g_sigmas, zsc
+    return p_f, rprs_f, a_f, i_f, fite, fitw, edist, wdist, gs, g_mean, g_sigmas, T14dist, T23dist

@@ -56,3 +56,4 @@ notebooks/plots_hpg/*
 notebooks/*.png
 notebooks/all_new_heatmaps/*
 notebooks/segfits/*
+notebooks/hpgresults/*
