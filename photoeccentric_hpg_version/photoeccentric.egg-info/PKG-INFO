@@ -1,0 +1,15 @@
+Metadata-Version: 1.0
+Name: photoeccentric
+Version: 0.0.0
+Summary: Fall 2020/Spring 2021
+Home-page: https://link-to-your-project
+Author: Sheila Sagear
+Author-email: ssagear@ufl.edu
+License: BSD 3-Clause License
+Description: photoeccentric
+        
+        Calculates stellar densities and eccentricities for exoplanets by the photoeccentric effect (Dawson & Johnson 2012) (https://arxiv.org/pdf/1203.5537.pdf).
+        
+        Tutorial: https://github.com/ssagear/photoeccentric/blob/master/notebooks/photoeccentric_tutorial.ipynb
+        
+Platform: UNKNOWN

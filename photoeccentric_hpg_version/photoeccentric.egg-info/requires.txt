@@ -1,0 +1,7 @@
+numpy
+astropy
+matplotlib
+tqdm
+emcee
+corner
+batman
