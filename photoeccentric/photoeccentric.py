@@ -669,7 +669,6 @@ def tfit_log_likelihood(theta, time, ptime, flux, flux_err):
     sigma2 = flux_err ** 2
 
 
-    print(-0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2)))
 
     return -0.5 * np.sum((flux - model) ** 2 / sigma2 + np.log(sigma2))
 
