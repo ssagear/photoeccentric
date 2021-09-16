@@ -6,7 +6,7 @@ from tqdm import tqdm
 import glob
 
 
-def fit_isochrone_lum(data, stellarobs, isochrones, gaia_lum=True, source='Muirhead'):
+def fit_isochrone_lum(data, isochrones, gaia_lum=True, source='Muirhead'):
     """Pulls isochrones where effective temperature, mass, radius, and luminosity fall within 1-sigma errorbars from an observed star.
 
    Parameters
@@ -27,27 +27,40 @@ def fit_isochrone_lum(data, stellarobs, isochrones, gaia_lum=True, source='Muirh
     iso_fits = pd.DataFrame()
 
     if source=='Muirhead':
+        print(data.Teff)
         Teff_range = [float(data.Teff)-float(data.eTeff), float(data.Teff)+float(data.ETeff)]
-        #print(Teff_range)
+
     elif source=='LAMOST':
         Teff_range = [float(data.TEFF_AP)-float(data.TEFF_AP_ERR), float(data.TEFF_AP)+float(data.TEFF_AP_ERR)]
 
     Mstar_range = [float(data.Mstar)-float(data.e_Mstar), float(data.Mstar)+float(data.e_Mstar)]
     Rstar_range = [float(data.Rstar)-float(data.e_Rstar), float(data.Rstar)+float(data.e_Rstar)]
-    lum_range = [float(data.lum_val)-float(data.lum_percentile_lower), float(data.lum_val)+float(data.lum_percentile_lower)]
+    lum_range = [float(data.lum_val)-float(data.lum_percentile_lower), float(data.lum_val)+float(data.lum_percentile_upper)]
 
-    for j in tqdm(range(len(isochrones))):
-        if gaia_lum==True:
-            if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1] and lum_range[0] < 10**isochrones.logl_ls[j] < lum_range[1]:
-                iso_fits = iso_fits.append(isochrones.loc[[j]])
-                #print(isochrones.loc[[j]])
+    if np.isnan(lum_range[0]) or np.isnan(lum_range[1]):
+        print(lum_range)
+        print("No Gaia Lums")
 
-        if gaia_lum==False:
+        for j in tqdm(range(len(isochrones))):
             if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1]:
                 iso_fits = iso_fits.append(isochrones.loc[[j]])
 
-    iso_fits['KIC'] = stellarobs['KIC']
-    iso_fits['KOI'] = stellarobs['KOI']
+    else:
+        print(lum_range)
+        print("Gaia Lums")
+
+        if gaia_lum==True:
+            for j in tqdm(range(len(isochrones))):
+                if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1] and lum_range[0] < 10**isochrones.logl_ls[j] < lum_range[1]:
+                    iso_fits = iso_fits.append(isochrones.loc[[j]])
+
+        if gaia_lum==False:
+            for j in tqdm(range(len(isochrones))):
+                if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1]:
+                    iso_fits = iso_fits.append(isochrones.loc[[j]])
+
+    #iso_fits['KIC'] = stellarobs['KIC']
+    #iso_fits['KOI'] = stellarobs['KOI']
 
     return iso_fits
 
@@ -104,10 +117,10 @@ def get_cdf(dist, nbins=100):
     cdf = cdf/np.max(cdf)
     return bin_edges[1:], cdf
 
-def find_nearest_index(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return int(np.where(array == array[idx])[0])
+# def find_nearest_index(array, value):
+#     array = np.asarray(array)
+#     idx = (np.abs(array - value)).argmin()
+#     return int(np.where(array == array[idx])[0])
 
 def find_nearest_index(array, value):
     array = np.asarray(array)

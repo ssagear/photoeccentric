@@ -58,3 +58,7 @@ notebooks/all_new_heatmaps/*
 notebooks/segfits/*
 notebooks/hpgresults/*
 notebooks/ph_segfits/*
+
+# In Progress #
+notebooks/*
+!photoeccentric_tutorial
