@@ -56,9 +56,20 @@ notebooks/plots_hpg/*
 notebooks/*.png
 notebooks/all_new_heatmaps/*
 notebooks/segfits/*
-notebooks/hpgresults/*
-notebooks/ph_segfits/*
+notebooks/hpgresults
+notebooks/ph_segfits
+notebooks/segfits/947_dynesty
+notebooks/utility_notebooks
+notebooks/datafiles/sample_SCs
+notebooks/datafiles/sample_LCs/
+notebooks/datafiles
+notebooks/*
+
 
 # In Progress #
-notebooks/*
-!photoeccentric_tutorial
+notebooks/*.ipynb
+notebooks/*.dat
+notebooks/*.csv
+notebooks/*.py
+notebooks/familyportrait
+!notebooks/photoeccentric_tutorial.ipynb
