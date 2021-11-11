@@ -63,7 +63,6 @@ notebooks/utility_notebooks
 notebooks/datafiles/sample_SCs
 notebooks/datafiles/sample_LCs/
 notebooks/datafiles
-notebooks/*
 
 
 # In Progress #
@@ -72,4 +71,5 @@ notebooks/*.dat
 notebooks/*.csv
 notebooks/*.py
 notebooks/familyportrait
+notebooks/*
 !notebooks/photoeccentric_tutorial.ipynb

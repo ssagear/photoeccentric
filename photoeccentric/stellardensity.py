@@ -1,8 +1,8 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
-from astropy.io import fits
-from tqdm import tqdm
+import pandas as pd
+
+from .utils import *
 
 def get_kepID(hdul):
     """Pulls KIC IDs from Kepler-Gaia dataset.
@@ -264,6 +264,26 @@ def solar_density():
     return sol_density
 
 
+def read_stellar_params(isodf):
+    mstar = isodf["mstar"].mean()
+    mstar_err = isodf["mstar"].std()
+    rstar = isodf["radius"].mean()
+    rstar_err = isodf["radius"].std()
+
+    return mstar, mstar_err, rstar, rstar_err
+
+
+
+def get_rho_star(mstar, mstar_err, rstar, rstar_err, arrlen=1000):
+
+    density, mass, radius = find_density_dist_symmetric(mstar, mstar_err, rstar, rstar_err, npoints=arrlen)
+
+    mean_density = mode(density)
+
+    return density, mass, radius, mean_density
+
+
+
 def find_density_dist_symmetric(mass, masserr, radius, raderr, npoints):
     """Gets symmetric stellar density distribution for stars.
     Symmetric stellar density distribution = Gaussian with same sigma on each end.
@@ -300,6 +320,7 @@ def find_density_dist_symmetric(mass, masserr, radius, raderr, npoints):
 
     mass_dist = np.random.normal(mass*smass_kg, masserr*smass_kg, npoints)
     rad_dist = np.random.normal(radius*srad_m, raderr*srad_m, npoints)
+
 
     #Add each density point to rho_temp (for each star)
     for point in range(len(mass_dist)):
@@ -387,3 +408,177 @@ def find_density_dist_asymmetric(ntargs, masses, masserr1, masserr2, radii, rade
 
 
     return rho_dist, mass_dist, rad_dist
+
+
+
+
+def fit_isochrone_lum(data, isochrones, gaia_lum=True, source='Muirhead', lum_source='Gaia', lums=None):
+    """Pulls isochrones where effective temperature, mass, radius, and luminosity fall within 1-sigma errorbars from an observed star.
+
+   Parameters
+   ----------
+   data: pandas.DataFrame
+       Spectroscopic data + Kepler/Gaia for n stars in one table. (muirhead_comb or muirhead_lamost)
+   isochrones: pandas.DataFrame
+       Isochrones table. (isochrones)
+   source: 'Muirhead' or 'LAMOST' (default 'Muirhead')
+       Source for Teffs
+
+   Returns
+   -------
+   iso_fits_final: pandas.DataFrame()
+       All isochrones that are consistent with this star based on spectroscopy and Gaia luminosity.
+   """
+
+    from tqdm import tqdm
+
+    iso_fits = pd.DataFrame()
+
+    wide = 1
+
+    if source=='Muirhead':
+        Teff_range = [float(data.Teff)-wide*float(data.eTeff), float(data.Teff)+wide*float(data.ETeff)]
+
+    elif source=='LAMOST':
+        Teff_range = [float(data.TEFF_AP)-float(data.TEFF_AP_ERR), float(data.TEFF_AP)+float(data.TEFF_AP_ERR)]
+
+    # Muirhead
+    Mstar_range = [float(data.Mstar)-wide*float(data.e_Mstar), float(data.Mstar)+wide*float(data.e_Mstar)]
+    # Muirhead
+    Rstar_range = [float(data.Rstar)-wide*float(data.e_Rstar), float(data.Rstar)+wide*float(data.e_Rstar)]
+
+    # Gaia
+    lum_range = [float(data.lum_percentile_lower), float(data.lum_percentile_upper)]
+
+    if lum_source=='custom':
+        lum_range=lums
+
+    print(Teff_range)
+    print(Rstar_range)
+    print(lum_range)
+
+    if np.isnan(lum_range[0]) or np.isnan(lum_range[1]):
+        #print(lum_range)
+        print("No Gaia Lums")
+
+        for j in tqdm(range(len(isochrones))):
+            if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1]:
+                iso_fits = iso_fits.append(isochrones.loc[[j]])
+
+    else:
+        print("Gaia Lums")
+
+        templums = []
+
+        if gaia_lum==True:
+            for j in tqdm(range(len(isochrones))):
+                #print(10**isochrones.logl_ls[j])
+                if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1] and lum_range[0] < 10**isochrones.logl_ls[j] < lum_range[1]:
+                    iso_fits = iso_fits.append(isochrones.loc[[j]])
+            print(len(iso_fits))
+
+        if gaia_lum==False:
+            for j in tqdm(range(len(isochrones))):
+                if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1]:
+                    iso_fits = iso_fits.append(isochrones.loc[[j]])
+                    templums.append(10**isochrones.logl_ls[j])
+            print(len(iso_fits))
+            print(np.nanmin(templums), np.nanmax(templums))
+
+    #iso_fits['KIC'] = stellarobs['KIC']
+    #iso_fits['KOI'] = stellarobs['KOI']
+
+    return iso_fits
+
+def solar_density():
+    #Define Solar density for 1 Msol and 1 Rsol in kg/m3
+    sol_density = ((1.*1.989e30)/((4./3.)*np.pi*1.**3*696.34e6**3))
+    return sol_density
+
+def find_density_dist(mass_dist, rad_dist, norm=None):
+
+    rho_dist = np.zeros(len(mass_dist))
+    #for point from 0 to len(isochrones)
+    #Adding each density point to rho_dist
+    for point in range(len(mass_dist)):
+        rho_dist[point] = density(mass_dist[point], rad_dist[point], norm=norm)
+
+    return rho_dist
+
+def density(mass, radius, norm=None):
+    """Mass in solar density
+    Radius in solar density
+    sol_density in kg/m^3"""
+
+    if norm==None:
+        return ((mass)/((4./3.)*np.pi*radius**3))
+    else:
+        return ((mass)/((4./3.)*np.pi*radius**3))/float(norm)
+
+def iso_lists(path):
+
+    from glob import glob
+
+    iso_lst = []
+    files = glob.glob(path)
+    for f in files:
+        iso_lst.append(pd.read_csv(f))
+    return iso_lst
+
+
+def dict_rhos(isos):
+    dict = {}
+    for i in range(len(isos)):
+        kic = isos[i].KIC[0]
+        dict["{0}".format(kic)] = find_density_dist(np.array(isos[i].mstar), np.array(isos[i].radius))
+    return dict
+
+
+def rho_dict_to_csv(rho_dict, filename):
+    pd.DataFrame.from_dict(rho_dict, orient='index').transpose().to_csv(filename, index=False)
+
+
+def get_cdf(dist, nbins=100):
+    counts, bin_edges = np.histogram(dist, bins=nbins, range=(np.min(dist), np.max(dist)))
+    cdf = np.cumsum(counts)
+    cdf = cdf/np.max(cdf)
+    return bin_edges[1:], cdf
+
+# def find_nearest_index(array, value):
+#     array = np.asarray(array)
+#     idx = (np.abs(array - value)).argmin()
+#     return int(np.where(array == array[idx])[0])
+
+def find_nearest_index(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    if len(np.where(array == array[idx])[0]) == 1:
+        return int(np.where(array == array[idx])[0])
+    else:
+        return int(np.where(array == array[idx])[0][0])
+
+def find_sigma(x, cdf, sign):
+    med = x[find_nearest_index(cdf, 0.5)]
+    if sign == "-":
+        sigma = x[find_nearest_index(cdf, 0.16)] - med
+    elif sign == "+":
+        sigma = x[find_nearest_index(cdf, 0.84)] - med
+    return sigma
+
+def plot_cdf(x, cdf):
+    plt.plot(x, cdf)
+    plt.axvline(x=x[find_nearest_index(cdf, 0.5)], c='r', label='Median')
+    plt.axvline(x=x[find_nearest_index(cdf, 0.5)]+find_sigma(x, cdf, "-"), c='blue', label='- sigma')
+    plt.axvline(x=x[find_nearest_index(cdf, 0.5)]+find_sigma(x, cdf, "+"), c='orange', label='+ sigma')
+    plt.legend()
+    plt.xlabel('Density')
+
+
+def iterate_stars(rho_dict):
+    for key, val in rho_dict.items():
+        x, cdf = get_cdf(rho_dict[key])
+        sigma_minus = find_sigma(x, cdf, "-")
+        sigma_plus = find_sigma(x, cdf, "+")
+
+        df = pd.DataFrame({"x" : x, "cdf" : cdf, "sigma_minus": sigma_minus, "sigma_plus": sigma_plus})
+        df.to_csv("cdfs/cdf_lum/cdf_lum_" + str(key) + ".csv", index=False)
