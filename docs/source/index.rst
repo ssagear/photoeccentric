@@ -1,10 +1,8 @@
-Welcome to Lumache's documentation!
+Welcome to photoeccentric's documentation!
 ===================================
 
-**Lumache** (/lu'make/) is a Python library for cooks and food lovers
-that creates recipes mixing random ingredients.
-It pulls data from the `Open Food Facts database <https://world.openfoodfacts.org/>`_
-and offers a *simple* and *intuitive* API.
+
+Calculates stellar densities and eccentricities for exoplanets by the photoeccentric effect (Dawson & Johnson 2012) (https://arxiv.org/pdf/1203.5537.pdf)
 
 Check out the :doc:`usage` section for further information, including
 how to :ref:`installation` the project.
