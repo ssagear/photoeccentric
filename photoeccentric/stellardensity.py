@@ -410,24 +410,26 @@ def find_density_dist_asymmetric(ntargs, masses, masserr1, masserr2, radii, rade
     return rho_dist, mass_dist, rad_dist
 
 
-
-
-def fit_isochrone_lum(data, isochrones, gaia_lum=True, source='Muirhead', lum_source='Gaia', lums=None):
-    """Pulls isochrones where effective temperature, mass, radius, and luminosity fall within 1-sigma errorbars from an observed star.
+def fit_isochrone_lum(data, isochrones, luminosity=True, lum_source='Gaia', lums=None):
+    """Gets stellar isochrones where effective temperature, mass, radius, and luminosity all fall within 1-sigma errorbars from stellar data.
 
    Parameters
    ----------
    data: pandas.DataFrame
-       Spectroscopic data + Kepler/Gaia for n stars in one table. (muirhead_comb or muirhead_lamost)
+       Spectroscopic data + Kepler/Gaia data for n stars in one table. (muirhead_comb)
    isochrones: pandas.DataFrame
-       Isochrones table. (isochrones)
-   source: 'Muirhead' or 'LAMOST' (default 'Muirhead')
-       Source for Teffs
+       Table of isochrones. (isochrones)
+   luminosity: boolean
+       'True' if including stellar luminosity constraints.
+   lum_source: 'Gaia' or 'custom'
+       If 'Gaia', use published Gaia stellar luminosity from input data. If 'custom', provide custom luminosity constraints ('lums' keyword must be defined in this case).
+   lums: list
+       List of custom luminosities (length 2) containing [lower luminostiy limit, upper luminosity limit] (Solar Luminosity)
 
    Returns
    -------
-   iso_fits_final: pandas.DataFrame()
-       All isochrones that are consistent with this star based on spectroscopy and Gaia luminosity.
+   iso_fits: pandas.DataFrame()
+       Set of all isochrones that are consistent with this star based on spectroscopy and Gaia luminosity.
    """
 
     from tqdm import tqdm
@@ -436,57 +438,39 @@ def fit_isochrone_lum(data, isochrones, gaia_lum=True, source='Muirhead', lum_so
 
     wide = 1
 
-    if source=='Muirhead':
-        Teff_range = [float(data.Teff)-wide*float(data.eTeff), float(data.Teff)+wide*float(data.ETeff)]
+    Teff_range = [float(data.Teff)-wide*float(data.eTeff), float(data.Teff)+wide*float(data.ETeff)]
 
-    elif source=='LAMOST':
-        Teff_range = [float(data.TEFF_AP)-float(data.TEFF_AP_ERR), float(data.TEFF_AP)+float(data.TEFF_AP_ERR)]
-
-    # Muirhead
     Mstar_range = [float(data.Mstar)-wide*float(data.e_Mstar), float(data.Mstar)+wide*float(data.e_Mstar)]
-    # Muirhead
     Rstar_range = [float(data.Rstar)-wide*float(data.e_Rstar), float(data.Rstar)+wide*float(data.e_Rstar)]
 
-    # Gaia
-    lum_range = [float(data.lum_percentile_lower), float(data.lum_percentile_upper)]
+    if lum_source=='Gaia': # Use published Gaia luminosities
+        lum_range = [float(data.lum_percentile_lower), float(data.lum_percentile_upper)]
 
-    if lum_source=='custom':
+    if lum_source=='custom': # Use input custom luminosities
         lum_range=lums
 
-    print(Teff_range)
-    print(Rstar_range)
-    print(lum_range)
-
     if np.isnan(lum_range[0]) or np.isnan(lum_range[1]):
-        #print(lum_range)
-        print("No Gaia Lums")
+        print("No Gaia luminosity estimates exist for this star. Defaulting to use spectroscopy data only.")
 
         for j in tqdm(range(len(isochrones))):
             if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1]:
                 iso_fits = iso_fits.append(isochrones.loc[[j]])
 
     else:
-        print("Gaia Lums")
 
         templums = []
-
-        if gaia_lum==True:
+        if luminosity==True:
             for j in tqdm(range(len(isochrones))):
-                #print(10**isochrones.logl_ls[j])
                 if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1] and lum_range[0] < 10**isochrones.logl_ls[j] < lum_range[1]:
                     iso_fits = iso_fits.append(isochrones.loc[[j]])
-            print(len(iso_fits))
+            print('Number of fit isochrones: ', len(iso_fits))
 
-        if gaia_lum==False:
+        if luminosity==False:
             for j in tqdm(range(len(isochrones))):
                 if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1]:
                     iso_fits = iso_fits.append(isochrones.loc[[j]])
                     templums.append(10**isochrones.logl_ls[j])
-            print(len(iso_fits))
-            print(np.nanmin(templums), np.nanmax(templums))
-
-    #iso_fits['KIC'] = stellarobs['KIC']
-    #iso_fits['KOI'] = stellarobs['KOI']
+            print('Number of fit isochrones: ', len(iso_fits))
 
     return iso_fits
 

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 def get_lc_files(KIC, KICs, lcpath):
+    """Gets a list of light curves from a directory."""
 
     import os
 
@@ -20,44 +21,69 @@ def get_lc_files(KIC, KICs, lcpath):
     return files
 
 def get_mid(time):
-    """Gets approximately 1/2 of cadence time."""
+    """Returns approximately 1/2 of cadence time."""
 
     return (time[1]-time[0])/2.
 
 def find_nearest(array, value):
+    """Gets the nearest element of array to a value."""
     array = np.asarray(array)
     idx = np.nanargmin((np.abs(array - value)))
     return array[idx]
 
 
-def get_ptime(time, mid, num):
-    """Time, get_mid, number of vals"""
+def find_nearest_index(array, value):
+    """Gets the index of the nearest element of array to a value."""
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    if len(np.where(array == array[idx])[0]) == 1:
+        return int(np.where(array == array[idx])[0])
+    else:
+        return int(np.where(array == array[idx])[0][0])
 
-    eti = []
+def get_sigma_individual(SNR, N, Ntransits, tdepth):
+    """Gets size of individual error bar for a certain light curve signal to noise ratio.
 
-    for i in range(len(time)):
-        ettemp = np.linspace(time[i]-mid, time[i]+mid, num, endpoint=True)
-        ettemp = list(ettemp)
+    Parameters
+    ----------
+    SNR: float
+        Target light curve signal to noise ratio
+    N: int
+        Number of in-transit flux points for each transit
+    Ntransits: int
+        Number of transits in light light curve
+    tdepth: float
+        Transit depth (Rp/Rs)^2
 
-        eti.append(ettemp)
+    Returns
+    -------
+    sigma_individual: float
+        Size of individual flux error bar
+    """
+    sigma_full = np.sqrt(Ntransits)*(tdepth/SNR)
+    sigma_individual = sigma_full*np.sqrt(N)
+    return sigma_individual
 
-    ptime = np.array([item for sublist in eti for item in sublist])
 
-    return ptime
+def get_N_intransit(tdur, cadence):
+    """Estimates number of in-transit points for transits in a light curve.
 
-def divide_chunks(l, n):
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
+    Parameters
+    ----------
+    tdur: float
+        Full transit duration
+    cadence: float
+        Cadence/integration time for light curve
 
-def array_integrated(arr, nint):
-
-    arr = list(divide_chunks(arr, nint))
-    arr = np.mean(np.array(arr), axis=1)
-
-    return arr
+    Returns
+    -------
+    n_intransit: int
+        Number of flux points in each transit
+    """
+    n_intransit = tdur//cadence
+    return n_intransit
 
 def mode(dist, bins=500):
-
     """Gets mode of a histogram.
 
     Parameters
@@ -119,125 +145,8 @@ def get_e_from_def(g, w):
     e = num/den
     return e
 
-#
-# def fit_keplc_emcee(KOI, transitmpt, time, flux, flux_err, nwalk, nsteps, ndiscard, nbuffer, spectplanets, muirhead_comb):
-#
-#     """
-#     One-step long-cadence light curve fitting with `emcee`.
-#
-#     Parameters:
-#     ----------
-#     KOI: int
-#         KOI # of planet
-#     midpoints: list
-#         Transit mid-times (BJD).
-#     time: np.array
-#         Time stamps of stitched long-cadence LCs.
-#     flux: np.array
-#         Normalized flux (to 1) of stitched long-cadence LCs.
-#     flux_err: np.array
-#         Normalized flux errors (to 1) of stitched long-cadence LCs.
-#     period: float
-#         Orbital period (days)
-#     nwalk: int
-#         Number of MCMC walkers
-#     nsteps: int
-#         Number of MCMC steps
-#     ndiscard: int
-#         Number of MCMC steps to discard (post-burn-in)
-#     nbuffer: int
-#         Number of out-of-transit data points to keep before and after transit
-#     spectplanets: pd.DataFrame
-#         Spectroscopy data from Muirhead et al. (2013) for targets
-#     muirhead_comb: pd.DataFrame
-#         Combined stellar params and Gaia data for targets
-#
-#     Returns:
-#     -------
-#     ms: list
-#         Linear fit slopes in order.
-#     bs: list
-#         Linear fit y-intercepts in order.
-#     timesBJD: list
-#         Time stamps of transit segments, BJD.
-#     timesPhase: list
-#         Time stamps of transit segments, phase (midpoint=0).
-#     fluxNorm: list
-#         Normalized, linfit-subtracted flux of transit segments.
-#     fluxErrs: list
-#         Normalized flux errors of transit segments.
-#     rpDists: list
-#         Fit Rp/Rs distributions.
-#     arsDists: list
-#         Fit a/Rs distributions.
-#     incDists: list
-#         Fit inclination distributions.
-#     t0Dists: lsit
-#         Fit t0 distributions.
-#
-#
-#     """
-#
-#     import emcee
-#     import os
-#
-#     print('dfkjsaflajsbflasjbfalsjb')
-#
-#     smass_kg = 1.9885e30  # Solar mass (kg)
-#     srad_m = 696.34e6 # Solar radius (m)
-#
-#     # Get alt IDs
-#     kepid = get_KIC(KOI, muirhead_comb)
-#     kepname = spectplanets.loc[spectplanets['kepid'] == kepid].kepler_name.values[0]
-#     kepoiname = spectplanets.loc[spectplanets['kepid'] == float(kepid)].kepoi_name.values[0]
-#     print('kepoiname', kepoiname)
-#     #kepoiname = kepoiname.replace('.01', '.01')
-#
-#     # Define directory to save
-#     direct = 'ph_segfits/' + str(KOI) + '_emcee/'
-#     if not os.path.exists(direct):
-#         os.mkdir(direct)
-#
-#     # Read in isohrone fits from csv
-#     isodf = pd.read_csv("datafiles/isochrones/iso_lums_" + str(kepid) + ".csv")
-#
-#
-#     # Stellar params from isochrone
-#     mstar = isodf["mstar"].mean()
-#     mstar_err = isodf["mstar"].std()
-#     rstar = isodf["radius"].mean()
-#     rstar_err = isodf["radius"].std()
-#     # Planet params from archive
-#     period, period_uerr, period_lerr, rprs, rprs_uerr, rprs_lerr, _, a_uerr_arc, a_lerr_arc, inc, _, _ = planet_params_from_archive(spectplanets, kepoiname)
-#
-#     # Calculate a/Rs to ensure that it's consistent with the spectroscopy/Gaia stellar density.
-#     a_rs = calc_a(period*86400.0, mstar*smass_kg, rstar*srad_m)
-#     a_rs_err = np.mean((a_uerr_arc, a_lerr_arc))
-#
-#     print('Stellar mass (Msun): ', mstar, 'Stellar radius (Rsun): ', rstar)
-#     print('Period (Days): ', period, 'Rp/Rs: ', rprs)
-#     print('a/Rs: ', a_rs)
-#     print('i (deg): ', inc)
-#
-#     # Inital guess: period, rprs, a/Rs, i, w
-#     p0 = [period, rprs, a_rs, inc, transitmpt]
-#
-#     mid = get_mid(time)
-#     ptime = get_ptime(time, mid, 29)
-#     arrlen = (nsteps-ndiscard)*nwalk
-#
-#     # EMCEE Transit Model Fitting
-#     res,reserrs, pdist, rdist, adist, idist, t0dist = mcmc_fitter(p0, time, ptime, flux, flux_err, nwalk, nsteps, ndiscard, 'X', 'X', direct, plot_Tburnin=False, plot_Tcorner=False)
-#
-#     # Create a light curve with the fit parameters
-#     mcmcfit = integratedlc_fitter(t1, mode(pdist), mode(rdist), mode(adist), mode(idist), mode(t0dist))
-#     truefit = integratedlc_fitter(t1, period, rprs, a_rs, inc, 0)
-#
-#     return res, reserrs, pdist, rdist, adist, idist, t0dist
-
-
-
 def calc_a_from_rho(period, rho_star):
+    """Calculate semimajor axis in stellar radii (a/Rs) from orbital period and average stellar density."""
 
     import scipy.constants as c
     a_rs = (((period*86400.0)**2)*((c.G*rho_star)/(3*c.pi)))**(1./3.)
@@ -245,6 +154,7 @@ def calc_a_from_rho(period, rho_star):
 
 
 def get_cdf(dist, nbins=250):
+    """Gets a CDF of a distribution."""
 
     counts, bin_edges = np.histogram(dist, bins=nbins, range=(np.min(dist), np.max(dist)))
     cdf = np.cumsum(counts)
@@ -256,15 +166,30 @@ def get_cdf_val(cdfx, cdfy, val):
     cdfval = cdfy[find_nearest_index(cdfx, val)]
     return cdfval
 
-
 def get_ppf_val(cdfx, cdfy, val):
     cdfval = cdfx[find_nearest_index(cdfy, val)]
     return cdfval
 
-def find_nearest_index(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    if len(np.where(array == array[idx])[0]) == 1:
-        return int(np.where(array == array[idx])[0])
-    else:
-        return int(np.where(array == array[idx])[0][0])
+
+def calc_r(a_rs, e, w):
+    """Calculate r (the planet-star distance) at any point during an eccentric orbit.
+    Equation 20 in Murray & Correia Text
+
+    Parameters
+    ----------
+    a_rs: float
+        Semi-major axis (Stellar radius)
+    e: float
+        Eccentricity
+    w: float
+        Longitude of periastron (degrees)
+
+    Returns
+    -------
+    r_rs: float
+        Planet-star distance (Stellar radius)
+    """
+
+    wrad = w*(np.pi/180.)
+    r_rs = (a_rs*(1-e**2))/(1+e*np.cos(wrad-(np.pi/2.)))
+    return r_rs

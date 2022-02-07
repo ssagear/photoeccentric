@@ -70,6 +70,4 @@ notebooks/*.ipynb
 notebooks/*.dat
 notebooks/*.csv
 notebooks/*.py
-notebooks/familyportrait
-notebooks/*
 !notebooks/photoeccentric_tutorial.ipynb
