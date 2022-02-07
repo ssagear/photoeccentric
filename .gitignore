@@ -20,6 +20,10 @@
 *.tar
 *.zip
 
+
+*.fits
+*sdss*
+
 # Logs and databases #
 ######################
 *.log
@@ -41,33 +45,4 @@ Thumbs.db
 photoeccentric.egg-info/*
 dist/*
 build/*
-
-# Large Files #
-##############
-notebooks/plots/*
-notebooks/sensitivity_test_results/*
-notebooks/datafiles/Kepler-Gaia/*
-notebooks/datafiles/isochrones_ignore/*
-notebooks/datafiles/Muirhead2013_isochrones/isochrones_sdss_spitzer_lowmass.dat
-notebooks/datafiles/MAST*
-notebooks/datafiles/katie_sample/*
-notebooks/datafiles/sample_LCs/*
-notebooks/plots_hpg/*
-notebooks/*.png
-notebooks/all_new_heatmaps/*
-notebooks/segfits/*
-notebooks/hpgresults
-notebooks/ph_segfits
-notebooks/segfits/947_dynesty
-notebooks/utility_notebooks
-notebooks/datafiles/sample_SCs
-notebooks/datafiles/sample_LCs/
-notebooks/datafiles
-
-
-# In Progress #
-notebooks/*.ipynb
-notebooks/*.dat
-notebooks/*.csv
-notebooks/*.py
-!notebooks/photoeccentric_tutorial.ipynb
+docs/tutorials/.ipynb_checkpoints/

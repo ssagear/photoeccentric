@@ -19,12 +19,3 @@ Contents
    :caption: User Guide
 
    user/installation
-   user/gettingstarted
-   user/api
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Tutorials
-
-   tutorials/simulatedfit
-   tutorials/lightcurvefit
