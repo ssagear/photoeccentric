@@ -1,9 +1,3 @@
-Template for the Read the Docs tutorial
-=======================================
+photoeccentric
 
-This GitHub template includes fictional Python library
-with some basic Sphinx docs.
-
-Read the tutorial here:
-
-https://docs.readthedocs.io/en/stable/tutorial/
+Calculates stellar densities and eccentricities for exoplanets by the photoeccentric effect (Dawson & Johnson 2012) (https://arxiv.org/pdf/1203.5537.pdf).
