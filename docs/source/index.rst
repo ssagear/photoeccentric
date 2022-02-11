@@ -19,3 +19,11 @@ Contents
    :caption: User Guide
 
    user/installation
+
+ .. toctree::
+
+    :maxdepth: 1
+    :caption: Tutorials
+
+    tutorials/photoeccentric_tutorial
+    tutorials/photoeccentric_lightcurvefitting
