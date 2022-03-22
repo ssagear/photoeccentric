@@ -17,4 +17,4 @@ Contents
 .. toctree::
    :numbered:
 
-   \user\installation
+   user\installation.rst
