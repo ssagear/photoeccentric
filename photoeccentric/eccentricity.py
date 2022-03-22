@@ -52,16 +52,16 @@ def get_T14(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
     chidot = np.zeros(nf)
     for j in range(nf):
 
-        p[j] = p[j]#*86400
+        p[j] = p[j]
 
-        rs_a[j] = 1.0/a_rs[j]                  # Rs/a - rstar in units of semimajor axis
+        rs_a[j] = 1.0/a_rs[j] # Rs/a - rstar in units of semimajor axis
         b[j] = a_rs[j]*np.cos(i[j]*(np.pi/180.0))   # convert i to radians
 
         T14[j] = (p[j]/np.pi)*np.arcsin(rs_a[j]*(np.sqrt(((1+rprs[j])**2)-b[j]**2))/np.sin(i[j]*(np.pi/180.0))) #Equation 14 in exoplanet textbook
 
         if ecc_prior==True:
             chidot[j] = np.sqrt(1-e[j]**2)/(1+e[j]*np.sin(w[j]*(np.pi/180.0))) #Equation 16 in exoplanet textbook
-            return T14[j]*chidot[j]
+            T14[j] =  T14[j]*chidot[j]
 
     return T14
 
@@ -104,17 +104,16 @@ def get_T23(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
 
     for j in range(nf):
 
-        p[j] = p[j]#*86400
+        p[j] = p[j]
 
         rs_a[j] = 1.0/a_rs[j]                  # Rs/a - rstar in units of semimajor axis
         b[j] = a_rs[j]*np.cos(i[j]*(np.pi/180.0))   # convert i to radians
 
         T23[j] = (p[j]/np.pi)*np.arcsin(rs_a[j]*(np.sqrt(((1-rprs[j])**2)-b[j]**2))/np.sin(i[j]*(np.pi/180.0))) #Equation 14 in exoplanet textbook
-        #print(np.sqrt((1-rprs[j])**2))
-        #print(-b[j]**2)
+
         if ecc_prior==True:
             chidot[j] = np.sqrt(1-e[j]**2)/(1+e[j]*np.sin(w[j]*(np.pi/180.0))) #Equation 16 in exoplanet textbook
-            return T23[j]*chidot[j]
+            T23[j] = T23[j]*chidot[j]
 
     return T23
 

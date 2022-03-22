@@ -528,10 +528,6 @@ def get_cdf(dist, nbins=100):
     cdf = cdf/np.max(cdf)
     return bin_edges[1:], cdf
 
-# def find_nearest_index(array, value):
-#     array = np.asarray(array)
-#     idx = (np.abs(array - value)).argmin()
-#     return int(np.where(array == array[idx])[0])
 
 def find_nearest_index(array, value):
     array = np.asarray(array)
@@ -541,6 +537,7 @@ def find_nearest_index(array, value):
     else:
         return int(np.where(array == array[idx])[0][0])
 
+
 def find_sigma(x, cdf, sign):
     med = x[find_nearest_index(cdf, 0.5)]
     if sign == "-":
@@ -548,6 +545,7 @@ def find_sigma(x, cdf, sign):
     elif sign == "+":
         sigma = x[find_nearest_index(cdf, 0.84)] - med
     return sigma
+
 
 def plot_cdf(x, cdf):
     plt.plot(x, cdf)

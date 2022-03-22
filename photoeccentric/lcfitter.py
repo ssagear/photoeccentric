@@ -85,10 +85,6 @@ def do_linfit(time, flux, flux_err, transitmid, nbuffer, nlinfit, odd=False):
     # Time array of cutout: BJD
     t1bjd = np.array(time[tindex-nbuffer:tindex+nbuffer+1])
 
-    # if np.nanmax(t1bjd)-np.nanmin(t1bjd) > 0.35:
-    #     t1bjd = np.empty(((2*nbuffer+1)))
-    #     t1bjd[:] = np.NaN
-    #     return 0.0, 0.0, t1bjd, t1bjd, t1bjd, t1bjd
 
     # Flux array of cutout
     f1 = np.array(flux[tindex-nbuffer:tindex+nbuffer+1])
@@ -111,8 +107,6 @@ def do_linfit(time, flux, flux_err, transitmid, nbuffer, nlinfit, odd=False):
     fnorm = f1/linfit
 
     return m, b, t1bjd, t1, fnorm, fe1
-
-
 
 def bls(time, nflux):
     """Applies astropy Box Least-Squares to light curve to fit period
@@ -140,23 +134,21 @@ def bls(time, nflux):
 
     return per_guess
 
-
 def planetlc(time, per, rp, ars, e, inc, w):
 
     import batman
 
-    params = batman.TransitParams()       #object to store transit parameters
-    params.t0 = 0.                        #time of inferior conjunction
-    params.per = per                      #orbital period
-    params.rp = rp                        #planet radius (in units of stellar radii)
-    params.a = ars                          #semi-major axis (in units of stellar radii)
-    params.inc = inc                      #orbital inclination (in degrees)
+    params = batman.TransitParams()
+    params.t0 = 0.
+    params.per = per
+    params.rp = rp
+    params.a = ars
+    params.inc = inc
     params.ecc = e
-    params.w = w                          #longitude of periastron (in degrees)
+    params.w = w
     params.limb_dark = "quadratic"
     params.u = [0.1, 0.3]
 
-    #times to calculate light curve
     m = batman.TransitModel(params, time)
 
     flux = m.light_curve(params)
@@ -169,18 +161,17 @@ def planetlc_fitter(time, per, rp, ars, inc):
 
     import batman
 
-    params = batman.TransitParams()       #object to store transit parameters
-    params.t0 = 0                        #time of inferior conjunction
-    params.per = per                     #orbital period
-    params.rp = rp                        #planet radius (in units of stellar radii)
-    params.a = a                          #semi-major axis (in units of stellar radii)
-    params.inc = inc                      #orbital inclination (in degrees)
-    params.ecc = 0.0                      #eccentricity
-    params.w = 0.0                        #longitude of periastron (in degrees)
+    params = batman.TransitParams()
+    params.t0 = 0
+    params.per = per
+    params.rp = rp
+    params.a = a
+    params.inc = inc
+    params.ecc = 0.0
+    params.w = 0.0
     params.limb_dark = "quadratic"
     params.u = [0.5, 0.2]
 
-    #times to calculate light curve
     m = batman.TransitModel(params, time)
 
     flux = m.light_curve(params)
@@ -228,9 +219,7 @@ def integratedlc_fitter(time, per, rp, ars, inc, t0, calc_ptime=True, ptime=None
     params.limb_dark = "quadratic"
     params.u = [0.5, 0.2]
 
-    #times to calculate light curve
     if calc_ptime==True:
-        #times to calculate light curve
         ptime = get_ptime(time, get_mid(time), 29)
 
     m = batman.TransitModel(params, ptime)
@@ -322,8 +311,6 @@ def get_transit_cutout_full(transitmids, ncadences, time, flux, flux_err):
     t1, f1, fe1 = [np.array(x).flatten() for x in [t1, f1, fe1]]
 
     return t1, f1, fe1
-
-
 
 
 def mcmc_fitter(guess_transit, time, nflux, flux_err, nwalk, nsteps, ndiscard, directory, plot_Tburnin=True, plot_Tcorner=True, backend=True, reset_backend=True):
