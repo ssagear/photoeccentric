@@ -29,5 +29,5 @@ to install the package.
 1. `NumPy <http://www.numpy.org/>`_,
 2. `SciPy <http://www.numpy.org/>`_,
 3. `batman <https://www.cfa.harvard.edu/~lkreidberg/batman/>`_,
-7. `dynesty <https://dynesty.readthedocs.io>`_, and
-8. `juliet <https://github.com/nespinoza/juliet>`_
+4. `dynesty <https://dynesty.readthedocs.io>`_, and
+5. `juliet <https://github.com/nespinoza/juliet>`_
