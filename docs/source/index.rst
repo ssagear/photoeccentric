@@ -12,9 +12,8 @@ Check out the :doc:`usage` section for further information, including :ref:`inst
 
    This project is under active development.
 
-Contents
---------
 .. toctree::
-   :numbered:
+   :maxdepth: 2
+   :caption: User Guide
 
-   user\installation.rst
+   user/installation
