@@ -14,17 +14,7 @@ Check out the :doc:`usage` section for further information, including :ref:`inst
 
 Contents
 --------
-
 .. toctree::
-   :maxdepth: 2
-   :caption: User Guide
+   :numbered:
 
-   user/installation
-
- .. toctree::
-
-    :maxdepth: 1
-    :caption: Tutorials
-
-    tutorials/photoeccentric_tutorial
-    tutorials/photoeccentric_lightcurvefitting
+   \user\installation
