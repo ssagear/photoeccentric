@@ -1,4 +1,4 @@
 .. _gettingstarted:
 
-
-Get started
+Gettingstarteds
+===
