@@ -1,6 +1,6 @@
 .. _photoeccentric_tutorial:
 
-`photoeccentric` Tutorial
+``photoeccentric`` Tutorial
 ===========================
 
 In this tutorial, I will create a simulated transit based on a Kepler
@@ -47,10 +47,10 @@ here: https://github.com/ssagear/photoeccentric
     # pandas display option
     pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
-    spectplanets = pd.read_csv('/Users/ssagear/Dropbox (UFL)/Research/MetallicityProject/HiPerGator/HPG_Replica/datafiles/spectplanets.csv')
-    muirhead_comb = pd.read_csv('/Users/ssagear/Dropbox (UFL)/Research/MetallicityProject/HiPerGator/HPG_Replica/datafiles/muirhead_comb.csv')
-    muirheadKOIs = pd.read_csv('/Users/ssagear/Dropbox (UFL)/Research/MetallicityProject/HiPerGator/HPG_Replica/datafiles/MuirheadKOIs.csv')
-    lcpath = '/Users/ssagear/Dropbox (UFL)/Research/MetallicityProject/HiPerGator/HPG_Replica/sample_lcs'
+    spectplanets = pd.read_csv('../datafiles/spectplanets.csv')
+    muirhead_comb = pd.read_csv('../datafiles/muirhead_comb.csv')
+    muirheadKOIs = pd.read_csv('../datafiles/MuirheadKOIs.csv')
+    lcpath = '../datafiles/sample_lcs'
 
     plt.rcParams['figure.figsize'] = [20, 10]
 
@@ -61,6 +61,8 @@ here: https://github.com/ssagear/photoeccentric
 
 .. parsed-literal::
 
+    The autoreload extension is already loaded. To reload it, use:
+      %reload_ext autoreload
     The autoreload extension is already loaded. To reload it, use:
       %reload_ext autoreload
 
@@ -74,7 +76,7 @@ meters for convenience.
     srad_m = 696.34e6 # Solar radius (m)
 
 The Sample
-----------
+~~~~~~~~~~
 
 I’m using the sample of “cool KOIs” from `Muirhead et
 al. 2013 <https://iopscience.iop.org/article/10.1088/0067-0049/213/1/5>`__,
@@ -87,33 +89,30 @@ from Gaia.
 
 .. code:: ipython3
 
-    muirhead_data = pd.read_csv("datafiles/muirhead_data_incmissing.txt", sep=" ")
-
     # ALL Kepler planets from exo archive
-    planets = pd.read_csv('datafiles/cumulative_kois.csv')
+    planets = pd.read_csv('../datafiles/cumulative_kois.csv')
 
     # Take the Kepler planet archive entries for the planets in Muirhead et al. 2013 sample
-    spectplanets = pd.read_csv('datafiles/spectplanets.csv')
+    spectplanets = pd.read_csv('../datafiles/spectplanets.csv')
 
     # Kepler-Gaia Data
-    kpgaia = Table.read('datafiles/kepler_dr2_4arcsec.fits', format='fits').to_pandas();
+    kpgaia = Table.read('../datafiles/kepler_dr2_4arcsec.fits', format='fits').to_pandas();
 
     # Kepler-Gaia data for only the objects in our sample
-    muirhead_gaia = pd.read_csv("datafiles/muirhead_gaia.csv")
+    muirhead_gaia = pd.read_csv("../datafiles/muirhead_gaia.csv")
 
     # Combined spectroscopy data + Gaia/Kepler data for our sample
-    muirhead_comb = pd.read_csv('datafiles/muirhead_comb.csv')
+    muirhead_comb = pd.read_csv('../datafiles/muirhead_comb.csv')
 
     # Only targets from table above with published luminosities from Gaia
-    muirhead_comb_lums = pd.read_csv('datafiles/muirhead_comb_lums.csv')
+    muirhead_comb_lums = pd.read_csv('../datafiles/muirhead_comb_lums.csv')
 
 Defining a “test planet”
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-I’m going to pick a planet from our sample to test how well ``photoeccentric`` works. Here, I’m picking KOI 818.01 (Kepler-691 b), a super-Earth orbiting an M dwarf.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`Exoplanet Catalog
+I’m going to pick a planet from our sample to test how well
+``photoeccentric`` works. Here, I’m picking KOI 818.01 (Kepler-691 b), a
+super-Earth orbiting an M dwarf. `Exoplanet Catalog
 Entry <https://exoplanets.nasa.gov/exoplanet-catalog/4987/kepler-818-b/>`__
 
 It has an orbital period of about 8 days.
@@ -138,7 +137,7 @@ Kepler-691 (Teff, Mstar, Rstar, and Gaia luminosity).
 .. code:: ipython3
 
     # # Read in MESA isochrones
-    isochrones = pd.read_csv('datafiles/isochrones_sdss_spitzer_lowmass.dat', sep='\s\s+', engine='python')
+    isochrones = pd.read_csv('../datafiles/isochrones_sdss_spitzer_lowmass.dat', sep='\s\s+', engine='python')
 
 Using ``ph.fit_isochrone_lum()`` to match isochrones to stellar data:
 
@@ -153,26 +152,17 @@ Using ``ph.fit_isochrone_lum()`` to match isochrones to stellar data:
 
 .. parsed-literal::
 
-    100%|██████████| 738479/738479 [00:06<00:00, 116182.48it/s]
-
-.. parsed-literal::
-
-    Number of fit isochrones:  84
-
-
-.. parsed-literal::
-
-
+    100%|██████████| 738479/738479 [00:06<00:00, 112685.12it/s]
 
 
 .. code:: ipython3
 
     # Write to csv, then read back in (prevents notebook from lagging)
-    iso_lums.to_csv("tutorial01/iso_lums_" + str(nkoi) + ".csv")
+    iso_lums.to_csv("iso_lums_" + str(nkoi) + ".csv")
 
 .. code:: ipython3
 
-    isodf = pd.read_csv("tutorial01/iso_lums_" + str(nkoi) + ".csv")
+    isodf = pd.read_csv("iso_lums_" + str(nkoi) + ".csv")
 
 Define a KeplerStar object, and use ph.get_stellar_params and the fit
 isochrones to get the stellar parameters.
@@ -180,7 +170,7 @@ isochrones to get the stellar parameters.
 .. code:: ipython3
 
     SKOI = int(np.floor(float(nkoi)))
-    print('System KOI', SKOI)
+    print('KOI', SKOI)
 
     star = ph.KeplerStar(SKOI)
     star.get_stellar_params(isodf)
@@ -188,7 +178,7 @@ isochrones to get the stellar parameters.
 
 .. parsed-literal::
 
-    System KOI 818
+    KOI 818
 
 
 .. code:: ipython3
@@ -202,7 +192,7 @@ isochrones to get the stellar parameters.
 
     Stellar Mass (Msol):  0.5691952380952375
     Stellar Radius (Rsol):  0.5488321428571431
-    Average Stellar Density (kg m^-3):  4850.87609359922
+    Average Stellar Density (kg m^-3):  4849.937558132769
 
 
 Define a KOI object.
@@ -221,7 +211,7 @@ Define a KOI object.
 
 
 Creating a fake light curve based on a real planet
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 I’m pulling the planet parameters of Kepler-691 b from the exoplanet
 archive using ``ph.planet_params_from_archive()``. This will give me the
@@ -266,8 +256,8 @@ choice. This will allow me to test whether ``photoeccentric`` accurately
 recovers the :math:`(e,w)` combination I have input. I’ll start with
 :math:`e = 0.0` and :math:`w = 90.0` degrees.
 
-:math:`e = 0.0`, :math:`\omega = 90.0`
---------------------------------------
+Test Case 1: :math:`e = 0.0`, :math:`\omega = 90.0`
+---------------------------------------------------
 
 I define a cadence length (~30 minutes, in days) that matches the Kepler
 long-cadence integration time, so I can create a fake light curve that
@@ -410,7 +400,7 @@ Kepler light curves)
 
 
 Fitting the transit
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 ``photoeccentric`` includes functionality to fit using ``juliet`` with
 ``multinest``.
@@ -428,9 +418,6 @@ eccentricity of the orbit. More on that in the next section.
 I enter an initial guess based on what I estimate the fit parameters
 will be. For this one, I’ll enter values close to the Kepler archive
 parameters.
-
-Removing Out of Transit Data
-''''''''''''''''''''''''''''
 
 .. code:: ipython3
 
@@ -465,7 +452,7 @@ Let’s just do the first 7 transits.
 
 
 
-.. image:: output_56_1.png
+.. image:: output_55_1.png
 
 
 .. code:: ipython3
@@ -481,8 +468,7 @@ Let’s just do the first 7 transits.
 
 .. parsed-literal::
 
-    Fitting KOI 818.01
-    Detected multinest sampler output files --- extracting from tutorial01/818.01/e_0.0_w_90.0/posteriors.pkl
+      analysing data from tutorial01/818.01/e_0.0_w_90.0/jomnest_.txt
 
 
 .. code:: ipython3
@@ -531,91 +517,91 @@ Let’s just do the first 7 transits.
           <th>0</th>
           <td>P_p1</td>
           <td></td>
-          <td>8.11226</td>
+          <td>8.11419</td>
           <td></td>
-          <td>0.00124</td>
+          <td>0.00069</td>
           <td></td>
-          <td>0.00126</td>
+          <td>0.00072</td>
         </tr>
         <tr>
           <th>1</th>
           <td>t0_p1</td>
           <td></td>
-          <td>2455009.34088</td>
+          <td>2455009.34043</td>
           <td></td>
-          <td>0.00372</td>
+          <td>0.00091</td>
           <td></td>
-          <td>0.00398</td>
+          <td>0.00091</td>
         </tr>
         <tr>
           <th>2</th>
           <td>p_p1</td>
           <td></td>
-          <td>0.03832</td>
+          <td>0.03726</td>
           <td></td>
-          <td>0.00229</td>
+          <td>0.00090</td>
           <td></td>
-          <td>0.00229</td>
+          <td>0.00087</td>
         </tr>
         <tr>
           <th>3</th>
           <td>b_p1</td>
           <td></td>
-          <td>0.33712</td>
+          <td>0.34351</td>
           <td></td>
-          <td>0.25833</td>
+          <td>0.21283</td>
           <td></td>
-          <td>0.22439</td>
+          <td>0.21383</td>
         </tr>
         <tr>
           <th>4</th>
           <td>q1_KEPLER</td>
           <td></td>
-          <td>0.50266</td>
+          <td>0.41629</td>
           <td></td>
-          <td>0.32074</td>
+          <td>0.33855</td>
           <td></td>
-          <td>0.30654</td>
+          <td>0.25182</td>
         </tr>
         <tr>
           <th>5</th>
           <td>q2_KEPLER</td>
           <td></td>
-          <td>0.46850</td>
+          <td>0.45065</td>
           <td></td>
-          <td>0.33069</td>
+          <td>0.34201</td>
           <td></td>
-          <td>0.31063</td>
+          <td>0.28467</td>
         </tr>
         <tr>
           <th>6</th>
           <td>a_p1</td>
           <td></td>
-          <td>22.22587</td>
+          <td>23.96618</td>
           <td></td>
-          <td>2.74053</td>
+          <td>2.29076</td>
           <td></td>
-          <td>3.13032</td>
+          <td>2.99624</td>
         </tr>
         <tr>
           <th>7</th>
           <td>mflux_KEPLER</td>
           <td></td>
-          <td>-0.00019</td>
+          <td>-0.00018</td>
           <td></td>
-          <td>0.00008</td>
+          <td>0.00007</td>
           <td></td>
-          <td>0.00008</td>
+          <td>0.00007</td>
         </tr>
         <tr>
           <th>8</th>
           <td>sigma_w_KEPLER</td>
           <td></td>
-          <td>3.92579</td>
+          <td>3.47350</td>
           <td></td>
-          <td>52.73840</td>
+          <td>33.94203</td>
           <td></td>
-          <td>3.59434</td>
+          <td>3.13059</td>
         </tr>
       </tbody>
     </table>
@@ -659,7 +645,7 @@ requires :math:`e = 0.0`).
 
 
 
-.. image:: output_63_0.png
+.. image:: output_62_0.png
 
 
 .. code:: ipython3
@@ -680,7 +666,7 @@ requires :math:`e = 0.0`).
 
 
 
-.. image:: output_64_0.png
+.. image:: output_63_0.png
 
 
 Determining T14 and T23
@@ -713,25 +699,29 @@ the eccentricity of the orbit.)
 
 .. parsed-literal::
 
-    Total Transit Duration:  0.11214203271552389 -/+ (0.009074328077622193, 0.01008020097475372) hours
-    Full Transit Duration:  0.10149275417258226 -/+ (0.009142889397238452, 0.009728546427558826) hours
+    Total Transit Duration:  0.10485137003852651 -/+ (0.006525117642141129, 0.006687207067543222) hours
+    Full Transit Duration:  0.09561957555025782 -/+ (0.005883030475635945, 0.006018819870806616) hours
 
 
 Get :math:`g`
-------------------------------
+~~~~~~~~~~~~~
 
 Finally, we can use all the values above to determine
 :math:`\rho_{circ}`. :math:`\rho_{circ}` is what we would calculate the
 stellar density to be if we knew that the orbit was definitely perfectly
 circular. We will compare :math:`\rho_{circ}` to :math:`\rho_{star}`
 (the true, observed stellar density we calculated from
-spectroscopy/Gaia), and get :math:`g(e, w)`: |image.png|
+spectroscopy/Gaia), and get :math:`g(e, w)`:
 
-.. |image.png| image:: attachment:image.png
+.. math::  \rho_{\star}(e, \omega) = g(e, \omega)^{-3} \rho_{circ}
 
-which is also defined as |image.png|
+-------------------------------------------------------------------
 
-.. |image.png| image:: attachment:image.png
+which is also defined as
+
+.. math::  g(e, \omega) = \frac{1 + e sin(\omega)}{\sqrt{1-e^2}}
+
+-----------------------------------------------------------------
 
 Thus, if the orbit is circular :math:`(e = 0)`, then :math:`g` should
 equal 1. If the orbit is not circular :math:`(e != 0)`, then
@@ -766,7 +756,7 @@ Print :math:`g` and :math:`\sigma_{g}`:
 
 .. parsed-literal::
 
-    0.8667875306010682
+    0.9898376567084125
 
 
 
@@ -779,7 +769,7 @@ Print :math:`g` and :math:`\sigma_{g}`:
 
 .. parsed-literal::
 
-    0.140700574554469
+    0.14832653472072282
 
 
 
@@ -799,7 +789,7 @@ most likely :math:`(e,w)`.
 
 .. parsed-literal::
 
-    17172it [01:55, 148.53it/s, batch: 15 | bound: 0 | nc: 1 | ncall: 68564 | eff(%): 25.045 | loglstar: -0.191 <  1.961 <  1.710 | logz:  1.256 +/-  0.042 | stop:  0.955]
+    18743it [01:53, 164.43it/s, batch: 15 | bound: 0 | nc: 1 | ncall: 88101 | eff(%): 21.274 | loglstar:   -inf <  1.908 <  1.837 | logz:  0.870 +/-  0.052 | stop:  0.954]
 
 
 .. code:: ipython3
@@ -815,14 +805,14 @@ most likely :math:`(e,w)`.
 
 
 
-.. image:: output_82_0.png
+.. image:: output_83_0.png
 
 
 And here is the corner plot for the most likely values of :math:`(e, w)`
 that correspond to :math:`g = 1`. The :math:`e` distribution peaks at 0!
 
-:math:`e = 0.3`, :math:`\omega = 90.0`
---------------------------------------
+Test Case 2: :math:`e = 0.3`, :math:`\omega = 90.0`
+---------------------------------------------------
 
 Now let’s repeat this example with an eccentricity of 0.3 at periapse.
 
@@ -883,7 +873,7 @@ Now let’s repeat this example with an eccentricity of 0.3 at periapse.
 
 
 
-.. image:: output_90_1.png
+.. image:: output_91_1.png
 
 
 To create a light curve with a target signal to noise ratio, we need the
@@ -931,11 +921,11 @@ Adding gaussian noise to produce a light curve with the target SNR:
 
 
 
-.. image:: output_97_1.png
+.. image:: output_98_1.png
 
 
 Fitting the transit
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 ``photoeccentric`` includes functionality to fit using ``juliet`` with
 ``multinest``.
@@ -953,9 +943,6 @@ eccentricity of the orbit. More on that in the next section.
 I enter an initial guess based on what I estimate the fit parameters
 will be. For this one, I’ll enter values close to the Kepler archive
 parameters.
-
-Removing Out of Transit Data
-''''''''''''''''''''''''''''
 
 .. code:: ipython3
 
@@ -1006,8 +993,7 @@ Let’s just do the first 7 transits.
 
 .. parsed-literal::
 
-    Fitting KOI 818.01
-    Detected multinest sampler output files --- extracting from tutorial01/818.01/e_0.3_w_90.0/posteriors.pkl
+      analysing data from tutorial01/818.01/e_0.3_w_90.0/jomnest_.txt
 
 
 .. code:: ipython3
@@ -1056,71 +1042,71 @@ Let’s just do the first 7 transits.
           <th>0</th>
           <td>P_p1</td>
           <td></td>
-          <td>8.11452</td>
+          <td>8.11447</td>
           <td></td>
-          <td>0.00023</td>
+          <td>0.00020</td>
           <td></td>
-          <td>0.00021</td>
+          <td>0.00020</td>
         </tr>
         <tr>
           <th>1</th>
           <td>t0_p1</td>
           <td></td>
-          <td>2455009.33937</td>
+          <td>2455009.34045</td>
           <td></td>
-          <td>0.00062</td>
+          <td>0.00050</td>
           <td></td>
-          <td>0.00063</td>
+          <td>0.00053</td>
         </tr>
         <tr>
           <th>2</th>
           <td>p_p1</td>
           <td></td>
-          <td>0.03809</td>
+          <td>0.03779</td>
           <td></td>
-          <td>0.00097</td>
+          <td>0.00074</td>
           <td></td>
-          <td>0.00105</td>
+          <td>0.00081</td>
         </tr>
         <tr>
           <th>3</th>
           <td>b_p1</td>
           <td></td>
-          <td>0.34853</td>
+          <td>0.25005</td>
           <td></td>
-          <td>0.26925</td>
+          <td>0.20836</td>
           <td></td>
-          <td>0.23012</td>
+          <td>0.16863</td>
         </tr>
         <tr>
           <th>4</th>
           <td>q1_KEPLER</td>
           <td></td>
-          <td>0.17705</td>
+          <td>0.24137</td>
           <td></td>
-          <td>0.30725</td>
+          <td>0.33555</td>
           <td></td>
-          <td>0.12297</td>
+          <td>0.16504</td>
         </tr>
         <tr>
           <th>5</th>
           <td>q2_KEPLER</td>
           <td></td>
-          <td>0.23627</td>
+          <td>0.20592</td>
           <td></td>
-          <td>0.34725</td>
+          <td>0.33467</td>
           <td></td>
-          <td>0.17349</td>
+          <td>0.14925</td>
         </tr>
         <tr>
           <th>6</th>
           <td>a_p1</td>
           <td></td>
-          <td>33.21021</td>
+          <td>34.01496</td>
           <td></td>
-          <td>2.06751</td>
+          <td>1.53172</td>
           <td></td>
-          <td>4.97506</td>
+          <td>2.81683</td>
         </tr>
         <tr>
           <th>7</th>
@@ -1136,11 +1122,11 @@ Let’s just do the first 7 transits.
           <th>8</th>
           <td>sigma_w_KEPLER</td>
           <td></td>
-          <td>2.76826</td>
+          <td>1.76799</td>
           <td></td>
-          <td>22.64271</td>
+          <td>10.52057</td>
           <td></td>
-          <td>2.45362</td>
+          <td>1.49476</td>
         </tr>
       </tbody>
     </table>
@@ -1225,12 +1211,12 @@ Determining T14 and T23
 
 .. parsed-literal::
 
-    Total Transit Duration:  0.07616815216249453 -/+ (0.0019461796163439543, 0.0022887898875228047) hours
-    Full Transit Duration:  0.06894928687607373 -/+ (0.0023735171102194363, 0.0023828588410691465) hours
+    Total Transit Duration:  0.07624977166072124 -/+ (0.001938522023045397, 0.0022380238235224087) hours
+    Full Transit Duration:  0.0700019311019035 -/+ (0.0018442657065528278, 0.00209380377961145) hours
 
 
 Get :math:`g`
-------------------------------
+~~~~~~~~~~~~~
 
 Print :math:`g` and :math:`\sigma_{g}`:
 
@@ -1252,7 +1238,7 @@ Print :math:`g` and :math:`\sigma_{g}`:
 
 .. parsed-literal::
 
-    1.2972506976145577
+    1.3096409093931336
 
 
 
@@ -1265,7 +1251,7 @@ Print :math:`g` and :math:`\sigma_{g}`:
 
 .. parsed-literal::
 
-    0.14175602288098554
+    0.09639732695175818
 
 
 
@@ -1285,7 +1271,7 @@ nested sampling (``dynesty``) to determine the surface of most likely
 
 .. parsed-literal::
 
-    20425it [02:06, 160.85it/s, batch: 13 | bound: 0 | nc: 1 | ncall: 123569 | eff(%): 16.529 | loglstar:   -inf <  1.954 <  1.819 | logz:  0.475 +/-  0.051 | stop:  0.993]
+    18966it [01:42, 184.48it/s, batch: 13 | bound: 0 | nc: 1 | ncall: 167069 | eff(%): 11.352 | loglstar:   -inf <  2.339 <  2.218 | logz:  0.239 +/-  0.065 | stop:  0.978]
 
 
 .. code:: ipython3
@@ -1308,8 +1294,8 @@ And here is the corner plot for the most likely values of :math:`(e, w)`
 that correspond to :math:`g = 1.3`. The :math:`e` distribution peaks at
 :math:`e = 0.3`!
 
-:math:`e = 0.3`, :math:`\omega = 270.0`
----------------------------------------
+Test Case 3: :math:`e = 0.3`, :math:`\omega = 270.0`
+----------------------------------------------------
 
 Now let’s repeat this example with an eccentricity of 0.3 at apoapse.
 
@@ -1422,10 +1408,7 @@ Adding gaussian noise to produce a light curve with the target SNR:
 
 
 Fitting the transit
--------------------
-
-Removing Out of Transit Data
-''''''''''''''''''''''''''''
+~~~~~~~~~~~~~~~~~~~
 
 .. code:: ipython3
 
@@ -1460,7 +1443,7 @@ Let’s just do the first 7 transits.
 
 
 
-.. image:: output_149_1.png
+.. image:: output_148_1.png
 
 
 .. code:: ipython3
@@ -1476,8 +1459,7 @@ Let’s just do the first 7 transits.
 
 .. parsed-literal::
 
-    Fitting KOI 818.01
-    Detected multinest sampler output files --- extracting from tutorial01/818.01/e_0.3_w_270.0/posteriors.pkl
+      analysing data from tutorial01/818.01/e_0.3_w_270.0/jomnest_.txt
 
 
 .. code:: ipython3
@@ -1526,91 +1508,91 @@ Let’s just do the first 7 transits.
           <th>0</th>
           <td>P_p1</td>
           <td></td>
-          <td>8.11420</td>
+          <td>8.11407</td>
           <td></td>
-          <td>0.00026</td>
+          <td>0.00024</td>
           <td></td>
-          <td>0.00025</td>
+          <td>0.00023</td>
         </tr>
         <tr>
           <th>1</th>
           <td>t0_p1</td>
           <td></td>
-          <td>2455009.33950</td>
+          <td>2455009.34021</td>
           <td></td>
-          <td>0.00073</td>
+          <td>0.00057</td>
           <td></td>
-          <td>0.00075</td>
+          <td>0.00057</td>
         </tr>
         <tr>
           <th>2</th>
           <td>p_p1</td>
           <td></td>
-          <td>0.03747</td>
+          <td>0.03688</td>
           <td></td>
-          <td>0.00088</td>
+          <td>0.00069</td>
           <td></td>
-          <td>0.00066</td>
+          <td>0.00065</td>
         </tr>
         <tr>
           <th>3</th>
           <td>b_p1</td>
           <td></td>
-          <td>0.31019</td>
+          <td>0.36570</td>
           <td></td>
-          <td>0.27339</td>
+          <td>0.17872</td>
           <td></td>
-          <td>0.19107</td>
+          <td>0.22039</td>
         </tr>
         <tr>
           <th>4</th>
           <td>q1_KEPLER</td>
           <td></td>
-          <td>0.22179</td>
+          <td>0.35974</td>
           <td></td>
-          <td>0.19919</td>
+          <td>0.26895</td>
           <td></td>
-          <td>0.11521</td>
+          <td>0.17441</td>
         </tr>
         <tr>
           <th>5</th>
           <td>q2_KEPLER</td>
           <td></td>
-          <td>0.22274</td>
+          <td>0.29702</td>
           <td></td>
-          <td>0.28201</td>
+          <td>0.31601</td>
           <td></td>
-          <td>0.14961</td>
+          <td>0.18794</td>
         </tr>
         <tr>
           <th>6</th>
           <td>a_p1</td>
           <td></td>
-          <td>17.96124</td>
+          <td>17.29780</td>
           <td></td>
-          <td>0.81427</td>
+          <td>1.10237</td>
           <td></td>
-          <td>2.54359</td>
+          <td>1.78141</td>
         </tr>
         <tr>
           <th>7</th>
           <td>mflux_KEPLER</td>
           <td></td>
-          <td>-0.00038</td>
+          <td>-0.00037</td>
           <td></td>
-          <td>0.00001</td>
+          <td>0.00002</td>
           <td></td>
-          <td>0.00001</td>
+          <td>0.00002</td>
         </tr>
         <tr>
           <th>8</th>
           <td>sigma_w_KEPLER</td>
           <td></td>
-          <td>7.36109</td>
+          <td>3.34227</td>
           <td></td>
-          <td>24.59268</td>
+          <td>24.49567</td>
           <td></td>
-          <td>6.53386</td>
+          <td>3.00753</td>
         </tr>
       </tbody>
     </table>
@@ -1655,7 +1637,7 @@ requires :math:`e = 0.0`).
 
 
 
-.. image:: output_156_0.png
+.. image:: output_155_0.png
 
 
 .. code:: ipython3
@@ -1677,7 +1659,7 @@ requires :math:`e = 0.0`).
 
 
 
-.. image:: output_157_0.png
+.. image:: output_156_0.png
 
 
 Determining T14 and T23
@@ -1695,12 +1677,12 @@ Determining T14 and T23
 
 .. parsed-literal::
 
-    Total Transit Duration:  0.14275268099236152 -/+ (0.0023435199725622413, 0.0027213269315621846) hours
-    Full Transit Duration:  0.12984540536601274 -/+ (0.0028364474698461817, 0.0027470745004642694) hours
+    Total Transit Duration:  0.1453917067458673 -/+ (0.0024099101024557534, 0.0029148854669333313) hours
+    Full Transit Duration:  0.1328974496125958 -/+ (0.002286337605429317, 0.002373614271698049) hours
 
 
 Get :math:`g`
-------------------------------
+~~~~~~~~~~~~~
 
 Print :math:`g` and :math:`\sigma_{g}`:
 
@@ -1722,7 +1704,7 @@ Print :math:`g` and :math:`\sigma_{g}`:
 
 .. parsed-literal::
 
-    0.7107423936545129
+    0.7138312721212587
 
 
 
@@ -1735,7 +1717,7 @@ Print :math:`g` and :math:`\sigma_{g}`:
 
 .. parsed-literal::
 
-    0.05821433747911953
+    0.056832865957797074
 
 
 
@@ -1755,7 +1737,7 @@ the surface of most likely :math:`(e,w)`.
 
 .. parsed-literal::
 
-    20134it [02:42, 123.65it/s, batch: 13 | bound: 43 | nc: 4 | ncall: 282175 | eff(%):  7.135 | loglstar: -3.744 <  2.844 <  2.742 | logz:  0.068 +/-  0.069 | stop:  0.925]
+    22184it [02:18, 160.69it/s, batch: 15 | bound: 0 | nc: 1 | ncall: 262862 | eff(%):  8.439 | loglstar:   -inf <  2.868 <  2.745 | logz:  0.281 +/-  0.074 | stop:  0.795]
 
 
 .. code:: ipython3
@@ -1771,7 +1753,7 @@ the surface of most likely :math:`(e,w)`.
 
 
 
-.. image:: output_170_0.png
+.. image:: output_169_0.png
 
 
 And here is the corner plot for the most likely values of :math:`(e, w)`
