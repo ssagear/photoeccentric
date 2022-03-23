@@ -1,6 +1,8 @@
 photoeccentric: transit light curve analysis for eccentric planetary systems
 ---
 
-![Logo](logo.jpeg?raw=true)
+.. image:: docs/logo.png
+   :width: 400
+   :alt: Photoeccentric Logo
 
 Author: Sheila Sagear (ssagear@ufl.edu)
