@@ -15,3 +15,4 @@ photoeccentric has its documentation hosted on Read the Docs.
    :caption: User Guide
 
    installation
+   gettingstarted
