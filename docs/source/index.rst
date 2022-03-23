@@ -11,10 +11,9 @@ photoeccentric has its documentation hosted on Read the Docs.
    This project is under active development.
 
 .. toctree::
+  :maxdepth: 2
+  :caption: User Guide
 
-   :maxdepth: 2
-   :caption: User Guide
-   
-      installation
-      quicktest
-      API
+  installation
+  quicktest
+  api
