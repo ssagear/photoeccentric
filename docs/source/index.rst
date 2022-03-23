@@ -17,3 +17,9 @@ photoeccentric has its documentation hosted on Read the Docs.
    installation
    quicktest
    api
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+
+   tutorials/tutorial01/photoeccentric_tutorial/photoeccentric_tutorial

@@ -1,4 +1,6 @@
-``photoeccentric`` Tutorial
+.. _photoeccentric_tutorial:
+
+photoeccentric_tutorial
 ===========================
 
 In this tutorial, I will create a simulated transit based on a Kepler
@@ -22,36 +24,36 @@ here: https://github.com/ssagear/photoeccentric
     import pickle
     import scipy
     import random
-    
+
     # Using `batman` to create & fit fake transit
     import batman
-    
+
     # Using astropy BLS and scipy curve_fit to fit transit
     from astropy.timeseries import BoxLeastSquares
-    
+
     # Using juliet & corner to find and plot (e, w) distribution
     import juliet
     import corner
-    
+
     # Using dynesty to do the same with nested sampling
     import dynesty
-    
+
     # And importing `photoeccentric`
     import photoeccentric as ph
-    
+
     %load_ext autoreload
     %autoreload 2
-    
+
     # pandas display option
     pd.set_option('display.float_format', lambda x: '%.5f' % x)
-    
+
     spectplanets = pd.read_csv('/Users/ssagear/Dropbox (UFL)/Research/MetallicityProject/HiPerGator/HPG_Replica/datafiles/spectplanets.csv')
     muirhead_comb = pd.read_csv('/Users/ssagear/Dropbox (UFL)/Research/MetallicityProject/HiPerGator/HPG_Replica/datafiles/muirhead_comb.csv')
     muirheadKOIs = pd.read_csv('/Users/ssagear/Dropbox (UFL)/Research/MetallicityProject/HiPerGator/HPG_Replica/datafiles/MuirheadKOIs.csv')
     lcpath = '/Users/ssagear/Dropbox (UFL)/Research/MetallicityProject/HiPerGator/HPG_Replica/sample_lcs'
-    
+
     plt.rcParams['figure.figsize'] = [20, 10]
-    
+
     %load_ext autoreload
     %autoreload 2
 
@@ -86,22 +88,22 @@ from Gaia.
 .. code:: ipython3
 
     muirhead_data = pd.read_csv("datafiles/muirhead_data_incmissing.txt", sep=" ")
-    
+
     # ALL Kepler planets from exo archive
     planets = pd.read_csv('datafiles/cumulative_kois.csv')
-    
+
     # Take the Kepler planet archive entries for the planets in Muirhead et al. 2013 sample
     spectplanets = pd.read_csv('datafiles/spectplanets.csv')
-    
+
     # Kepler-Gaia Data
     kpgaia = Table.read('datafiles/kepler_dr2_4arcsec.fits', format='fits').to_pandas();
-    
+
     # Kepler-Gaia data for only the objects in our sample
     muirhead_gaia = pd.read_csv("datafiles/muirhead_gaia.csv")
-    
+
     # Combined spectroscopy data + Gaia/Kepler data for our sample
     muirhead_comb = pd.read_csv('datafiles/muirhead_comb.csv')
-    
+
     # Only targets from table above with published luminosities from Gaia
     muirhead_comb_lums = pd.read_csv('datafiles/muirhead_comb_lums.csv')
 
@@ -160,7 +162,7 @@ Using ``ph.fit_isochrone_lum()`` to match isochrones to stellar data:
 
 .. parsed-literal::
 
-    
+
 
 
 .. code:: ipython3
@@ -179,7 +181,7 @@ isochrones to get the stellar parameters.
 
     SKOI = int(np.floor(float(nkoi)))
     print('System KOI', SKOI)
-    
+
     star = ph.KeplerStar(SKOI)
     star.get_stellar_params(isodf)
 
@@ -209,7 +211,7 @@ Define a KOI object.
 
     koi = ph.KOI(nkoi, SKOI, isodf)
     koi.get_KIC(muirhead_comb)
-    
+
     print('KIC', koi.KIC)
 
 
@@ -238,11 +240,11 @@ Let’s force the inclination to be 90 degrees for this example.
 
     koi.planet_params_from_archive(spectplanets)
     koi.calc_a(koi.mstar, koi.rstar)
-    
+
     print('Stellar mass (Msun): ', koi.mstar, 'Stellar radius (Rsun): ', koi.rstar)
     print('Period (Days): ', koi.period, 'Rp/Rs: ', koi.rprs)
     print('a/Rs: ', koi.a_rs)
-    
+
     koi.i = 90.
     print('i (deg): ', koi.i)
 
@@ -285,14 +287,14 @@ First, reading in the light curves that I have saved for this planet.
 
     KICs = np.sort(np.unique(np.array(muirhead_comb['KIC'])))
     KOIs = np.sort(np.unique(np.array(muirhead_comb['KOI'])))
-    
+
     files = ph.get_lc_files(koi.KIC, KICs, lcpath)
 
 .. code:: ipython3
 
     # Stitching the light curves together, preserving the time stamps
     koi.get_stitched_lcs(files)
-    
+
     # Getting the midpoint times
     koi.get_midpoints()
 
@@ -305,7 +307,7 @@ First, reading in the light curves that I have saved for this planet.
 
     # 30 minute cadence
     cadence = 0.02142857142857143
-    
+
     time = np.arange(starttime, endtime, cadence)
 
 .. code:: ipython3
@@ -313,7 +315,7 @@ First, reading in the light curves that I have saved for this planet.
     # Define e and w, calculate flux from transit model
     e = 0.0
     w = 90.0
-    
+
     params = batman.TransitParams()       #object to store transit parameters
     params.t0 = koi.epoch                 #time of inferior conjunction
     params.per = koi.period               #orbital period
@@ -324,7 +326,7 @@ First, reading in the light curves that I have saved for this planet.
     params.w = w                          #longitude of periastron (in degrees)
     params.limb_dark = "nonlinear"        #limb darkening model
     params.u = [0.5, 0.1, 0.1, -0.1]      #limb darkening coefficients [u1, u2, u3, u4]
-    
+
     t = time
     m = batman.TransitModel(params, t, supersample_factor = 29, exp_time = 0.0201389)
 
@@ -336,7 +338,7 @@ First, reading in the light curves that I have saved for this planet.
 
     time = time
     flux = flux
-    
+
     plt.plot(time-2454900, flux)
     plt.xlim(109,109.7)
     plt.xlabel('Time (BJD-2454900)')
@@ -363,7 +365,7 @@ transit, and the transit depth.
 .. code:: ipython3
 
     tduration = koi.dur/24.0
-    
+
     N = round(ph.get_N_intransit(tduration, cadence))
     ntransits = len(koi.midpoints)
     depth = koi.rprs**2
@@ -383,7 +385,7 @@ Kepler light curves)
 
     noise = np.random.normal(0,errbar,len(time))
     nflux = flux+noise
-    
+
     flux_err = np.array([errbar]*len(nflux))
 
 .. code:: ipython3
@@ -502,11 +504,11 @@ Let’s just do the first 7 transits.
         .dataframe tbody tr th:only-of-type {
             vertical-align: middle;
         }
-    
+
         .dataframe tbody tr th {
             vertical-align: top;
         }
-    
+
         .dataframe thead th {
             text-align: right;
         }
@@ -629,7 +631,7 @@ Let’s just do the first 7 transits.
     rprs_f = res.iloc[2][2]
     b_f = res.iloc[3][2]
     a_f = res.iloc[6][2]
-    
+
     i_f = np.arccos(b_f*(1./a_f))*(180./np.pi)
 
 Below, I plot the transit fit corner plot.
@@ -647,12 +649,12 @@ requires :math:`e = 0.0`).
     b = results.posteriors['posterior_samples']['b_p1']
     a = results.posteriors['posterior_samples']['a_p1']
     inc = np.arccos(b*(1./a))*(180./np.pi)
-    
+
     params = ['Period', 't0', 'rprs', 'inc', 'a']
-    
+
     fs = np.vstack((p, t0, rprs, inc, a))
     fs = fs.T
-    
+
     figure = corner.corner(fs, labels=params)
 
 
@@ -665,10 +667,10 @@ requires :math:`e = 0.0`).
     # Plot the data:
     plt.errorbar(dataset.times_lc['KEPLER']-2454900, dataset.data_lc['KEPLER'], \
                  yerr = dataset.errors_lc['KEPLER'], fmt = '.', alpha = 0.1)
-    
+
     # Plot the model:
     plt.plot(dataset.times_lc['KEPLER']-2454900, results.lc.evaluate('KEPLER'), c='r')
-    
+
     plt.xlabel('Time (BJD)-2454900')
     plt.xlim(np.min(dataset.times_lc['KEPLER'])-2454900, np.max(dataset.times_lc['KEPLER'])-2454900)
     plt.ylim(0.998, 1.002)
@@ -797,7 +799,7 @@ most likely :math:`(e,w)`.
 
 .. parsed-literal::
 
-    17172it [01:55, 148.53it/s, batch: 15 | bound: 0 | nc: 1 | ncall: 68564 | eff(%): 25.045 | loglstar: -0.191 <  1.961 <  1.710 | logz:  1.256 +/-  0.042 | stop:  0.955]          
+    17172it [01:55, 148.53it/s, batch: 15 | bound: 0 | nc: 1 | ncall: 68564 | eff(%): 25.045 | loglstar: -0.191 <  1.961 <  1.710 | logz:  1.256 +/-  0.042 | stop:  0.955]
 
 
 .. code:: ipython3
@@ -808,7 +810,7 @@ most likely :math:`(e,w)`.
 .. code:: ipython3
 
     labels = ["w", "e"]
-    
+
     fig = corner.corner(ewdres.samples, labels=labels, title_kwargs={"fontsize": 12}, truths=[w, e], plot_contours=True)
 
 
@@ -833,7 +835,7 @@ Now let’s repeat this example with an eccentricity of 0.3 at periapse.
 
     # 30 minute cadence
     cadence = 0.02142857142857143
-    
+
     time = np.arange(starttime, endtime, cadence)
 
 .. code:: ipython3
@@ -841,7 +843,7 @@ Now let’s repeat this example with an eccentricity of 0.3 at periapse.
     # Define e and w, calculate flux from transit model
     e = 0.3
     w = 90.0
-    
+
     params = batman.TransitParams()       #object to store transit parameters
     params.t0 = koi.epoch                 #time of inferior conjunction
     params.per = koi.period               #orbital period
@@ -852,7 +854,7 @@ Now let’s repeat this example with an eccentricity of 0.3 at periapse.
     params.w = w                          #longitude of periastron (in degrees)
     params.limb_dark = "nonlinear"        #limb darkening model
     params.u = [0.5, 0.1, 0.1, -0.1]      #limb darkening coefficients [u1, u2, u3, u4]
-    
+
     t = time
     m = batman.TransitModel(params, t, supersample_factor = 29, exp_time = 0.0201389)
 
@@ -864,7 +866,7 @@ Now let’s repeat this example with an eccentricity of 0.3 at periapse.
 
     time = time
     flux = flux
-    
+
     plt.plot(time-2454900, flux)
     plt.xlim(109,109.7)
     plt.xlabel('Time (BJD-2454900)')
@@ -891,7 +893,7 @@ transit, and the transit depth.
 .. code:: ipython3
 
     tduration = koi.dur/24.0
-    
+
     N = round(ph.get_N_intransit(tduration, cadence))
     ntransits = len(koi.midpoints)
     depth = koi.rprs**2
@@ -908,7 +910,7 @@ Adding gaussian noise to produce a light curve with the target SNR:
 
     noise = np.random.normal(0,errbar,len(time))
     nflux = flux+noise
-    
+
     flux_err = np.array([errbar]*len(nflux))
 
 .. code:: ipython3
@@ -1027,11 +1029,11 @@ Let’s just do the first 7 transits.
         .dataframe tbody tr th:only-of-type {
             vertical-align: middle;
         }
-    
+
         .dataframe tbody tr th {
             vertical-align: top;
         }
-    
+
         .dataframe thead th {
             text-align: right;
         }
@@ -1154,7 +1156,7 @@ Let’s just do the first 7 transits.
     rprs_f = res.iloc[2][2]
     b_f = res.iloc[3][2]
     a_f = res.iloc[6][2]
-    
+
     i_f = np.arccos(b_f*(1./a_f))*(180./np.pi)
 
 Below, I print the original parameters and fit parameters, and overlay
@@ -1173,12 +1175,12 @@ requires :math:`e = 0.0`).
     b = results.posteriors['posterior_samples']['b_p1']
     a = results.posteriors['posterior_samples']['a_p1']
     inc = np.arccos(b*(1./a))*(180./np.pi)
-    
+
     params = ['Period', 't0', 'rprs', 'inc', 'a']
-    
+
     fs = np.vstack((p, t0, rprs, inc, a))
     fs = fs.T
-    
+
     figure = corner.corner(fs, labels=params)
 
 
@@ -1191,10 +1193,10 @@ requires :math:`e = 0.0`).
     # Plot the data:
     plt.errorbar(dataset.times_lc['KEPLER']-2454900, dataset.data_lc['KEPLER'], \
                  yerr = dataset.errors_lc['KEPLER'], fmt = '.', alpha = 0.1)
-    
+
     # Plot the model:
     plt.plot(dataset.times_lc['KEPLER']-2454900, results.lc.evaluate('KEPLER'), c='r')
-    
+
     # Plot portion of the lightcurve, axes, etc.:
     plt.xlabel('Time (BJD)-2454900')
     plt.xlim(np.min(dataset.times_lc['KEPLER'])-2454900, np.max(dataset.times_lc['KEPLER'])-2454900)
@@ -1283,7 +1285,7 @@ nested sampling (``dynesty``) to determine the surface of most likely
 
 .. parsed-literal::
 
-    20425it [02:06, 160.85it/s, batch: 13 | bound: 0 | nc: 1 | ncall: 123569 | eff(%): 16.529 | loglstar:   -inf <  1.954 <  1.819 | logz:  0.475 +/-  0.051 | stop:  0.993]         
+    20425it [02:06, 160.85it/s, batch: 13 | bound: 0 | nc: 1 | ncall: 123569 | eff(%): 16.529 | loglstar:   -inf <  1.954 <  1.819 | logz:  0.475 +/-  0.051 | stop:  0.993]
 
 
 .. code:: ipython3
@@ -1294,7 +1296,7 @@ nested sampling (``dynesty``) to determine the surface of most likely
 .. code:: ipython3
 
     labels = ["w", "e"]
-    
+
     fig = corner.corner(ewdres.samples, labels=labels, title_kwargs={"fontsize": 12}, truths=[w, e], plot_contours=True)
 
 
@@ -1320,7 +1322,7 @@ Now let’s repeat this example with an eccentricity of 0.3 at apoapse.
 
     # 30 minute cadence
     cadence = 0.02142857142857143
-    
+
     time = np.arange(starttime, endtime, cadence)
 
 .. code:: ipython3
@@ -1328,7 +1330,7 @@ Now let’s repeat this example with an eccentricity of 0.3 at apoapse.
     # Define e and w, calculate flux from transit model
     e = 0.3
     w = 270.0
-    
+
     params = batman.TransitParams()       #object to store transit parameters
     params.t0 = koi.epoch                        #time of inferior conjunction
     params.per = koi.period                       #orbital period
@@ -1339,7 +1341,7 @@ Now let’s repeat this example with an eccentricity of 0.3 at apoapse.
     params.w = w                        #longitude of periastron (in degrees)
     params.limb_dark = "nonlinear"        #limb darkening model
     params.u = [0.5, 0.1, 0.1, -0.1]      #limb darkening coefficients [u1, u2, u3, u4]
-    
+
     t = time
     m = batman.TransitModel(params, t, supersample_factor = 29, exp_time = 0.0201389)
 
@@ -1351,7 +1353,7 @@ Now let’s repeat this example with an eccentricity of 0.3 at apoapse.
 
     time = time
     flux = flux
-    
+
     plt.plot(time-2454900, flux)
     plt.xlim(109,109.7)
     plt.xlabel('Time (BJD-2454900)')
@@ -1378,7 +1380,7 @@ transit, and the transit depth.
 .. code:: ipython3
 
     tduration = koi.dur/24.0
-    
+
     N = round(ph.get_N_intransit(tduration, cadence))
     ntransits = len(koi.midpoints)
     depth = koi.rprs**2
@@ -1395,7 +1397,7 @@ Adding gaussian noise to produce a light curve with the target SNR:
 
     noise = np.random.normal(0,errbar,len(time))
     nflux = flux+noise
-    
+
     flux_err = np.array([errbar]*len(nflux))
 
 .. code:: ipython3
@@ -1497,11 +1499,11 @@ Let’s just do the first 7 transits.
         .dataframe tbody tr th:only-of-type {
             vertical-align: middle;
         }
-    
+
         .dataframe tbody tr th {
             vertical-align: top;
         }
-    
+
         .dataframe thead th {
             text-align: right;
         }
@@ -1624,7 +1626,7 @@ Let’s just do the first 7 transits.
     rprs_f = res.iloc[2][2]
     b_f = res.iloc[3][2]
     a_f = res.iloc[6][2]
-    
+
     i_f = np.arccos(b_f*(1./a_f))*(180./np.pi)
 
 Below, I print the original parameters and fit parameters, and overlay
@@ -1643,12 +1645,12 @@ requires :math:`e = 0.0`).
     b = results.posteriors['posterior_samples']['b_p1']
     a = results.posteriors['posterior_samples']['a_p1']
     inc = np.arccos(b*(1./a))*(180./np.pi)
-    
+
     params = ['Period', 't0', 'rprs', 'inc', 'a']
-    
+
     fs = np.vstack((p, t0, rprs, inc, a))
     fs = fs.T
-    
+
     figure = corner.corner(fs, labels=params)
 
 
@@ -1661,10 +1663,10 @@ requires :math:`e = 0.0`).
     # Plot the data:
     plt.errorbar(dataset.times_lc['KEPLER']-2454900, dataset.data_lc['KEPLER'], \
                  yerr = dataset.errors_lc['KEPLER'], fmt = '.', alpha = 0.1)
-    
+
     # Plot the model:
     plt.plot(dataset.times_lc['KEPLER']-2454900, results.lc.evaluate('KEPLER'), c='r')
-    
+
     # Plot portion of the lightcurve, axes, etc.:
     plt.xlabel('Time (BJD)-2454900')
     plt.xlim(np.min(dataset.times_lc['KEPLER'])-2454900, np.max(dataset.times_lc['KEPLER'])-2454900)
@@ -1753,7 +1755,7 @@ the surface of most likely :math:`(e,w)`.
 
 .. parsed-literal::
 
-    20134it [02:42, 123.65it/s, batch: 13 | bound: 43 | nc: 4 | ncall: 282175 | eff(%):  7.135 | loglstar: -3.744 <  2.844 <  2.742 | logz:  0.068 +/-  0.069 | stop:  0.925]         
+    20134it [02:42, 123.65it/s, batch: 13 | bound: 43 | nc: 4 | ncall: 282175 | eff(%):  7.135 | loglstar: -3.744 <  2.844 <  2.742 | logz:  0.068 +/-  0.069 | stop:  0.925]
 
 
 .. code:: ipython3
@@ -1764,7 +1766,7 @@ the surface of most likely :math:`(e,w)`.
 .. code:: ipython3
 
     labels = ["w", "e"]
-    
+
     fig = corner.corner(ewdres.samples, labels=labels, title_kwargs={"fontsize": 12}, truths=[w, e], plot_contours=True)
 
 
