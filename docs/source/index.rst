@@ -6,8 +6,6 @@ Calculates stellar densities and eccentricities for exoplanets by the photoeccen
 
 photoeccentric has its documentation hosted on Read the Docs.
 
-Check out the :doc:`usage` section for further information, including :ref:`installation` of the project.
-
 .. note::
 
    This project is under active development.
@@ -17,3 +15,4 @@ Check out the :doc:`usage` section for further information, including :ref:`inst
    :caption: User Guide
 
    user/installation
+   user/gettingstarted
