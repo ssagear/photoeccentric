@@ -257,7 +257,7 @@ recovers the :math:`(e,w)` combination I have input. I’ll start with
 :math:`e = 0.0` and :math:`w = 90.0` degrees.
 
 Test Case 1: :math:`e = 0.0`, :math:`\omega = 90.0`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------
 
 I define a cadence length (~30 minutes, in days) that matches the Kepler
 long-cadence integration time, so I can create a fake light curve that
@@ -400,7 +400,7 @@ Kepler light curves)
 
 
 Fitting the transit
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 ``photoeccentric`` includes functionality to fit using ``juliet`` with
 ``multinest``.
@@ -670,7 +670,7 @@ requires :math:`e = 0.0`).
 
 
 Determining T14 and T23
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 A crucial step to determining the :math:`(e, w)` distribution from the
 transit is calculating the total and full transit durations. T14 is the
@@ -704,7 +704,7 @@ the eccentricity of the orbit.)
 
 
 Get :math:`g`
--------------
+~~~~~~~~~~~~~
 
 Finally, we can use all the values above to determine
 :math:`\rho_{circ}`. :math:`\rho_{circ}` is what we would calculate the
@@ -808,7 +808,7 @@ And here is the corner plot for the most likely values of :math:`(e, w)`
 that correspond to :math:`g = 1`. The :math:`e` distribution peaks at 0!
 
 Test Case 2: :math:`e = 0.3`, :math:`\omega = 90.0`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------
 
 Now let’s repeat this example with an eccentricity of 0.3 at periapse.
 
@@ -921,7 +921,7 @@ Adding gaussian noise to produce a light curve with the target SNR:
 
 
 Fitting the transit
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 ``photoeccentric`` includes functionality to fit using ``juliet`` with
 ``multinest``.
@@ -1193,7 +1193,7 @@ requires :math:`e = 0.0`).
 
 
 Determining T14 and T23
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: ipython3
 
@@ -1212,7 +1212,7 @@ Determining T14 and T23
 
 
 Get :math:`g`
--------------
+~~~~~~~~~~~~~
 
 Print :math:`g` and :math:`\sigma_{g}`:
 
@@ -1291,7 +1291,7 @@ that correspond to :math:`g = 1.3`. The :math:`e` distribution peaks at
 :math:`e = 0.3`!
 
 Test Case 3: :math:`e = 0.3`, :math:`\omega = 270.0`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------
 
 Now let’s repeat this example with an eccentricity of 0.3 at apoapse.
 
@@ -1404,7 +1404,7 @@ Adding gaussian noise to produce a light curve with the target SNR:
 
 
 Fitting the transit
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 .. code:: ipython3
 
@@ -1659,7 +1659,7 @@ requires :math:`e = 0.0`).
 
 
 Determining T14 and T23
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: ipython3
 
@@ -1678,7 +1678,7 @@ Determining T14 and T23
 
 
 Get :math:`g`
--------------
+~~~~~~~~~~~~~
 
 Print :math:`g` and :math:`\sigma_{g}`:
 
