@@ -1,6 +1,6 @@
 .. _photoeccentric_tutorial:
 
-photoeccentric_tutorial
+`photoeccentric` Tutorial
 ===========================
 
 In this tutorial, I will create a simulated transit based on a Kepler
@@ -108,7 +108,7 @@ from Gaia.
     muirhead_comb_lums = pd.read_csv('datafiles/muirhead_comb_lums.csv')
 
 Defining a “test planet”
-========================
+------------------------------
 
 I’m going to pick a planet from our sample to test how well ``photoeccentric`` works. Here, I’m picking KOI 818.01 (Kepler-691 b), a super-Earth orbiting an M dwarf.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -221,7 +221,7 @@ Define a KOI object.
 
 
 Creating a fake light curve based on a real planet
-==================================================
+------------------------------------------------------------
 
 I’m pulling the planet parameters of Kepler-691 b from the exoplanet
 archive using ``ph.planet_params_from_archive()``. This will give me the
@@ -718,7 +718,7 @@ the eccentricity of the orbit.)
 
 
 Get :math:`g`
-=============
+------------------------------
 
 Finally, we can use all the values above to determine
 :math:`\rho_{circ}`. :math:`\rho_{circ}` is what we would calculate the
@@ -1230,7 +1230,7 @@ Determining T14 and T23
 
 
 Get :math:`g`
-=============
+------------------------------
 
 Print :math:`g` and :math:`\sigma_{g}`:
 
@@ -1700,7 +1700,7 @@ Determining T14 and T23
 
 
 Get :math:`g`
-=============
+------------------------------
 
 Print :math:`g` and :math:`\sigma_{g}`:
 

@@ -463,14 +463,12 @@ def fit_isochrone_lum(data, isochrones, luminosity=True, lum_source='Gaia', lums
             for j in tqdm(range(len(isochrones))):
                 if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1] and lum_range[0] < 10**isochrones.logl_ls[j] < lum_range[1]:
                     iso_fits = iso_fits.append(isochrones.loc[[j]])
-            print('Number of fit isochrones: ', len(iso_fits))
 
         if luminosity==False:
             for j in tqdm(range(len(isochrones))):
                 if Teff_range[0] < 10**isochrones.logt[j] < Teff_range[1] and Mstar_range[0] < isochrones.mstar[j] < Mstar_range[1] and Rstar_range[0] < isochrones.radius[j] < Rstar_range[1]:
                     iso_fits = iso_fits.append(isochrones.loc[[j]])
                     templums.append(10**isochrones.logl_ls[j])
-            print('Number of fit isochrones: ', len(iso_fits))
 
     return iso_fits
 
