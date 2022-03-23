@@ -14,5 +14,4 @@ photoeccentric has its documentation hosted on Read the Docs.
    :maxdepth: 2
    :caption: User Guide
 
-   user/installation
-   user/gettingstarted
+   installation
