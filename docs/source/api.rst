@@ -3,7 +3,4 @@
 API
 ===
 
-.. autosummary::
-   :toctree: generated
-
-   photoeccentric
+API TEST TEXT
