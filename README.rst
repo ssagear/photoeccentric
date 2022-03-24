@@ -1,5 +1,6 @@
-photoeccentric: transit light curve analysis for eccentric planetary systems
----
+photoeccentric is a transit light curve analysis tool for eccentric transiting systems.
+
+photoeccentric has its documentation hosted at https://photoeccentric.readthedocs.io/en/latest/.
 
 .. image:: docs/logo.jpeg
    :width: 400

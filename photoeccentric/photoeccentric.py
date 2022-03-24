@@ -273,8 +273,8 @@ class KOI(KeplerStar):
         self.midpoints = midpoints
 
 
-    def remove_oot_data(self, nbuffer, nlinfit, include_nans=False):
-        """Removes long out-of-transit segments of Kepler light curves.
+    def remove_oot_data(self, nbuffer, nlinfit, include_nans=False, delete_nan_transits=False):
+        """Removes out-of-transit segments of Kepler light curves.
         Fits a linear model to out-of-transit points immediately surrounding each transit.
         Subtracts the linear model from each transit cutout.
 
@@ -286,8 +286,10 @@ class KOI(KeplerStar):
         nlinfit: int
             Number of flux points from each end of transit cutout to use in linear fit.
             e.g. if nbuffer = 7 and nlinfit = 5, function will use the 10 outermost flux points for linear fit.
-        include_nans: boolean
+        include_nans: boolean, default False
             Include nans in in-transit data?
+        delete_nan_transits: boolean, default False
+            Delete entire transit if includes nan flux value?
 
         Returns
         -------
@@ -307,12 +309,31 @@ class KOI(KeplerStar):
                 m, b, t1bjd, t1, fnorm, fe1 = do_linfit(self.time, self.flux, self.flux_err, self.midpoints[i], nbuffer, nlinfit)
 
                 if include_nans==False:
+
                     if np.isnan(fnorm).any() == False:
                         tbjd.append(list(t1bjd))
                         tnorm.append(list(t1))
                         fl.append(list(fnorm))
                         fr.append(list(fe1))
                         mpintransit.append(self.midpoints[i])
+
+                    if np.isnan(fnorm).any() == True:
+
+                        if delete_nan_transits == True:
+                            continue
+
+                        elif delete_nan_transits == False:
+                            naninds = []
+                            for idx in range(len(t1bjd)):
+                                if np.isnan(fnorm[idx]):
+                                    naninds.append(idx)
+
+
+                            tbjd.append(list(np.delete(t1bjd, naninds)))
+                            tnorm.append(list(np.delete(t1, naninds)))
+                            fl.append(list(np.delete(fnorm, naninds)))
+                            fr.append(list(np.delete(fe1, naninds)))
+                            mpintransit.append(self.midpoints[i])
 
                 elif include_nans==True:
                     tbjd.append(list(t1bjd))

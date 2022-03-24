@@ -8,7 +8,7 @@ Installation
 Installing from source
 +++++++++++
 
-TEST TEXT. The source code for ``photoeccentric`` can be downloaded with
+The source code for ``photoeccentric`` can be downloaded with
 
 .. code-block:: bash
 

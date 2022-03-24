@@ -5,13 +5,13 @@ Welcome to photoeccentric's documentation!
     :width: 400pt
     :align: center
 
-Calculates stellar densities and eccentricities for exoplanets by the photoeccentric effect (Dawson & Johnson 2012) (https://arxiv.org/pdf/1203.5537.pdf)
-
-photoeccentric has its documentation hosted on Read the Docs.
-
 .. note::
 
    This project is under active development.
+
+photoeccentric is a transit light curve analysis tool for eccentric transiting systems. It implements the photoeccentric effect, first described in Dawson & Johnson (2012), allowing you to constrain host stellar density
+
+photoeccentric currently supports Kepler short- and long-cadence data. Check out the Installation instructions and Getting Started!
 
 .. toctree::
    :maxdepth: 2
