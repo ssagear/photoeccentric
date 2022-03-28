@@ -47,14 +47,18 @@ class KeplerStar:
         self.StarKOI = StarKOI
 
     def get_stellar_params(self, isodf):
-        """Gets stellar parameters from set of consistent stellar isochrones."""
+        """
+        Gets stellar parameters from set of consistent stellar isochrones.
+        """
 
         self.isodf = isodf
         self.mstar, self.mstar_err, self.rstar, self.rstar_err = read_stellar_params(self.isodf)
         self.rho_star_dist, self.mass, self.radius, self.rho_star = get_rho_star(self.mstar, self.mstar_err, self.rstar, self.rstar_err, arrlen=1000)
 
     def get_KIC(self, muirhead_comb):
-        """Gets KIC number for KOI (star)."""
+        """
+        Gets KIC number for KOI (star).
+        """
         self.KIC = muirhead_comb[muirhead_comb['KOI'] == str(int(self.StarKOI))].KIC.item()
 
 
@@ -86,26 +90,22 @@ class KOI(KeplerStar):
     def planet_params_from_archive(self, df):
         """Get stellar parameters for the host of a KOI from exoplanet archive (downloaded data).
 
-        Parameters
-        ----------
-        df: pandas.DataFrame
-            dataframe of exop. archive downloaded data
-        kepoiname: str
+        :param df: pandas.DataFrame
+            Sataframe of exop. archive downloaded data
+        :param kepoiname: string
             Kepler name of planet
 
-        Returns
-        -------
-        period: float
+        :returns period: float
             Orbital period (days)
-        rprs: float
+        :returns rprs: float
             Planet radius (stellar radii)
-        a: float
+        :returns a: float
             Semi-major axis (stellar radii)
-        e: float
+        :returns e: float
             Eccentricity
-        w: float
+        :returns w: float
             Longitude of periastron (degrees)
-        i: float
+        :returns i: float
             Inclination (degrees)
 
         """
@@ -134,18 +134,14 @@ class KOI(KeplerStar):
     def calc_a(self, smass, srad):
         """Calculates semi-major axis from planet period and stellar mass using Kepler's 3rd law
 
-        Parameters
-        ----------
-        period: float
+        :param period: float
             Planet period (SECONDS)
-        smass: float
+        :param smass: float
             Stellar mass (Msol)
-        srad: float
+        :param srad: float
             Stellar radius (Rsol)
 
-        Returns
-        -------
-        a: float
+        :return a: float
             a/Rs: Semi-major axis of planet's orbit (units of stellar radii)
         """
 
@@ -164,14 +160,12 @@ class KOI(KeplerStar):
     def get_stitched_lcs(self, files, cadence_combine=False, record_bounds=False):
         """Stitches Kepler LCs from a list of fits files downloaded from MAST.
 
-        Parameters:
-        ----------
-        files: List
-
-        KIC: float
+        :param files: List
+            Files
+        :param KIC: float
             KOI of target
 
-        cadence_combine: boolean
+        :param cadence_combine: boolean
             True if light curve files include both short- and long-cadence data. False otherwise.
 
         Returns:
@@ -253,7 +247,9 @@ class KOI(KeplerStar):
 
 
     def normalize_flux(self):
-        """Normalizes flux array."""
+        """
+        Normalizes flux array.
+        """
 
         fmed = np.nanmedian(self.flux)
         self.flux = self.flux/fmed
@@ -261,7 +257,9 @@ class KOI(KeplerStar):
 
 
     def get_midpoints(self):
-        """Calculates transit midpoints within time bounds of Kepler light curve."""
+        """
+        Calculates transit midpoints within time bounds of Kepler light curve.
+        """
 
         starttime = np.min(self.starttimes)
         stoptime = np.max(self.stoptimes)
@@ -278,22 +276,18 @@ class KOI(KeplerStar):
         Fits a linear model to out-of-transit points immediately surrounding each transit.
         Subtracts the linear model from each transit cutout.
 
-        Parameters
-        ----------
-        nbuffer: int
+        :param nbuffer: int
             Number of flux points before and after transit midpoint to include in transit cut-out.
             e.g. if nbuffer = 7, function will preserve 7 flux points before and after each transit midpoint and discard the rest of light curve.
-        nlinfit: int
+        :param nlinfit: int
             Number of flux points from each end of transit cutout to use in linear fit.
             e.g. if nbuffer = 7 and nlinfit = 5, function will use the 10 outermost flux points for linear fit.
-        include_nans: boolean, default False
+        :param include_nans: boolean, default False
             Include nans in in-transit data?
-        delete_nan_transits: boolean, default False
+        :param delete_nan_transits: boolean, default False
             Delete entire transit if includes nan flux value?
 
-        Returns
-        -------
-        None
+        :returns: None
 
         """
 
