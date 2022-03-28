@@ -42,6 +42,10 @@ def run_fit_juliet(nkoi, isodf, spectplanets, muirhead_comb, muirheadKOIs, lcpat
     return dataset, results, koi.e_dist, koi.w_dist
 
 class KeplerStar:
+    """
+    KeplerStar class hooheoo
+
+    """
 
     def __init__(self, StarKOI):
         self.StarKOI = StarKOI
