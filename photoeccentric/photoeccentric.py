@@ -127,9 +127,15 @@ class KOI(KeplerStar):
         self.e = float(df.loc[df['kepoi_name'] == self.kepoiname].koi_eccen) #eccentricity (assumed 0)
         self.w = float(df.loc[df['kepoi_name'] == self.kepoiname].koi_longp) #longtitude of periastron (assumed 0)
 
-        self.epoch = float(df.loc[df['kepoi_name'] == self.kepoiname].koi_time0) #transit epoch (BJD)
+        self.epoch = float(df.loc[df['kepoi_name'] == self.kepoiname].koi_time0)-2454900. #transit epoch (BJD)
 
         self.dur = float(df.loc[df['kepoi_name'] == self.kepoiname].koi_duration) #transit epoch (BJD)
+
+        self.ld1 = float(df.loc[df['kepoi_name'] == self.kepoiname].koi_ldm_coeff1) #ld coefficient 1
+        self.ld2 = float(df.loc[df['kepoi_name'] == self.kepoiname].koi_ldm_coeff2) #ld coefficient 2
+
+        self.b = float(df.loc[df['kepoi_name'] == self.kepoiname].koi_impact) #impact parameter
+
 
     def calc_a(self, smass, srad):
         """Calculates semi-major axis from planet period and stellar mass using Kepler's 3rd law
@@ -237,17 +243,17 @@ class KOI(KeplerStar):
             hdu.close()
 
         if record_bounds==True:
-            self.bounds = bounds
+            self.bounds = np.array(bounds)-2454900.
 
         self.hdus = hdus
 
-        self.time = np.array([element for sublist in time for element in sublist])
+        self.time = np.array([element for sublist in time for element in sublist])-2454900.
         self.flux = np.array([element for sublist in flux for element in sublist])
         self.flux_err = np.array([element for sublist in flux_err for element in sublist])
 
 
-        self.starttimes = starttimes
-        self.stoptimes = stoptimes
+        self.starttimes = np.array(starttimes)-2454900.
+        self.stoptimes = np.array(stoptimes)-2454900.
 
 
 
@@ -273,7 +279,7 @@ class KOI(KeplerStar):
         self.midpoints = midpoints
 
 
-    def remove_oot_data(self, nbuffer, nlinfit, include_nans=False, delete_nan_transits=False):
+    def remove_oot_data(self, nbuffer, linearfit=False, nlinfit=None, include_nans=False, delete_nan_transits=False, simultaneous_midpoints=None):
         """Removes out-of-transit segments of Kepler light curves.
         Fits a linear model to out-of-transit points immediately surrounding each transit.
         Subtracts the linear model from each transit cutout.
@@ -306,7 +312,19 @@ class KOI(KeplerStar):
         for i in range(len(self.midpoints)):
 
             try:
-                m, b, t1bjd, t1, fnorm, fe1 = do_linfit(self.time, self.flux, self.flux_err, self.midpoints[i], nbuffer, nlinfit)
+                if simultaneous_midpoints is not None:
+                    near_sim_mpt = find_nearest(simultaneous_midpoints, self.midpoints[i])
+                    if abs(self.midpoints[i] - near_sim_mpt) < 3*0.0416667: # If transit midpoint is close to a simultaneous transit, then don't include that transit.
+                        continue
+
+                if linearfit==True:
+                    assert nlinfit is not None, "If performing a linear fit, you must define nlinfit."
+                    m, b, t1bjd, t1, fnorm, fe1 = do_linfit(self.time, self.flux, self.flux_err, self.midpoints[i], nbuffer, nlinfit)
+                    if np.isnan(m) and np.isnan(t1) and np.isnan(fnorm):
+                        print('Gap midpoint')
+                        continue
+                elif linearfit==False:
+                    t1bjd, t1, fnorm, fe1 = cutout_no_linfit(self.time, self.flux, self.flux_err, self.midpoints[i], nbuffer)
 
                 if include_nans==False:
 
@@ -352,6 +370,7 @@ class KOI(KeplerStar):
         self.midpoints_intransit = np.array(mpintransit)
 
 
+
     def calc_durations(self):
         """After fitting circular period, Rp/Rs, a/Rs, and inclination, calculates full and total transit duration of circular transit using Winn (2010) Eqs. 14, 15."""
 
@@ -362,12 +381,16 @@ class KOI(KeplerStar):
         self.T23_errs = get_sigmas(self.T23_dist)
 
 
-    def get_gs(self):
+    def get_gs(self, custom_rho_star="None"):
         """Calculates g using Dawson & Johsnon (2012) Eq. 6."""
 
-        self.g_dist, self.rho_circ = get_g_distribution(self.rho_star_dist, self.per_dist, self.rprs_dist, self.T14_dist, self.T23_dist)
+        if type(custom_rho_star)==str:
+            self.g_dist, self.rho_circ = get_g_distribution(self.rho_star_dist, self.per_dist, self.rprs_dist, self.T14_dist, self.T23_dist)
+        else:
+            self.g_dist, self.rho_circ = get_g_distribution(custom_rho_star, self.per_dist, self.rprs_dist, self.T14_dist, self.T23_dist)
 
-        self.g_mean = mode(self.g_dist)
+        g_bins = np.arange(0,5,0.05)
+        self.g_mean = mode(self.g_dist, bin_type='arr', bins=g_bins)
         self.g_sigma = np.nanmean(np.abs(get_sigmas(self.g_dist)))
 
     def do_eccfit(self, direct, arrlen=1000, bound='multi', sample='rwalk', savecsv=False, savepickle=True):

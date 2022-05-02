@@ -83,7 +83,7 @@ def get_N_intransit(tdur, cadence):
     n_intransit = tdur//cadence
     return n_intransit
 
-def mode(dist, bins=500):
+def mode(dist, window=5, polyorder=2, bin_type='int', bins=25):
     """Gets mode of a histogram.
 
     Parameters
@@ -97,8 +97,16 @@ def mode(dist, bins=500):
         Mode
     """
 
-    n, bins = np.histogram(dist, bins=np.linspace(np.nanmin(dist), np.nanmax(dist), bins))
-    mode = bins[np.nanargmax(n)]
+    from scipy.signal import savgol_filter
+
+    if bin_type == 'int':
+        n, rbins = np.histogram(dist, bins=bins)
+    elif bin_type == 'arr':
+        n, rbins = np.histogram(dist, bins=bins)
+
+    bin_centers = np.array([np.mean((rbins[i], rbins[i+1])) for i in range(len(rbins)-1)])
+    smooth = savgol_filter(n, window, polyorder)
+    mode = bin_centers[np.argmax(n)]
     return mode
 
 
