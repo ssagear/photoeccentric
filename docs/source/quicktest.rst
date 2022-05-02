@@ -3,12 +3,11 @@
 Getting started
 ===================
 
-Section 1
+Using `photoeccentric`
 -------------------------
 
-Section 12345
+To use ``photoeccentric`` inside a python script, do:
 
-Section 2
------------------------------------------------
+.. code-block:: python
 
-Section 23456
+    import photoeccentric as ph

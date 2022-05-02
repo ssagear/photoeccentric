@@ -7,18 +7,18 @@ Welcome to photoeccentric's documentation!
 
 .. note::
 
-   This project is under active development.
+   This project is under active development!
 
-photoeccentric is a transit light curve analysis tool for eccentric transiting systems. It implements the photoeccentric effect, first described in Dawson & Johnson (2012), allowing you to constrain host stellar density
+photoeccentric is a transit light curve analysis tool for eccentric transiting systems.
+It allows you to get individual eccentricity posterior distributions for transiting exoplanets using Kepler light curves and stellar density priors.
 
-photoeccentric currently supports Kepler short- and long-cadence data. Check out the Installation instructions and Getting Started!
+photoeccentric currently supports Kepler short- and long-cadence data. Support for K2 and TESS data coming soon. Check out the Installation instructions and Getting Started!
 
 .. toctree::
    :maxdepth: 2
    :caption: User Guide
 
    installation
-   quicktest
    api
 
 .. toctree::

@@ -79,7 +79,6 @@ def do_linfit(time, flux, flux_err, transitmid, nbuffer, nlinfit, odd=False):
 
     # Find closest Kepler time stamp to transit mid-timess
     tindex = int(np.where(time == find_nearest(time, transitmid))[0])
-
     # Time array of cutout: phase 0 at tmid
     t1 = np.array(time[tindex-nbuffer:tindex+nbuffer+1]) - transitmid
     # Time array of cutout: BJD
@@ -107,6 +106,55 @@ def do_linfit(time, flux, flux_err, transitmid, nbuffer, nlinfit, odd=False):
     fnorm = f1/linfit
 
     return m, b, t1bjd, t1, fnorm, fe1
+
+
+
+
+def cutout_no_linfit(time, flux, flux_err, transitmid, nbuffer, cadence=0.0208333):
+    """For a segment of a Kepler light curve with a transit,
+    fit a line to the out-of-transit data and subtract.
+
+    Parameters:
+    ----------
+    time: np.array
+        Time array of entire light curve
+    flux: np.array
+        Flux array of entire light curve (normalized to 1)
+    flux_err: np.array
+        Flux error array of entire light curve (normalized to 1)
+    transitmid: float
+        Mid-time of transit (same units as time: BJD, BJD-X, etc.)
+
+    Returns:
+    -------
+    t1bjd: np.array
+        Time cutout in BJD
+    fnorm: np.array
+        Flux cutout - linear fit
+    fe1: np.array
+        Flux error cutout
+
+    """
+
+    # Find closest Kepler time stamp to transit mid-timess
+    tindex = int(np.where(time == find_nearest(time, transitmid))[0])
+    if abs(time-find_nearest(time, transitmid)) < 1.*cadence: # if the nearest time stamp is more than a cadence away from the midpoint, the midpoint lies in a gap.
+        return np.nan, np.nan, np.nan, np.nan, np.nan
+
+
+    # Time array of cutout: phase 0 at tmid
+    t1 = np.array(time[tindex-nbuffer:tindex+nbuffer+1]) - transitmid
+    # Time array of cutout: BJD
+    t1bjd = np.array(time[tindex-nbuffer:tindex+nbuffer+1])
+
+
+    # Flux array of cutout
+    f1 = np.array(flux[tindex-nbuffer:tindex+nbuffer+1])
+    # Flux error array of cutout
+    fe1 = np.array(flux_err[tindex-nbuffer:tindex+nbuffer+1])
+
+    return t1bjd, t1, f1, fe1
+
 
 def bls(time, nflux):
     """Applies astropy Box Least-Squares to light curve to fit period
