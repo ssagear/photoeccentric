@@ -80,7 +80,7 @@ def get_N_intransit(tdur, cadence):
     n_intransit: int
         Number of flux points in each transit
     """
-    n_intransit = tdur//cadence
+    n_intransit = tdur/cadence
     return n_intransit
 
 def mode(dist, window=5, polyorder=2, bin_type='int', bins=25):
