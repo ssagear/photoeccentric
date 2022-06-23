@@ -14,4 +14,10 @@ fit Kepler light curve, eccentricity posteriors, etc...)
 .. autoclass:: photoeccentric.KOI
    :members:
 
+.. autoclass:: photoeccentric.KOI
+   :members:
+
+.. automodule:: photoeccentric.utils
+   :members:
+
 The KOI object defines the planet in question.
