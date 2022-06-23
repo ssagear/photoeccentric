@@ -79,6 +79,7 @@
 <span class="target" id="module-photoeccentric"></span><p>The core classes within <code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> are the <code class="docutils literal notranslate"><span class="pre">KeplerStar</span></code> and <code class="docutils literal notranslate"><span class="pre">KOI</span></code> classes. After creating  a <code class="docutils literal notranslate"><span class="pre">photoeccentric.KeplerStar</span></code> object with information about the host star of a KOI system,
 you will be able to create a <code class="docutils literal notranslate"><span class="pre">photoeccentric.KOI</span></code> object for each planet you wish to investigate. This <code class="docutils literal notranslate"><span class="pre">photoeccentric.KOI</span></code> object will allow you to fit and save information about the
 fit Kepler light curve, eccentricity posteriors, etc…)</p>
+<p>The KOI object defines the planet in question.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="photoeccentric.KeplerStar">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">photoeccentric.</span></span><span class="sig-name descname"><span class="pre">KeplerStar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">StarKOI</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KeplerStar" title="Permalink to this definition"></a></dt>
@@ -295,203 +296,930 @@ e.g. if nbuffer = 7 and nlinfit = 5, function will use the 10 outermost flux poi
 
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="id0">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">photoeccentric.</span></span><span class="sig-name descname"><span class="pre">KOI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nkoi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">StarKOI</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isodf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
-<dd><dl class="py method">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">calc_a</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">srad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
-<dd><p>Calculates semi-major axis from planet period and stellar mass using Kepler’s 3rd law</p>
-<dl class="simple">
-<dt>period: float</dt><dd><p>Planet period (SECONDS)</p>
-</dd>
-<dt>smass: float</dt><dd><p>Stellar mass (Msol)</p>
-</dd>
-<dt>srad: float</dt><dd><p>Stellar radius (Rsol)</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>a: float</dt><dd><p>a/Rs: Semi-major axis of planet’s orbit (units of stellar radii)</p>
-</dd>
-</dl>
+<span class="target" id="module-photoeccentric.eccentricity"></span><dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.bprior_log_likelihood">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">bprior_log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gerr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.bprior_log_likelihood" title="Permalink to this definition"></a></dt>
+<dd><p>Log of likelihood
+model = g(e,w)
+gerr = sigma of g distribution</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">calc_durations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
-<dd><p>After fitting circular period, Rp/Rs, a/Rs, and inclination, calculates full and total transit duration of circular transit using Winn (2010) Eqs. 14, 15.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.bprior_log_prior">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">bprior_log_prior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.bprior_log_prior" title="Permalink to this definition"></a></dt>
+<dd><p>Log of prior
+e between 0 and 1
+w between -90 and 300</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">do_eccfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrlen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'multi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rwalk'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savecsv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepickle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
-<dd><p>One-step eccentricity &amp; longitude of periastron fitting from g. Nested sampling w/ dynesty.
-Using Dawson &amp; Johnson (2012) Eq. 4.</p>
-<dl class="simple">
-<dt>direct: str</dt><dd><p>Output path.</p>
-</dd>
-<dt>arrlen: int, default 1000</dt><dd><p>Number of (e, omega) posterior points to save.</p>
-</dd>
-<dt>bound: default ‘multi’</dt><dd><p>dynesty bound</p>
-</dd>
-<dt>sample: default ‘rwalk’</dt><dd><p>dynesty sampling method</p>
-</dd>
-<dt>savecsv: boolean, default False</dt><dd><p>Save e, w, transit durations, and g distributions as csvs?</p>
-</dd>
-<dt>savepickle: boolean, default True</dt><dd><p>Save dynesty results as pickle file?</p>
-</dd>
-</dl>
-<p>None</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.bprior_log_probability">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">bprior_log_probability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gerr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.bprior_log_probability" title="Permalink to this definition"></a></dt>
+<dd><p>Log of probability</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">do_tfit_juliet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsupersample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">29</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptimesupersample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0201389</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
-<dd><p>One-step Kepler transit light curve fitting. Using Juliet w/ pymultinest. Only fits circular transits (e, w fixed at 0!).</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.extprior_log_likelihood">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">extprior_log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gerr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.extprior_log_likelihood" title="Permalink to this definition"></a></dt>
+<dd><p>Log of likelihood
+model = g(e,w)
+gerr = sigma of g distribution</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.extprior_log_prior">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">extprior_log_prior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.extprior_log_prior" title="Permalink to this definition"></a></dt>
+<dd><p>Log of prior
+e between 0 and 1
+w between -90 and 300</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.extprior_log_probability">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">extprior_log_probability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gerr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.extprior_log_probability" title="Permalink to this definition"></a></dt>
+<dd><p>Log of probability</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.get_T14">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">get_T14</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rprs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_rs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.get_T14" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates T14 (total transit duration, 1st to 4th contact).
+Assumes a circular orbit (e=0, w=0) if ecc_prior=False.
+If ecc_prior=True, e and w are required. T14 is multiplied by an eccentricity factor.</p>
 <dl class="simple">
-<dt>direct: str</dt><dd><p>Output path.</p>
+<dt>p: np.array</dt><dd><p>Period (days)</p>
 </dd>
-<dt>nsupersample: int, default 29</dt><dd><p>Number of flux points over which to supersample, default 29 (for Kepler long cadence.)</p>
+<dt>rprs: np.array</dt><dd><p>Planet radius/stellar radius</p>
 </dd>
-<dt>exptimesupersample: float, default 0.0201389 (29 min for Kepler long cadence)</dt><dd><p>Time over which to supersample, default</p>
+<dt>a_rs: np.array</dt><dd><p>Semi-major axis (in stellar radii) (a/Rs)</p>
 </dd>
-<dt>nlive: int, default 400</dt><dd><p>Number of pymultinest live points</p>
+<dt>i: np.array</dt><dd><p>Inclination (degrees)</p>
 </dd>
-<dt>priors: default None</dt><dd><p>Custom transit fitting priors for juliet fit</p>
+<dt>ecc: boolean</dt><dd><p>Eccentricity taken into account? Default False</p>
 </dd>
-<dt>reset_out: boolean, default False</dt><dd><p>Reset output directory?</p>
+<dt>e: float</dt><dd><p>Eccentricity if ecc=True, default None</p>
+</dd>
+<dt>w: float</dt><dd><p>Longitude of periastron (degrees) if ecc=True, default None</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>dataset: juliet object</dt><dd><p>Juliet dataset</p>
-</dd>
-<dt>results: juliet object</dt><dd><p>Juliet results</p>
+<dt>T14: float</dt><dd><p>Total transit duration (seconds)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">do_ttv_tfit_juliet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mptsintransit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsupersample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">29</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptimesupersample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0201389</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
-<dd><p>One-step Kepler transit light curve fitting, for transits with TTVs. Using Juliet w/ pymultinest. Only fits circular transits (e, w fixed at 0!).
-Fixes TTV midpoints. Uses Kepler catalog orbital period + errorbars to simluate a fit period distribution.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.get_T23">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">get_T23</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rprs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_rs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.get_T23" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates T23 (full transit duration, 1st to 4th contact).
+Assumes a circular orbit (e=0, w=0) if ecc_prior=False.
+If ecc_prior=True, e and w are required. T23 is multiplied by an eccentricity factor.</p>
 <dl class="simple">
-<dt>direct: str</dt><dd><p>Output path.</p>
+<dt>p: np.array</dt><dd><p>Period (days)</p>
 </dd>
-<dt>mptsintransit: array or float, default 0.</dt><dd><p>Input irregular transit midpoints with TTVs. If 0, uses default, calculated midpoints.</p>
+<dt>rprs: np.array</dt><dd><p>Planet radius/stellar radius</p>
 </dd>
-<dt>nsupersample: int, default 29</dt><dd><p>Number of flux points over which to supersample, default 29 (for Kepler long cadence.)</p>
+<dt>a_rs: np.array</dt><dd><p>Semi-major axis (in stellar radii) (a/Rs)</p>
 </dd>
-<dt>exptimesupersample: float, default 0.0201389 (29 min for Kepler long cadence)</dt><dd><p>Time over which to supersample, default</p>
+<dt>i: np.array</dt><dd><p>Inclination (degrees)</p>
 </dd>
-<dt>nlive: int, default 400</dt><dd><p>Number of pymultinest live points</p>
+<dt>ecc: boolean</dt><dd><p>Eccentricity taken into account? Default False</p>
 </dd>
-<dt>priors: default None</dt><dd><p>Custom transit fitting priors for juliet fit</p>
+<dt>e: float</dt><dd><p>Eccentricity if ecc=True, default None</p>
 </dd>
-<dt>reset_out: boolean, default False</dt><dd><p>Reset output directory?</p>
+<dt>w: float</dt><dd><p>Longitude of periastron (degrees) if ecc=True, default None</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>dataset: juliet object</dt><dd><p>Juliet dataset</p>
-</dd>
-<dt>results: juliet object</dt><dd><p>Juliet results</p>
+<dt>T23: float</dt><dd><p>Full transit time (seconds)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">get_KIC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">muirhead_comb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
-<dd><p>Gets KIC number for KOI (star).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">get_gs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">custom_rho_star</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'None'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
-<dd><p>Calculates g using Dawson &amp; Johsnon (2012) Eq. 6.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">get_midpoints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
-<dd><p>Calculates transit midpoints within time bounds of Kepler light curve.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id10">
-<span class="sig-name descname"><span class="pre">get_stitched_lcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadence_combine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id10" title="Permalink to this definition"></a></dt>
-<dd><p>Stitches Kepler LCs from a list of fits files downloaded from MAST.</p>
-<p>files: List</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.get_a_rs">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">get_a_rs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.get_a_rs" title="Permalink to this definition"></a></dt>
+<dd><p>Gets a/Rs guess based on orbital period, density &amp; Kepler’s 3rd law</p>
 <dl class="simple">
-<dt>KIC: float</dt><dd><p>KOI of target</p>
+<dt>rhos: np.array</dt><dd><p>Stellar density array</p>
 </dd>
-<dt>cadence_combine: boolean</dt><dd><p>True if light curve files include both short- and long-cadence data. False otherwise.</p>
+<dt>periods: np.array</dt><dd><p>Periods array</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>hdus: list</dt><dd><p>List of FITS hdus</p>
+<dt>a_rs: np.array</dt><dd><p>a/Rs array calculated from periods, rhos</p>
 </dd>
 </dl>
-<p>time:
-flux:
-flux_err:
-startimes:
-stoptimes:</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="id11">
-<span class="sig-name descname"><span class="pre">normalize_flux</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id11" title="Permalink to this definition"></a></dt>
-<dd><p>Normalizes flux array.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id12">
-<span class="sig-name descname"><span class="pre">planet_params_from_archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id12" title="Permalink to this definition"></a></dt>
-<dd><p>Get stellar parameters for the host of a KOI from exoplanet archive (downloaded data).</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.get_e">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">get_e</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.get_e" title="Permalink to this definition"></a></dt>
+<dd><p>Gets eccentricity (from photoeccentric effect)</p>
 <dl class="simple">
-<dt>df: pandas.DataFrame</dt><dd><p>dataframe of exop. archive downloaded data</p>
+<dt>g: float</dt><dd><p>Cube root of ratio between rho_circ and rho_star</p>
 </dd>
-<dt>kepoiname: str</dt><dd><p>Kepler name of planet</p>
+<dt>w: float</dt><dd><p>Angle of apoapse or periapse (?) (degrees, -90 &lt; w &lt; 90)</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>period: float</dt><dd><p>Orbital period (days)</p>
+<dt>e: float</dt><dd><p>Eccentricity of planet orbit</p>
 </dd>
-<dt>rprs: float</dt><dd><p>Planet radius (stellar radii)</p>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.get_g">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">get_g</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho_circ</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_star</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.get_g" title="Permalink to this definition"></a></dt>
+<dd><p>Gets g</p>
+<dl class="simple">
+<dt>rho_circ: float</dt><dd><p>Stellar density, assuming a circular orbit (kg/m^3)</p>
 </dd>
-<dt>a: float</dt><dd><p>Semi-major axis (stellar radii)</p>
+<dt>rho_star: float</dt><dd><p>Stellar density, calculated from Kepler/Gaia/spectroscopy (kg/m^3)</p>
 </dd>
+</dl>
+<dl class="simple">
+<dt>g: float</dt><dd><p>Cube root of ratio between rho_circ and rho_star</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.get_g_distribution">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">get_g_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rprs_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T14_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T23_dist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.get_g_distribution" title="Permalink to this definition"></a></dt>
+<dd><p>Gets g distribution for a KOI.</p>
+<dl class="simple">
+<dt>rhos: np.array</dt><dd><p>Density histogram</p>
+</dd>
+<dt>per_dist: np.array</dt><dd><p>Best-fit period (days)</p>
+</dd>
+<dt>rprs_dist: np.array</dt><dd><p>Best-fit rp/rs</p>
+</dd>
+<dt>T14_dist: np.array</dt><dd><p>Total transit duration (seconds) calculated from best-fit planet parameters</p>
+</dd>
+<dt>T23_dist: np.array</dt><dd><p>Full transit duration (seconds) calculated from best-fit planet parameters</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>gs: np.array</dt><dd><p>g distribution for star/planet.</p>
+</dd>
+<dt>rho_circ: np.array</dt><dd><p>Density distribution assuming a circular orbit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.get_g_from_def">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">get_g_from_def</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.get_g_from_def" title="Permalink to this definition"></a></dt>
+<dd><p>Gets g from e and omega</p>
+<dl class="simple">
 <dt>e: float</dt><dd><p>Eccentricity</p>
 </dd>
-<dt>w: float</dt><dd><p>Longitude of periastron (degrees)</p>
+<dt>w: float</dt><dd><p>Angle of periapse or something</p>
 </dd>
+</dl>
+<dl class="simple">
+<dt>g: float</dt><dd><p>Cube root of ratio between rho_circ and rho_star</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.get_inclination">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">get_inclination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_rs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.get_inclination" title="Permalink to this definition"></a></dt>
+<dd><p>Get inclination (in degrees) from an impact parameter and semi-major axis (on stellar radius).</p>
+<dl class="simple">
+<dt>b: float</dt><dd><p>Impact parameter</p>
+</dd>
+<dt>a_rs: float</dt><dd><p>Ratio of semi-major axis to stellar radius (a/Rs)</p>
+</dd>
+</dl>
+<dl class="simple">
 <dt>i: float</dt><dd><p>Inclination (degrees)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="id13">
-<span class="sig-name descname"><span class="pre">remove_oot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbuffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linearfit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlinfit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_nans</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_nan_transits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simultaneous_midpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simultaneous_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_intransit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0201389</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id13" title="Permalink to this definition"></a></dt>
-<dd><p>Removes out-of-transit segments of Kepler light curves.
-Fits a linear model to out-of-transit points immediately surrounding each transit.
-Subtracts the linear model from each transit cutout.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.get_planet_params">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">get_planet_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T23</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.get_planet_params" title="Permalink to this definition"></a></dt>
+<dd><p>Returns planet parameters in correct units.</p>
 <dl class="simple">
-<dt>nbuffer: int</dt><dd><p>Number of flux points before and after transit midpoint to include in transit cut-out.
-e.g. if nbuffer = 7, function will preserve 7 flux points before and after each transit midpoint and discard the rest of light curve.</p>
+<dt>p: float</dt><dd><p>Planet orbital period (days)</p>
 </dd>
-<dt>nlinfit: int</dt><dd><p>Number of flux points from each end of transit cutout to use in linear fit.
-e.g. if nbuffer = 7 and nlinfit = 5, function will use the 10 outermost flux points for linear fit.</p>
+<dt>rp_earth: float</dt><dd><p>Planet radius (earth radii)</p>
 </dd>
-<dt>include_nans: boolean, default False</dt><dd><p>Include nans in in-transit data?</p>
+<dt>rs: float</dt><dd><p>Stellar radius (solar radii)</p>
 </dd>
-<dt>delete_nan_transits: boolean, default False</dt><dd><p>Delete entire transit if includes nan flux value?</p>
+<dt>T14: float</dt><dd><p>Total transit time - first to fourth contact (hours)</p>
+</dd>
+<dt>a: float</dt><dd><p>Planet semi-major axis (AU)</p>
+</dd>
+<dt>i: float</dt><dd><p>Orbital inclination (degrees)</p>
 </dd>
 </dl>
-<p>None</p>
+<dl class="simple">
+<dt>p_seconds: float</dt><dd><p>Orbital period (seconds)</p>
+</dd>
+<dt>rprs: float</dt><dd><p>Planet radius (stellar host radii)</p>
+</dd>
+<dt>T14_seconds: float</dt><dd><p>Total transit time - first to fourth contact (seconds)</p>
+</dd>
+<dt>T23_seconds: float</dt><dd><p>Full transit time - second to third contact (seconds)</p>
+</dd>
+</dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.get_rho_circ">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">get_rho_circ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rprs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T23</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.get_rho_circ" title="Permalink to this definition"></a></dt>
+<dd><p>Returns stellar density, assuming a perfectly circular planetary orbit.</p>
+<dl class="simple">
+<dt>rprs: float</dt><dd><p>Planet radius/stellar radii</p>
+</dd>
+<dt>T14: float</dt><dd><p>Total transit time - first to fourth contact (seconds)</p>
+</dd>
+<dt>T23: float</dt><dd><p>Full transit time - second to third contact (seconds)</p>
+</dd>
+<dt>p: float</dt><dd><p>Orbital period (seconds)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>rho_circ: float</dt><dd><p>Stellar density, assuming a circular orbit (kg/m^3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.log_likelihood">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gerr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.log_likelihood" title="Permalink to this definition"></a></dt>
+<dd><p>Log of likelihood
+model = g(e,w)
+gerr = sigma of g distribution</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.log_prior">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">log_prior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.log_prior" title="Permalink to this definition"></a></dt>
+<dd><p>Log of prior
+e between 0 and 1
+w between -90 and 300</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.log_probability">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">log_probability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gerr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.log_probability" title="Permalink to this definition"></a></dt>
+<dd><p>Log of probability</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.photo_fit">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">photo_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nflux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess_transit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess_ew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nwalk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndiscard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_transit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_burnin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_corner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_Tburnin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_Tcorner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.photo_fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit eccentricity for a planet.</p>
+<dl class="simple">
+<dt>time: np.array</dt><dd><p>Light curve time</p>
+</dd>
+<dt>nflux: np.array</dt><dd><p>Light curve flux</p>
+</dd>
+<dt>flux_err: np.array</dt><dd><p>Light curve flux errors</p>
+</dd>
+<dt>guess_transit: np.array (length 4)</dt><dd><p>Initial guess for MCMC transit fitting. Passed into mcmc_fitter().</p>
+</dd>
+<dt>guess_ew: np.array (length 2)</dt><dd><p>Initial guess for MCMC e and w fitting. [e guess, w guess]</p>
+</dd>
+<dt>rho_star: np.array</dt><dd><p>“True” stellar density distribution</p>
+</dd>
+<dt>e: float</dt><dd><p>True eccentricity (just to name plots)</p>
+</dd>
+<dt>w: float</dt><dd><p>True longitude of periastron (just to name plots)</p>
+</dd>
+<dt>directory: str</dt><dd><p>Directory to save plots</p>
+</dd>
+<dt>nwalk: int</dt><dd><p>Number of walkers</p>
+</dd>
+<dt>nsteps: int</dt><dd><p>Number of steps to run in MCMC. Passed into mcmc_fitter().</p>
+</dd>
+<dt>ndiscard: int</dt><dd><p>Number of steps to discard in MCMC. Passed into mcmc_fitter().</p>
+</dd>
+<dt>plot_transit: boolean, default True</dt><dd><p>Save transit light curve plot + fit in specified directory.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>fite: float</dt><dd><p>Best-fit eccentricity (mean of MCMC distribution)</p>
+</dd>
+<dt>fitw: float</dt><dd><p>Best-fit longitude of periastron (mean of MCMC distribution)</p>
+</dd>
+<dt>gs: np.array</dt><dd><p>“g” distribution for planet</p>
+</dd>
+<dt>g_mean: float</dt><dd><p>Mean of g distribution</p>
+</dd>
+<dt>g_sigmas: list (length 2)</dt><dd><p>[(-) sigma, (+) sigma] of g distribution</p>
+</dd>
+<dt>zsc: list (length 2)</dt><dd><p>Number of sigmas away [fit e, fit w] are from true [e, w]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.photo_fit_bprior">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">photo_fit_bprior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nflux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess_transit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess_ew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nwalk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndiscard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_transit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_burnin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_corner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_Tburnin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_Tcorner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.photo_fit_bprior" title="Permalink to this definition"></a></dt>
+<dd><p>Fit eccentricity for a planet.</p>
+<p>Applies Bayesian beta-dist prior from Kipping 2014</p>
+<dl class="simple">
+<dt>time: np.array</dt><dd><p>Light curve time</p>
+</dd>
+<dt>nflux: np.array</dt><dd><p>Light curve flux</p>
+</dd>
+<dt>flux_err: np.array</dt><dd><p>Light curve flux errors</p>
+</dd>
+<dt>guess_transit: np.array (length 4)</dt><dd><p>Initial guess for MCMC transit fitting. Passed into mcmc_fitter().</p>
+</dd>
+<dt>guess_ew: np.array (length 2)</dt><dd><p>Initial guess for MCMC e and w fitting. [e guess, w guess]</p>
+</dd>
+<dt>rho_star: np.array</dt><dd><p>“True” stellar density distribution</p>
+</dd>
+<dt>e: float</dt><dd><p>True eccentricity (just to name plots)</p>
+</dd>
+<dt>w: float</dt><dd><p>True longitude of periastron (just to name plots)</p>
+</dd>
+<dt>directory: str</dt><dd><p>Directory to save plots</p>
+</dd>
+<dt>nwalk: int</dt><dd><p>Number of walkers</p>
+</dd>
+<dt>nsteps: int</dt><dd><p>Number of steps to run in MCMC. Passed into mcmc_fitter().</p>
+</dd>
+<dt>ndiscard: int</dt><dd><p>Number of steps to discard in MCMC. Passed into mcmc_fitter().</p>
+</dd>
+<dt>plot_transit: boolean, default True</dt><dd><p>Save transit light curve plot + fit in specified directory.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>fite: float</dt><dd><p>Best-fit eccentricity (mean of MCMC distribution)</p>
+</dd>
+<dt>fitw: float</dt><dd><p>Best-fit longitude of periastron (mean of MCMC distribution)</p>
+</dd>
+<dt>gs: np.array</dt><dd><p>“g” distribution for planet</p>
+</dd>
+<dt>g_mean: float</dt><dd><p>Mean of g distribution</p>
+</dd>
+<dt>g_sigmas: list (length 2)</dt><dd><p>[(-) sigma, (+) sigma] of g distribution</p>
+</dd>
+<dt>zsc: list (length 2)</dt><dd><p>Number of sigmas away [fit e, fit w] are from true [e, w]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.photo_fit_noper">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">photo_fit_noper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">per</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nflux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess_transit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess_ew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nwalk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndiscard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_transit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_burnin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_corner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_Tburnin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_Tcorner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.photo_fit_noper" title="Permalink to this definition"></a></dt>
+<dd><p>Fit eccentricity for a planet.
+Period is NOT a free parameter.</p>
+<dl class="simple">
+<dt>per: float</dt><dd><p>Known period (days)</p>
+</dd>
+<dt>time: np.array</dt><dd><p>Light curve time</p>
+</dd>
+<dt>nflux: np.array</dt><dd><p>Light curve flux</p>
+</dd>
+<dt>flux_err: np.array</dt><dd><p>Light curve flux errors</p>
+</dd>
+<dt>guess_transit: np.array (length 4)</dt><dd><p>Initial guess for MCMC transit fitting. Passed into mcmc_fitter().</p>
+</dd>
+<dt>guess_ew: np.array (length 2)</dt><dd><p>Initial guess for MCMC e and w fitting. [e guess, w guess]</p>
+</dd>
+<dt>rho_star: np.array</dt><dd><p>“True” stellar density distribution</p>
+</dd>
+<dt>e: float</dt><dd><p>True eccentricity (just to name plots)</p>
+</dd>
+<dt>w: float</dt><dd><p>True longitude of periastron (just to name plots)</p>
+</dd>
+<dt>directory: str</dt><dd><p>Directory to save plots</p>
+</dd>
+<dt>nwalk: int</dt><dd><p>Number of walkers</p>
+</dd>
+<dt>nsteps: int</dt><dd><p>Number of steps to run in MCMC. Passed into mcmc_fitter().</p>
+</dd>
+<dt>ndiscard: int</dt><dd><p>Number of steps to discard in MCMC. Passed into mcmc_fitter().</p>
+</dd>
+<dt>plot_transit: boolean, default True</dt><dd><p>Save transit light curve plot + fit in specified directory.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>fite: float</dt><dd><p>Best-fit eccentricity (mean of MCMC distribution)</p>
+</dd>
+<dt>fitw: float</dt><dd><p>Best-fit longitude of periastron (mean of MCMC distribution)</p>
+</dd>
+<dt>gs: np.array</dt><dd><p>“g” distribution for planet</p>
+</dd>
+<dt>g_mean: float</dt><dd><p>Mean of g distribution</p>
+</dd>
+<dt>g_sigmas: list (length 2)</dt><dd><p>[(-) sigma, (+) sigma] of g distribution</p>
+</dd>
+<dt>zsc: list (length 2)</dt><dd><p>Number of sigmas away [fit e, fit w] are from true [e, w]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.photo_init">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">photo_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-06</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.photo_init" title="Permalink to this definition"></a></dt>
+<dd><p>Creates fake transit based on input planet parameters.</p>
+<dl class="simple">
+<dt>time: np.array</dt><dd><p>Time over which to evaluate transit flux</p>
+</dd>
+<dt>per: float</dt><dd><p>Orbital peiod (days)</p>
+</dd>
+<dt>rp: float</dt><dd><p>Planet radius (units of stellar radii)</p>
+</dd>
+<dt>a: float</dt><dd><p>Semi-major axis (units of stellar radii)</p>
+</dd>
+<dt>e: float</dt><dd><p>Eccentricity</p>
+</dd>
+<dt>inc: float</dt><dd><p>Inclination (degrees)</p>
+</dd>
+<dt>w: float</dt><dd><p>Longitude of periastron (degrees)</p>
+</dd>
+<dt>noise: float, default 0.000005</dt><dd><p>Sigma of Gaussian noise to be added to light curve flux</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>nflux: np.array</dt><dd><p>Flux array with noise</p>
+</dd>
+<dt>flux_err: np.array</dt><dd><p>Flux errors</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.row_to_top">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">row_to_top</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.row_to_top" title="Permalink to this definition"></a></dt>
+<dd><p>Bring row to top</p>
+<dl class="simple">
+<dt>df: pandas.dataframe</dt><dd><p>Dataframe to copy</p>
+</dd>
+<dt>index: int</dt><dd><p>Index of row to bring to top</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>df_cp: pandas.dataframe</dt><dd><p>Copy of dataframe with specified row at top</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.stellar_params_from_archive">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">stellar_params_from_archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kep_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.stellar_params_from_archive" title="Permalink to this definition"></a></dt>
+<dd><p>Get stellar parameters for the host of a KOI from exoplanet archive (downloaded data).</p>
+<dl class="simple">
+<dt>df: pandas.DataFrame</dt><dd><p>dataframe of exop. archive downloaded data</p>
+</dd>
+<dt>kep_name: str</dt><dd><p>Kepler name of planet</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>smass: float</dt><dd><p>Stellar mass (solar mass)</p>
+</dd>
+<dt>srad: float</dt><dd><p>Stellar radius (solar radius)</p>
+</dd>
+<dt>limbdark_mod: str</dt><dd><p>Limb darkening model</p>
+</dd>
+<dt>ldm_c1: float</dt><dd><p>Limb darkening coefficient 1</p>
+</dd>
+<dt>ldm_c2: float</dt><dd><p>Limb darkening coefficient 2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.eccentricity.zscore">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.eccentricity.</span></span><span class="sig-name descname"><span class="pre">zscore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.eccentricity.zscore" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates zscore of a data point in (or outside of) a dataset
+zscore: how many sigmas away is a value from the mean of a dataset?</p>
+<dl class="simple">
+<dt>dat: float</dt><dd><p>Data point</p>
+</dd>
+<dt>mean: float</dt><dd><p>Mean of dataset</p>
+</dd>
+<dt>sigma: flaot</dt><dd><p>Sigma of dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-photoeccentric.lcfitter"></span><dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.lcfitter.bls">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.lcfitter.</span></span><span class="sig-name descname"><span class="pre">bls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nflux</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.lcfitter.bls" title="Permalink to this definition"></a></dt>
+<dd><p>Applies astropy Box Least-Squares to light curve to fit period</p>
+<dl class="simple">
+<dt>time: np.array</dt><dd><p>Time array</p>
+</dd>
+<dt>nflux: np.array</dt><dd><p>Flux array</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>per_guess: float</dt><dd><p>Period fit from BLS</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.lcfitter.cutout_no_linfit">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.lcfitter.</span></span><span class="sig-name descname"><span class="pre">cutout_no_linfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transitmid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbuffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0208333</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.lcfitter.cutout_no_linfit" title="Permalink to this definition"></a></dt>
+<dd><p>For a segment of a Kepler light curve with a transit,
+fit a line to the out-of-transit data and subtract.</p>
+<dl class="simple">
+<dt>time: np.array</dt><dd><p>Time array of entire light curve</p>
+</dd>
+<dt>flux: np.array</dt><dd><p>Flux array of entire light curve (normalized to 1)</p>
+</dd>
+<dt>flux_err: np.array</dt><dd><p>Flux error array of entire light curve (normalized to 1)</p>
+</dd>
+<dt>transitmid: float</dt><dd><p>Mid-time of transit (same units as time: BJD, BJD-X, etc.)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>t1bjd: np.array</dt><dd><p>Time cutout in BJD</p>
+</dd>
+<dt>fnorm: np.array</dt><dd><p>Flux cutout - linear fit</p>
+</dd>
+<dt>fe1: np.array</dt><dd><p>Flux error cutout</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.lcfitter.do_linfit">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.lcfitter.</span></span><span class="sig-name descname"><span class="pre">do_linfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transitmid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbuffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlinfit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0201389</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">odd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.lcfitter.do_linfit" title="Permalink to this definition"></a></dt>
+<dd><p>For a segment of a Kepler light curve with a transit,
+fit a line to the out-of-transit data and subtract.</p>
+<dl class="simple">
+<dt>time: np.array</dt><dd><p>Time array of entire light curve</p>
+</dd>
+<dt>flux: np.array</dt><dd><p>Flux array of entire light curve (normalized to 1)</p>
+</dd>
+<dt>flux_err: np.array</dt><dd><p>Flux error array of entire light curve (normalized to 1)</p>
+</dd>
+<dt>transitmid: float</dt><dd><p>Mid-time of transit (same units as time: BJD, BJD-X, etc.)</p>
+</dd>
+<dt>nbuffer: int</dt><dd><p>Number of out-of-transit data points to keep before and after transit</p>
+</dd>
+<dt>nlinfit: int</dt><dd><p>Number of out-of-transit data points to use in linear fit (from each end of cutout light curve)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>t1bjd: np.array</dt><dd><p>Time cutout in BJD</p>
+</dd>
+<dt>fnorm: np.array</dt><dd><p>Flux cutout - linear fit</p>
+</dd>
+<dt>fe1: np.array</dt><dd><p>Flux error cutout</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.lcfitter.get_transit_cutout">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.lcfitter.</span></span><span class="sig-name descname"><span class="pre">get_transit_cutout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transitmid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncadences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.lcfitter.get_transit_cutout" title="Permalink to this definition"></a></dt>
+<dd><p>Gets cutout with n cadences before and after transit.
+transitmid and time have same units.</p>
+<dl class="simple">
+<dt>transitmid: float</dt><dd><p>Transit mid-time</p>
+</dd>
+<dt>ncadences: int</dt><dd><p>Number of cadences before and after transit mid-time.</p>
+</dd>
+<dt>time: np.array</dt><dd><p>Time</p>
+</dd>
+<dt>flux: np.array</dt><dd><p>Flux</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>t1: np.array</dt><dd><p>Cutout time</p>
+</dd>
+<dt>f1: np.array</dt><dd><p>Cutout flux</p>
+</dd>
+<dt>fe1: np.array</dt><dd><p>Cutout flux error</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.lcfitter.get_transit_cutout_full">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.lcfitter.</span></span><span class="sig-name descname"><span class="pre">get_transit_cutout_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transitmids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncadences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.lcfitter.get_transit_cutout_full" title="Permalink to this definition"></a></dt>
+<dd><p>Removes out of transit data from light curve.
+n cadences before and after transit for full light curve.
+transitmid and time must have the same units.</p>
+<dl class="simple">
+<dt>transitmid: array</dt><dd><p>All transit mid-times</p>
+</dd>
+<dt>ncadences: int</dt><dd><p>Number of cadences before and after transit mid-time.</p>
+</dd>
+<dt>time: np.array</dt><dd><p>Time</p>
+</dd>
+<dt>flux: np.array</dt><dd><p>Flux</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>t1: np.array</dt><dd><p>Cutout time</p>
+</dd>
+<dt>f1: np.array</dt><dd><p>Cutout flux</p>
+</dd>
+<dt>fe1: np.array</dt><dd><p>Cutout flux error</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.lcfitter.mcmc_fitter">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.lcfitter.</span></span><span class="sig-name descname"><span class="pre">mcmc_fitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guess_transit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nflux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nwalk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndiscard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_Tburnin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_Tcorner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.lcfitter.mcmc_fitter" title="Permalink to this definition"></a></dt>
+<dd><p>One-step MCMC transit fitting with <cite>photoeccentric</cite>.</p>
+<p>NB: (nsteps-ndiscard)*nwalkers must equal the length of rho_star.</p>
+<dl class="simple">
+<dt>guess_transit: np.array</dt><dd><p>Initial guess: [period, Rp/Rs, a/Rs, i (deg)]</p>
+</dd>
+<dt>time: np.array</dt><dd><p>Time axis of light curve to fit</p>
+</dd>
+<dt>nflux: np.arrayss</dt><dd><p>Flux of light curve to fit</p>
+</dd>
+<dt>flux_err: np.array</dt><dd><p>Flux errors of light curve to fit</p>
+</dd>
+<dt>nwalk: int</dt><dd><p>Number of <cite>emcee</cite> walkers</p>
+</dd>
+<dt>nsteps: int</dt><dd><p>Number of <cite>emcee</cite> steps to run</p>
+</dd>
+<dt>ndiscard: int</dt><dd><p>Number of <cite>emcee</cite> steps to discard (after burn-in)</p>
+</dd>
+<dt>directory: str</dt><dd><p>Full directory path to save plots</p>
+</dd>
+<dt>plot_Tburnin: boolean, default True</dt><dd><p>Plot burn-in and save to directory</p>
+</dd>
+<dt>plot_Tcorner: boolean, default True</dt><dd><p>Plot corner plot and save to directory</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>results: list</dt><dd><p>Fit results [period, Rp/Rs, a/Rs, i]</p>
+</dd>
+<dt>results_errs: list</dt><dd><p>Fit results errors [period err, Rp/Rs err, a/Rs err, i err]</p>
+</dd>
+<dt>rprs_dist: np.array</dt><dd><p>MCMC Rp/Rs distribution</p>
+</dd>
+<dt>ars_dist: np.array</dt><dd><p>MCMC a/Rs distributions</p>
+</dd>
+<dt>i_dist: np.array</dt><dd><p>MCMC i distribution</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.lcfitter.planetlc_fitter">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.lcfitter.</span></span><span class="sig-name descname"><span class="pre">planetlc_fitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.lcfitter.planetlc_fitter" title="Permalink to this definition"></a></dt>
+<dd><p>Always assumes e=0.
+w is NOT a free parameter.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.lcfitter.tfit_log_likelihood">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.lcfitter.</span></span><span class="sig-name descname"><span class="pre">tfit_log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.lcfitter.tfit_log_likelihood" title="Permalink to this definition"></a></dt>
+<dd><p>Transit fit emcee function</p>
+<p>model = integratedlc_fitter()
+gerr = sigma of g distribution</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.lcfitter.tfit_log_prior">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.lcfitter.</span></span><span class="sig-name descname"><span class="pre">tfit_log_prior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.lcfitter.tfit_log_prior" title="Permalink to this definition"></a></dt>
+<dd><p>Transit fit emcee function</p>
+<p>e must be between 0 and 1
+w must be between -90 and 300</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.lcfitter.tfit_log_probability">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.lcfitter.</span></span><span class="sig-name descname"><span class="pre">tfit_log_probability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.lcfitter.tfit_log_probability" title="Permalink to this definition"></a></dt>
+<dd><p>Transit fit emcee function</p>
+</dd></dl>
+
+<span class="target" id="module-photoeccentric.stellardensity"></span><dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.asymmetric_gaussian">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">asymmetric_gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_minus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_plus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nvals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.asymmetric_gaussian" title="Permalink to this definition"></a></dt>
+<dd><p>Generates an asymmetric Gaussian distribution based on a mean and 2 different sigmas (one (-) and one (+))
+Made by generating 2 symmetric Gaussians with different sigmas and sticking them together at the mean.
+The integral of the resulting Gaussian is 1.</p>
+<dl class="simple">
+<dt>mean: float</dt><dd><p>Mean of distribution</p>
+</dd>
+<dt>sigma_minus: float</dt><dd><p>Negative sigma of distribtion</p>
+</dd>
+<dt>sigma_plus: float</dt><dd><p>Positive sigma of distribtion</p>
+</dd>
+<dt>nvals: int</dt><dd><p>Number of values</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>dist: np.ndarray</dt><dd><p>Asymmetric Gaussian distribution, length nvals</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.density">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.density" title="Permalink to this definition"></a></dt>
+<dd><p>Mass in solar density
+Radius in solar density
+sol_density in kg/m^3</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.find_density_dist_asymmetric">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">find_density_dist_asymmetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ntargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masserr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masserr2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radii</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raderr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raderr2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.find_density_dist_asymmetric" title="Permalink to this definition"></a></dt>
+<dd><p>Gets asymmetric stellar density distribution for stars, based on asymmetric mass and radius errorbars.
+Asymmetric stellar density distribution = Gaussian with different sigmas on each end.</p>
+<dl class="simple">
+<dt>ntargs: int</dt><dd><p>Number of stars to get distribution for</p>
+</dd>
+<dt>masses: np.ndarray</dt><dd><p>Array of stellar masses (solar mass)</p>
+</dd>
+<dt>masserr1: np.ndarray</dt><dd><p>Array of (-) sigma_mass (solar mass)</p>
+</dd>
+<dt>masserr2: np.ndarray</dt><dd><p>Array of (+) sigma_mass (solar mass)</p>
+</dd>
+<dt>radii: np.ndarray</dt><dd><p>Array of stellar radii (solar radii)</p>
+</dd>
+<dt>raderr1: np.ndarray</dt><dd><p>Array of (-) sigma_radius (solar radii)</p>
+</dd>
+<dt>raderr2: np.ndarray</dt><dd><p>Array of (+) sigma_radius (solar radii)</p>
+</dd>
+<dt>logg: np.ndarray</dt><dd><p>Array of log(g)s</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>rho_dist: np.ndarray</dt><dd><p>Array of density distributions for each star
+Each element length 1000</p>
+</dd>
+<dt>mass_dist: np.ndarray</dt><dd><p>Array of asymmetric Gaussian mass distributions for each star
+Each element length 1000</p>
+</dd>
+<dt>rad_dist: np.ndarray</dt><dd><p>Array of asymmetric Gaussian radius distributions for each star
+Each element length 1000</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.find_density_dist_symmetric">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">find_density_dist_symmetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masserr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raderr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npoints</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.find_density_dist_symmetric" title="Permalink to this definition"></a></dt>
+<dd><p>Gets symmetric stellar density distribution for stars.
+Symmetric stellar density distribution = Gaussian with same sigma on each end.</p>
+<dl class="simple">
+<dt>mass: float</dt><dd><p>Mean stellar mass (solar mass)</p>
+</dd>
+<dt>masserr: np.ndarray</dt><dd><p>Sigma of mass (solar mass)</p>
+</dd>
+<dt>radius: float</dt><dd><p>Mean stellar radius (solar radii)</p>
+</dd>
+<dt>raderr: np.ndarray</dt><dd><p>Sigma of radius (solar radii)</p>
+</dd>
+</dl>
+<p>npoints: int</p>
+<dl class="simple">
+<dt>rho_dist: np.ndarray</dt><dd><p>Array of density distributions for each star in kg/m^3
+Length npoints</p>
+</dd>
+<dt>mass_dist: np.ndarray</dt><dd><p>Array of symmetric Gaussian mass distributions for each star in kg
+Length npoints</p>
+</dd>
+<dt>rad_dist: np.ndarray</dt><dd><p>Array of symmetric Gaussian radius distributions for each star in m
+Length 100npoints0</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.fit_isochrone_lum">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">fit_isochrone_lum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isochrones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">luminosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lum_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Gaia'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lums</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.fit_isochrone_lum" title="Permalink to this definition"></a></dt>
+<dd><p>Gets stellar isochrones where effective temperature, mass, radius, and luminosity all fall within 1-sigma errorbars from stellar data.</p>
+<dl class="simple">
+<dt>data: pandas.DataFrame</dt><dd><p>Spectroscopic data + Kepler/Gaia data for n stars in one table. (muirhead_comb)</p>
+</dd>
+<dt>isochrones: pandas.DataFrame</dt><dd><p>Table of isochrones. (isochrones)</p>
+</dd>
+<dt>luminosity: boolean</dt><dd><p>‘True’ if including stellar luminosity constraints.</p>
+</dd>
+<dt>lum_source: ‘Gaia’ or ‘custom’</dt><dd><p>If ‘Gaia’, use published Gaia stellar luminosity from input data. If ‘custom’, provide custom luminosity constraints (‘lums’ keyword must be defined in this case).</p>
+</dd>
+<dt>lums: list</dt><dd><p>List of custom luminosities (length 2) containing [lower luminostiy limit, upper luminosity limit] (Solar Luminosity)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>iso_fits: pandas.DataFrame()</dt><dd><p>Set of all isochrones that are consistent with this star based on spectroscopy and Gaia luminosity.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.get_kepID">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">get_kepID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdul</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.get_kepID" title="Permalink to this definition"></a></dt>
+<dd><p>Pulls KIC IDs from Kepler-Gaia dataset.</p>
+<dl class="simple">
+<dt>hdul: astropy.io.fits.hdu.hdulist.HDUList</dt><dd><p>Astropy hdulist from FITS file of Kepler-Gaia dataset</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>kepID_lst: np.array</dt><dd><p>Array of KIC IDs for entire Kepler-Gaia dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.get_logg">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">get_logg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdul</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.get_logg" title="Permalink to this definition"></a></dt>
+<dd><p>Pulls stellar log(g) from Kepler-Gaia dataset.</p>
+<dl class="simple">
+<dt>hdul: astropy.io.fits.hdu.hdulist.HDUList</dt><dd><p>Astropy hdulist from FITS file of Kepler-Gaia dataset</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>rad_lst: np.array</dt><dd><p>Array of radii for entire Kepler-Gaia dataset</p>
+</dd>
+<dt>raderr1_lst: np.array</dt><dd><p>Array of radius (-) errors for entire Kepler-Gaia dataset</p>
+</dd>
+<dt>raderr2_lst: np.array</dt><dd><p>Array of radius (+) errors for entire Kepler-Gaia dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.get_masses">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">get_masses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdul</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.get_masses" title="Permalink to this definition"></a></dt>
+<dd><p>Pulls stellar masses from Kepler-Gaia dataset.</p>
+<dl class="simple">
+<dt>hdul: astropy.io.fits.hdu.hdulist.HDUList</dt><dd><p>Astropy hdulist from FITS file of Kepler-Gaia dataset</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>mass_lst: np.array</dt><dd><p>Array of masses for entire Kepler-Gaia dataset</p>
+</dd>
+<dt>masserr1_lst: np.array</dt><dd><p>Array of mass (-) errors for entire Kepler-Gaia dataset</p>
+</dd>
+<dt>masserr2_lst: np.array</dt><dd><p>Array of mass (+) errors for entire Kepler-Gaia dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.get_nan_indices">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">get_nan_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">masses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radii</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radii2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.get_nan_indices" title="Permalink to this definition"></a></dt>
+<dd><p>Removes stars with nans in any of stellar masses, radii, and log(g).
+If one or more entry is nan, the whole star is discarded.</p>
+<dl class="simple">
+<dt>masses: np.ndarray</dt><dd><p>Masses of all stars in dataset</p>
+</dd>
+<dt>radii: np.ndarray</dt><dd><p>Radii of all stars in dataset from Kepler</p>
+</dd>
+<dt>radii2: np.ndarray</dt><dd><p>Radii of all stars in dataset from Gaia</p>
+</dd>
+<dt>logg: np.ndarray</dt><dd><p>log(g)s of all stars in dataset</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>nan_i = list</dt><dd><p>Indices of stars with nan values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.get_radii">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">get_radii</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdul</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Kepler'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.get_radii" title="Permalink to this definition"></a></dt>
+<dd><p>Pulls stellar radii from Kepler-Gaia dataset.</p>
+<dl class="simple">
+<dt>hdul: astropy.io.fits.hdu.hdulist.HDUList</dt><dd><p>Astropy hdulist from FITS file of Kepler-Gaia dataset</p>
+</dd>
+<dt>mission: ‘Kepler’ or ‘Gaia’</dt><dd><p>Mission from which radii are measured</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>rad_lst: np.array</dt><dd><p>Array of radii for entire Kepler-Gaia dataset</p>
+</dd>
+<dt>raderr1_lst: np.array</dt><dd><p>Array of radius (-) errors for entire Kepler-Gaia dataset</p>
+</dd>
+<dt>raderr2_lst: np.array</dt><dd><p>Array of radius (+) errors for entire Kepler-Gaia dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="photoeccentric.stellardensity.remove_nans">
+<span class="sig-prename descclassname"><span class="pre">photoeccentric.stellardensity.</span></span><span class="sig-name descname"><span class="pre">remove_nans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nan_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stellar_prop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.stellardensity.remove_nans" title="Permalink to this definition"></a></dt>
+<dd><p>Removes nans from array of stellar property.</p>
+<p>Notes: nan_indices is the output from get_nan_indices()
+Run remove_nans() on every array input in get_nan_indices().</p>
+<dl class="simple">
+<dt>nan_indices: list</dt><dd><p>Indices of nan values to be removed</p>
+</dd>
+<dt>stellar_prop: np.ndarray</dt><dd><p>Array of stellar property (masses, radii, etc) to remove nans from</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>stellar_prop_nonans: np.ndarray</dt><dd><p>Array of stellar property without nans.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <span class="target" id="module-photoeccentric.utils"></span><dl class="py function">
@@ -635,7 +1363,6 @@ Equation 20 in Murray &amp; Correia Text</p>
 </dl>
 </dd></dl>
 
-<p>The KOI object defines the planet in question.</p>
 </section>
 
 
