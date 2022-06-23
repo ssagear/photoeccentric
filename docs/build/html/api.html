@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API &mdash; photoeccentric 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="photoeccentric Tutorial" href="tutorials/tutorial01/photoeccentric_tutorial/photoeccentric_tutorial.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> photoeccentric
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial01/photoeccentric_tutorial/photoeccentric_tutorial.html"><code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">photoeccentric</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api">
+<span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline"></a></h1>
+<span class="target" id="module-photoeccentric"></span><p>The core classes within <code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> are the <code class="docutils literal notranslate"><span class="pre">KeplerStar</span></code> and <code class="docutils literal notranslate"><span class="pre">KOI</span></code> classes. After creating  a <code class="docutils literal notranslate"><span class="pre">photoeccentric.KeplerStar</span></code> object with information about the host star of a KOI system,
+you will be able to create a <code class="docutils literal notranslate"><span class="pre">photoeccentric.KOI</span></code> object for each planet you wish to investigate. This <code class="docutils literal notranslate"><span class="pre">photoeccentric.KOI</span></code> object will allow you to fit and save information about the
+fit Kepler light curve, eccentricity posteriors, etc…)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="photoeccentric.KeplerStar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">photoeccentric.</span></span><span class="sig-name descname"><span class="pre">KeplerStar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">StarKOI</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KeplerStar" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KeplerStar.get_KIC">
+<span class="sig-name descname"><span class="pre">get_KIC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">muirhead_comb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KeplerStar.get_KIC" title="Permalink to this definition"></a></dt>
+<dd><p>Gets KIC number for KOI (star).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KeplerStar.get_stellar_params">
+<span class="sig-name descname"><span class="pre">get_stellar_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isodf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KeplerStar.get_stellar_params" title="Permalink to this definition"></a></dt>
+<dd><p>Gets stellar parameters from set of consistent stellar isochrones.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="photoeccentric.KOI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">photoeccentric.</span></span><span class="sig-name descname"><span class="pre">KOI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nkoi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">StarKOI</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isodf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI" title="Permalink to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.calc_a">
+<span class="sig-name descname"><span class="pre">calc_a</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">srad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.calc_a" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates semi-major axis from planet period and stellar mass using Kepler’s 3rd law</p>
+<dl class="simple">
+<dt>period: float</dt><dd><p>Planet period (SECONDS)</p>
+</dd>
+<dt>smass: float</dt><dd><p>Stellar mass (Msol)</p>
+</dd>
+<dt>srad: float</dt><dd><p>Stellar radius (Rsol)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>a: float</dt><dd><p>a/Rs: Semi-major axis of planet’s orbit (units of stellar radii)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.calc_durations">
+<span class="sig-name descname"><span class="pre">calc_durations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.calc_durations" title="Permalink to this definition"></a></dt>
+<dd><p>After fitting circular period, Rp/Rs, a/Rs, and inclination, calculates full and total transit duration of circular transit using Winn (2010) Eqs. 14, 15.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.do_eccfit">
+<span class="sig-name descname"><span class="pre">do_eccfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrlen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'multi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rwalk'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savecsv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepickle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.do_eccfit" title="Permalink to this definition"></a></dt>
+<dd><p>One-step eccentricity &amp; longitude of periastron fitting from g. Nested sampling w/ dynesty.
+Using Dawson &amp; Johnson (2012) Eq. 4.</p>
+<dl class="simple">
+<dt>direct: str</dt><dd><p>Output path.</p>
+</dd>
+<dt>arrlen: int, default 1000</dt><dd><p>Number of (e, omega) posterior points to save.</p>
+</dd>
+<dt>bound: default ‘multi’</dt><dd><p>dynesty bound</p>
+</dd>
+<dt>sample: default ‘rwalk’</dt><dd><p>dynesty sampling method</p>
+</dd>
+<dt>savecsv: boolean, default False</dt><dd><p>Save e, w, transit durations, and g distributions as csvs?</p>
+</dd>
+<dt>savepickle: boolean, default True</dt><dd><p>Save dynesty results as pickle file?</p>
+</dd>
+</dl>
+<p>None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.do_tfit_juliet">
+<span class="sig-name descname"><span class="pre">do_tfit_juliet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsupersample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">29</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptimesupersample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0201389</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.do_tfit_juliet" title="Permalink to this definition"></a></dt>
+<dd><p>One-step Kepler transit light curve fitting. Using Juliet w/ pymultinest. Only fits circular transits (e, w fixed at 0!).</p>
+<dl class="simple">
+<dt>direct: str</dt><dd><p>Output path.</p>
+</dd>
+<dt>nsupersample: int, default 29</dt><dd><p>Number of flux points over which to supersample, default 29 (for Kepler long cadence.)</p>
+</dd>
+<dt>exptimesupersample: float, default 0.0201389 (29 min for Kepler long cadence)</dt><dd><p>Time over which to supersample, default</p>
+</dd>
+<dt>nlive: int, default 400</dt><dd><p>Number of pymultinest live points</p>
+</dd>
+<dt>priors: default None</dt><dd><p>Custom transit fitting priors for juliet fit</p>
+</dd>
+<dt>reset_out: boolean, default False</dt><dd><p>Reset output directory?</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>dataset: juliet object</dt><dd><p>Juliet dataset</p>
+</dd>
+<dt>results: juliet object</dt><dd><p>Juliet results</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.do_ttv_tfit_juliet">
+<span class="sig-name descname"><span class="pre">do_ttv_tfit_juliet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mptsintransit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsupersample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">29</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptimesupersample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0201389</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.do_ttv_tfit_juliet" title="Permalink to this definition"></a></dt>
+<dd><p>One-step Kepler transit light curve fitting, for transits with TTVs. Using Juliet w/ pymultinest. Only fits circular transits (e, w fixed at 0!).
+Fixes TTV midpoints. Uses Kepler catalog orbital period + errorbars to simluate a fit period distribution.</p>
+<dl class="simple">
+<dt>direct: str</dt><dd><p>Output path.</p>
+</dd>
+<dt>mptsintransit: array or float, default 0.</dt><dd><p>Input irregular transit midpoints with TTVs. If 0, uses default, calculated midpoints.</p>
+</dd>
+<dt>nsupersample: int, default 29</dt><dd><p>Number of flux points over which to supersample, default 29 (for Kepler long cadence.)</p>
+</dd>
+<dt>exptimesupersample: float, default 0.0201389 (29 min for Kepler long cadence)</dt><dd><p>Time over which to supersample, default</p>
+</dd>
+<dt>nlive: int, default 400</dt><dd><p>Number of pymultinest live points</p>
+</dd>
+<dt>priors: default None</dt><dd><p>Custom transit fitting priors for juliet fit</p>
+</dd>
+<dt>reset_out: boolean, default False</dt><dd><p>Reset output directory?</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>dataset: juliet object</dt><dd><p>Juliet dataset</p>
+</dd>
+<dt>results: juliet object</dt><dd><p>Juliet results</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.get_KIC">
+<span class="sig-name descname"><span class="pre">get_KIC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">muirhead_comb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.get_KIC" title="Permalink to this definition"></a></dt>
+<dd><p>Gets KIC number for KOI (star).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.get_gs">
+<span class="sig-name descname"><span class="pre">get_gs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">custom_rho_star</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'None'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.get_gs" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates g using Dawson &amp; Johsnon (2012) Eq. 6.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.get_midpoints">
+<span class="sig-name descname"><span class="pre">get_midpoints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.get_midpoints" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates transit midpoints within time bounds of Kepler light curve.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.get_stitched_lcs">
+<span class="sig-name descname"><span class="pre">get_stitched_lcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadence_combine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.get_stitched_lcs" title="Permalink to this definition"></a></dt>
+<dd><p>Stitches Kepler LCs from a list of fits files downloaded from MAST.</p>
+<p>files: List</p>
+<dl class="simple">
+<dt>KIC: float</dt><dd><p>KOI of target</p>
+</dd>
+<dt>cadence_combine: boolean</dt><dd><p>True if light curve files include both short- and long-cadence data. False otherwise.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>hdus: list</dt><dd><p>List of FITS hdus</p>
+</dd>
+</dl>
+<p>time:
+flux:
+flux_err:
+startimes:
+stoptimes:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.normalize_flux">
+<span class="sig-name descname"><span class="pre">normalize_flux</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.normalize_flux" title="Permalink to this definition"></a></dt>
+<dd><p>Normalizes flux array.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.planet_params_from_archive">
+<span class="sig-name descname"><span class="pre">planet_params_from_archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.planet_params_from_archive" title="Permalink to this definition"></a></dt>
+<dd><p>Get stellar parameters for the host of a KOI from exoplanet archive (downloaded data).</p>
+<dl class="simple">
+<dt>df: pandas.DataFrame</dt><dd><p>dataframe of exop. archive downloaded data</p>
+</dd>
+<dt>kepoiname: str</dt><dd><p>Kepler name of planet</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>period: float</dt><dd><p>Orbital period (days)</p>
+</dd>
+<dt>rprs: float</dt><dd><p>Planet radius (stellar radii)</p>
+</dd>
+<dt>a: float</dt><dd><p>Semi-major axis (stellar radii)</p>
+</dd>
+<dt>e: float</dt><dd><p>Eccentricity</p>
+</dd>
+<dt>w: float</dt><dd><p>Longitude of periastron (degrees)</p>
+</dd>
+<dt>i: float</dt><dd><p>Inclination (degrees)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="photoeccentric.KOI.remove_oot_data">
+<span class="sig-name descname"><span class="pre">remove_oot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbuffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linearfit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlinfit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_nans</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_nan_transits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simultaneous_midpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simultaneous_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_intransit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0201389</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#photoeccentric.KOI.remove_oot_data" title="Permalink to this definition"></a></dt>
+<dd><p>Removes out-of-transit segments of Kepler light curves.
+Fits a linear model to out-of-transit points immediately surrounding each transit.
+Subtracts the linear model from each transit cutout.</p>
+<dl class="simple">
+<dt>nbuffer: int</dt><dd><p>Number of flux points before and after transit midpoint to include in transit cut-out.
+e.g. if nbuffer = 7, function will preserve 7 flux points before and after each transit midpoint and discard the rest of light curve.</p>
+</dd>
+<dt>nlinfit: int</dt><dd><p>Number of flux points from each end of transit cutout to use in linear fit.
+e.g. if nbuffer = 7 and nlinfit = 5, function will use the 10 outermost flux points for linear fit.</p>
+</dd>
+<dt>include_nans: boolean, default False</dt><dd><p>Include nans in in-transit data?</p>
+</dd>
+<dt>delete_nan_transits: boolean, default False</dt><dd><p>Delete entire transit if includes nan flux value?</p>
+</dd>
+</dl>
+<p>None</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>The KOI object defines the planet in question.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorials/tutorial01/photoeccentric_tutorial/photoeccentric_tutorial.html" class="btn btn-neutral float-right" title="photoeccentric Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Sagear.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
