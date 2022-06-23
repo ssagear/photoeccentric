@@ -14,8 +14,23 @@ from .stellardensity import *
 from .lcfitter import *
 
 
+def get_b_from_i(inc, a_rs, e, w):
 
-def get_T14(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
+    g = (1-e**2)/(1+e*np.sin(w*(np.pi/180)))
+    print(np.cos(inc*(np.pi/180)))
+    b = a_rs*np.cos(inc*(np.pi/180))*g
+
+    return b
+
+def get_i_from_b(b, a_rs, e, w):
+
+    g = (1+e*np.sin(w*(np.pi/180)))/(1-e**2)
+    inc = np.arccos(b*(1./a_rs)*g)
+
+    return inc
+
+
+def get_T14(p, rprs, a_rs, i, e, w):
     """
     Calculates T14 (total transit duration, 1st to 4th contact).
     Assumes a circular orbit (e=0, w=0) if ecc_prior=False.
@@ -43,29 +58,19 @@ def get_T14(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
     T14: float
         Total transit duration (seconds)
     """
-    nf = len(p)
 
-    T14 = np.zeros(nf)
-    rs_a = np.zeros(nf)
-    b = np.zeros(nf)
 
-    chidot = np.zeros(nf)
-    for j in range(nf):
+    rs_a = 1.0/a_rs # Rs/a - rstar in units of semimajor axis
+    b = get_b_from_i(i, a_rs, e, w)
+    print(b)
 
-        p[j] = p[j]
-
-        rs_a[j] = 1.0/a_rs[j] # Rs/a - rstar in units of semimajor axis
-        b[j] = a_rs[j]*np.cos(i[j]*(np.pi/180.0))   # convert i to radians
-
-        T14[j] = (p[j]/np.pi)*np.arcsin(rs_a[j]*(np.sqrt(((1+rprs[j])**2)-b[j]**2))/np.sin(i[j]*(np.pi/180.0))) #Equation 14 in exoplanet textbook
-
-        if ecc_prior==True:
-            chidot[j] = np.sqrt(1-e[j]**2)/(1+e[j]*np.sin(w[j]*(np.pi/180.0))) #Equation 16 in exoplanet textbook
-            T14[j] =  T14[j]*chidot[j]
+    T14_circ = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1+rprs)**2)-b**2))/np.sin(i*(np.pi/180.0))) #Equation 14 in exoplanet textbook
+    chidot = np.sqrt(1-e**2)/(1+e*np.sin(w*(np.pi/180.0))) #Equation 16 in exoplanet textbook
+    T14 =  T14_circ*chidot
 
     return T14
 
-def get_T23(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
+def get_T23(p, rprs, a_rs, i, e, w):
     """
     Calculates T23 (full transit duration, 1st to 4th contact).
     Assumes a circular orbit (e=0, w=0) if ecc_prior=False.
@@ -94,26 +99,13 @@ def get_T23(p, rprs, a_rs, i, ecc_prior=False, e=None, w=None):
         Full transit time (seconds)
     """
 
-    nf = len(p)
+    rs_a = 1.0/a_rs # Rs/a - rstar in units of semimajor axis
+    b = get_b_from_i(i, a_rs, e, w)
 
-    T23 = np.zeros(nf)
-    rs_a = np.zeros(nf)
-    b = np.zeros(nf)
+    T23_circ = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1-rprs)**2)-b**2))/np.sin(i*(np.pi/180.0))) #Equation 14 in exoplanet textbook
 
-    chidot = np.zeros(nf)
-
-    for j in range(nf):
-
-        p[j] = p[j]
-
-        rs_a[j] = 1.0/a_rs[j]                  # Rs/a - rstar in units of semimajor axis
-        b[j] = a_rs[j]*np.cos(i[j]*(np.pi/180.0))   # convert i to radians
-
-        T23[j] = (p[j]/np.pi)*np.arcsin(rs_a[j]*(np.sqrt(((1-rprs[j])**2)-b[j]**2))/np.sin(i[j]*(np.pi/180.0))) #Equation 14 in exoplanet textbook
-
-        if ecc_prior==True:
-            chidot[j] = np.sqrt(1-e[j]**2)/(1+e[j]*np.sin(w[j]*(np.pi/180.0))) #Equation 16 in exoplanet textbook
-            T23[j] = T23[j]*chidot[j]
+    chidot = np.sqrt(1-e**2)/(1+e*np.sin(w*(np.pi/180.0))) #Equation 16 in exoplanet textbook
+    T23 = T23_circ*chidot
 
     return T23
 

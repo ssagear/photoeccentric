@@ -47,7 +47,8 @@ def tfit_log_probability(theta, time, ptime, flux, flux_err):
 
 
 
-def do_linfit(time, flux, flux_err, transitmid, nbuffer, nlinfit, odd=False):
+def do_linfit(time, flux, flux_err, transitmid, nbuffer, nlinfit, cadence=0.0201389, odd=False):
+
     """For a segment of a Kepler light curve with a transit,
     fit a line to the out-of-transit data and subtract.
 
@@ -77,18 +78,25 @@ def do_linfit(time, flux, flux_err, transitmid, nbuffer, nlinfit, odd=False):
 
     """
 
+    nbuffer = int(nbuffer)
+    nlinfit = int(nlinfit)
+
     # Find closest Kepler time stamp to transit mid-timess
     tindex = int(np.where(time == find_nearest(time, transitmid))[0])
     # Time array of cutout: phase 0 at tmid
-    t1 = np.array(time[tindex-nbuffer:tindex+nbuffer+1]) - transitmid
+    t1 = np.array(time[int(tindex-nbuffer):int(tindex+nbuffer+1)]) - transitmid
     # Time array of cutout: BJD
-    t1bjd = np.array(time[tindex-nbuffer:tindex+nbuffer+1])
+    t1bjd = np.array(time[int(tindex-nbuffer):int(tindex+nbuffer+1)])
 
 
     # Flux array of cutout
-    f1 = np.array(flux[tindex-nbuffer:tindex+nbuffer+1])
+    f1 = np.array(flux[int(tindex-nbuffer):int(tindex+nbuffer+1)])
     # Flux error array of cutout
-    fe1 = np.array(flux_err[tindex-nbuffer:tindex+nbuffer+1])
+    fe1 = np.array(flux_err[int(tindex-nbuffer):int(tindex+nbuffer+1)])
+
+
+    if np.any(np.array([j-i for i, j in zip(t1bjd[:-1], t1bjd[1:])]) > 5*cadence): # If the midpoint lies during a gap in the data
+        return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
 
     if odd==False:
         # Do linear fit to OOT data
@@ -100,10 +108,19 @@ def do_linfit(time, flux, flux_err, transitmid, nbuffer, nlinfit, odd=False):
         idx = np.isfinite(t1) & np.isfinite(f1)
         m, b = np.polyfit(np.concatenate((t1[idx][:nlinfit-1], t1[idx][-nlinfit:])), np.concatenate((f1[idx][:nlinfit-1], f1[idx][-nlinfit:])), 1)
 
+
     # Subtract linear fit from LC
     linfit = m*t1 + b
-    fnorm = (f1-linfit)+1
+    #plt.cla
+    #plt.errorbar(t1, f1, yerr=fe1)
+    #plt.plot(t1, linfit)
+    #plt.show()
+    #fnorm = (f1-linfit)+1
     fnorm = f1/linfit
+
+    #plt.cla()
+    #plt.errorbar(t1, fnorm, yerr=fe1)
+    #plt.show()
 
     return m, b, t1bjd, t1, fnorm, fe1
 
@@ -138,8 +155,8 @@ def cutout_no_linfit(time, flux, flux_err, transitmid, nbuffer, cadence=0.020833
 
     # Find closest Kepler time stamp to transit mid-timess
     tindex = int(np.where(time == find_nearest(time, transitmid))[0])
-    if abs(time-find_nearest(time, transitmid)) < 1.*cadence: # if the nearest time stamp is more than a cadence away from the midpoint, the midpoint lies in a gap.
-        return np.nan, np.nan, np.nan, np.nan, np.nan
+    #if abs(transitmid-find_nearest(time, transitmid)) < 1.*cadence: # if the nearest time stamp is more than a cadence away from the midpoint, the midpoint lies in a gap.
+    #    return np.nan, np.nan, np.nan, np.nan
 
 
     # Time array of cutout: phase 0 at tmid

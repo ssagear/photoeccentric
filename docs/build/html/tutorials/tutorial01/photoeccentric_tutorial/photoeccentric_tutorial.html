@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>photoeccentric Tutorial &mdash; photoeccentric 0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="prev" title="API" href="../../../api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> photoeccentric
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-sample">The Sample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#defining-a-test-planet">Defining a “test planet”</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-fake-light-curve-based-on-a-real-planet">Creating a fake light curve based on a real planet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-case-1-e-0-0-omega-90-0">Test Case 1: <span class="math notranslate nohighlight">\(e = 0.0\)</span>, <span class="math notranslate nohighlight">\(\omega = 90.0\)</span></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fitting-the-transit">Fitting the transit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#determining-t14-and-t23">Determining T14 and T23</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-g">Get <span class="math notranslate nohighlight">\(g\)</span></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#test-case-2-e-0-3-omega-90-0">Test Case 2: <span class="math notranslate nohighlight">\(e = 0.3\)</span>, <span class="math notranslate nohighlight">\(\omega = 90.0\)</span></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Fitting the transit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Determining T14 and T23</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Get <span class="math notranslate nohighlight">\(g\)</span></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#test-case-3-e-0-3-omega-270-0">Test Case 3: <span class="math notranslate nohighlight">\(e = 0.3\)</span>, <span class="math notranslate nohighlight">\(\omega = 270.0\)</span></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Fitting the transit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Determining T14 and T23</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">Get <span class="math notranslate nohighlight">\(g\)</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">photoeccentric</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/tutorials/tutorial01/photoeccentric_tutorial/photoeccentric_tutorial.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="photoeccentric-tutorial">
+<span id="id1"></span><h1><code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> Tutorial<a class="headerlink" href="#photoeccentric-tutorial" title="Permalink to this headline"></a></h1>
+<p>In this tutorial, I will create a simulated transit based on a Kepler
+planet and demonstrate how to use <code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> to recover the
+planet’s eccentricity using the photoeccentric effect <a class="reference external" href="https://arxiv.org/pdf/1203.5537.pdf">(Dawson &amp; Johnson
+2012)</a>.</p>
+<p>The code I’m using to implement the photoeccentric effect is compiled
+into a package called <code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code>, and can be viewed/downloaded
+here: <a class="reference external" href="https://github.com/ssagear/photoeccentric">https://github.com/ssagear/photoeccentric</a></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="c1"># Using `batman` to create &amp; fit fake transit</span>
+<span class="kn">import</span> <span class="nn">batman</span>
+
+<span class="c1"># Using astropy BLS and scipy curve_fit to fit transit</span>
+<span class="kn">from</span> <span class="nn">astropy.timeseries</span> <span class="kn">import</span> <span class="n">BoxLeastSquares</span>
+
+<span class="c1"># Using juliet &amp; corner to find and plot (e, w) distribution</span>
+<span class="kn">import</span> <span class="nn">juliet</span>
+<span class="kn">import</span> <span class="nn">corner</span>
+
+<span class="c1"># Using dynesty to do the same with nested sampling</span>
+<span class="kn">import</span> <span class="nn">dynesty</span>
+
+<span class="c1"># And importing `photoeccentric`</span>
+<span class="kn">import</span> <span class="nn">photoeccentric</span> <span class="k">as</span> <span class="nn">ph</span>
+
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+
+<span class="c1"># pandas display option</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.float_format&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%.5f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+
+<span class="n">spectplanets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datafiles/spectplanets.csv&#39;</span><span class="p">)</span>
+<span class="n">muirhead_comb</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datafiles/muirhead_comb.csv&#39;</span><span class="p">)</span>
+<span class="n">muirheadKOIs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datafiles/MuirheadKOIs.csv&#39;</span><span class="p">)</span>
+<span class="n">lcpath</span> <span class="o">=</span> <span class="s1">&#39;../datafiles/sample_lcs&#39;</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">autoreload</span> <span class="n">extension</span> <span class="ow">is</span> <span class="n">already</span> <span class="n">loaded</span><span class="o">.</span> <span class="n">To</span> <span class="n">reload</span> <span class="n">it</span><span class="p">,</span> <span class="n">use</span><span class="p">:</span>
+  <span class="o">%</span><span class="n">reload_ext</span> <span class="n">autoreload</span>
+<span class="n">The</span> <span class="n">autoreload</span> <span class="n">extension</span> <span class="ow">is</span> <span class="n">already</span> <span class="n">loaded</span><span class="o">.</span> <span class="n">To</span> <span class="n">reload</span> <span class="n">it</span><span class="p">,</span> <span class="n">use</span><span class="p">:</span>
+  <span class="o">%</span><span class="n">reload_ext</span> <span class="n">autoreload</span>
+</pre></div>
+</div>
+<p>I’ll define the conversions between solar mass -&gt; kg and solar radius -&gt;
+meters for convenience.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">smass_kg</span> <span class="o">=</span> <span class="mf">1.9885e30</span>  <span class="c1"># Solar mass (kg)</span>
+<span class="n">srad_m</span> <span class="o">=</span> <span class="mf">696.34e6</span> <span class="c1"># Solar radius (m)</span>
+</pre></div>
+</div>
+<section id="the-sample">
+<h2>The Sample<a class="headerlink" href="#the-sample" title="Permalink to this headline"></a></h2>
+<p>I’m using the sample of “cool KOIs” from <a class="reference external" href="https://iopscience.iop.org/article/10.1088/0067-0049/213/1/5">Muirhead et
+al. 2013</a>,
+and their properites from spectroscopy published here.</p>
+<p>I’m reading in several .csv files containing data for this sample. The
+data includes spectroscopy data from Muirhead et al. (2013), stellar and
+planet parameters from the Kepler archive, and distances/luminosities
+from Gaia.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ALL Kepler planets from exo archive</span>
+<span class="n">planets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datafiles/cumulative_kois.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># Take the Kepler planet archive entries for the planets in Muirhead et al. 2013 sample</span>
+<span class="n">spectplanets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datafiles/spectplanets.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># Kepler-Gaia Data</span>
+<span class="n">kpgaia</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;../datafiles/kepler_dr2_4arcsec.fits&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;fits&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">();</span>
+
+<span class="c1"># Kepler-Gaia data for only the objects in our sample</span>
+<span class="n">muirhead_gaia</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../datafiles/muirhead_gaia.csv&quot;</span><span class="p">)</span>
+
+<span class="c1"># Combined spectroscopy data + Gaia/Kepler data for our sample</span>
+<span class="n">muirhead_comb</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datafiles/muirhead_comb.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># Only targets from table above with published luminosities from Gaia</span>
+<span class="n">muirhead_comb_lums</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datafiles/muirhead_comb_lums.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="defining-a-test-planet">
+<h2>Defining a “test planet”<a class="headerlink" href="#defining-a-test-planet" title="Permalink to this headline"></a></h2>
+<p>I’m going to pick a planet from our sample to test how well
+<code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> works. Here, I’m picking KOI 818.01 (Kepler-691 b), a
+super-Earth orbiting an M dwarf. <a class="reference external" href="https://exoplanets.nasa.gov/exoplanet-catalog/4987/kepler-818-b/">Exoplanet Catalog
+Entry</a></p>
+<p>It has an orbital period of about 8 days.</p>
+<p>First, I’ll use the spectroscopy data from Muirhead et al. 2013 and Gaia
+luminosities to constrain the mass and radius of the host star beyond
+the constraint published in the Exoplanet Archive. I’ll do this by
+matching these data with stellar isochrones
+<a class="reference external" href="https://iopscience.iop.org/article/10.3847/0004-637X/823/2/102">MESA</a>
+and using the masses/radii from the matching isochrones to constrian the
+stellar density.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nkoi</span> <span class="o">=</span> <span class="mf">818.01</span>
+</pre></div>
+</div>
+<p>I’ll read in a file with the MESA stellar isochrones for low-mass stars.
+I’ll use <code class="docutils literal notranslate"><span class="pre">ph.fit_isochrone_lum()</span></code> to find the subset of stellar
+isochrones that are consistent with a certain stellar parameters form
+Kepler-691 (Teff, Mstar, Rstar, and Gaia luminosity).</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># # Read in MESA isochrones</span>
+<span class="n">isochrones</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../datafiles/isochrones_sdss_spitzer_lowmass.dat&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;\s\s+&#39;</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">ph.fit_isochrone_lum()</span></code> to match isochrones to stellar data:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi818</span> <span class="o">=</span> <span class="n">muirhead_comb</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">muirhead_comb</span><span class="p">[</span><span class="s1">&#39;KOI&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;818&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iso_lums</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">fit_isochrone_lum</span><span class="p">(</span><span class="n">koi818</span><span class="p">,</span> <span class="n">isochrones</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>100%|██████████| 738479/738479 [00:06&lt;00:00, 112685.12it/s]
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Write to csv, then read back in (prevents notebook from lagging)</span>
+<span class="n">iso_lums</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;iso_lums_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nkoi</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">isodf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;iso_lums_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nkoi</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Define a KeplerStar object, and use ph.get_stellar_params and the fit
+isochrones to get the stellar parameters.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">SKOI</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">nkoi</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;KOI&#39;</span><span class="p">,</span> <span class="n">SKOI</span><span class="p">)</span>
+
+<span class="n">star</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">KeplerStar</span><span class="p">(</span><span class="n">SKOI</span><span class="p">)</span>
+<span class="n">star</span><span class="o">.</span><span class="n">get_stellar_params</span><span class="p">(</span><span class="n">isodf</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">KOI</span> <span class="mi">818</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Stellar Mass (Msol): &#39;</span><span class="p">,</span> <span class="n">star</span><span class="o">.</span><span class="n">mstar</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Stellar Radius (Rsol): &#39;</span><span class="p">,</span> <span class="n">star</span><span class="o">.</span><span class="n">rstar</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Average Stellar Density (kg m^-3): &#39;</span><span class="p">,</span> <span class="n">star</span><span class="o">.</span><span class="n">rho_star</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Stellar</span> <span class="n">Mass</span> <span class="p">(</span><span class="n">Msol</span><span class="p">):</span>  <span class="mf">0.5691952380952375</span>
+<span class="n">Stellar</span> <span class="n">Radius</span> <span class="p">(</span><span class="n">Rsol</span><span class="p">):</span>  <span class="mf">0.5488321428571431</span>
+<span class="n">Average</span> <span class="n">Stellar</span> <span class="n">Density</span> <span class="p">(</span><span class="n">kg</span> <span class="n">m</span><span class="o">^-</span><span class="mi">3</span><span class="p">):</span>  <span class="mf">4849.937558132769</span>
+</pre></div>
+</div>
+<p>Define a KOI object.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">KOI</span><span class="p">(</span><span class="n">nkoi</span><span class="p">,</span> <span class="n">SKOI</span><span class="p">,</span> <span class="n">isodf</span><span class="p">)</span>
+<span class="n">koi</span><span class="o">.</span><span class="n">get_KIC</span><span class="p">(</span><span class="n">muirhead_comb</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;KIC&#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">KIC</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">KIC</span> <span class="mi">4913852</span>
+</pre></div>
+</div>
+</section>
+<section id="creating-a-fake-light-curve-based-on-a-real-planet">
+<h2>Creating a fake light curve based on a real planet<a class="headerlink" href="#creating-a-fake-light-curve-based-on-a-real-planet" title="Permalink to this headline"></a></h2>
+<p>I’m pulling the planet parameters of Kepler-691 b from the exoplanet
+archive using <code class="docutils literal notranslate"><span class="pre">ph.planet_params_from_archive()</span></code>. This will give me the
+published period, Rp/Rs, and inclination constraints of this planet.</p>
+<p>I’m calculating a/Rs using <code class="docutils literal notranslate"><span class="pre">ph.calc_a()</span></code>, instead of using the a/Rs
+constraint from the Exoplanet Archive. The reason is because a/Rs must
+be consistent with the density calculated above from spectroscopy/Gaia
+for the photoeccentric effect to work correctly, and the published a/Rs
+is often inconsistent. a/Rs depends on the orbital period, Mstar, and
+Rstar.</p>
+<p>Let’s force the inclination to be 90 degrees for this example.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">planet_params_from_archive</span><span class="p">(</span><span class="n">spectplanets</span><span class="p">)</span>
+<span class="n">koi</span><span class="o">.</span><span class="n">calc_a</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">mstar</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">rstar</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Stellar mass (Msun): &#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">mstar</span><span class="p">,</span> <span class="s1">&#39;Stellar radius (Rsun): &#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">rstar</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Period (Days): &#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="s1">&#39;Rp/Rs: &#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">rprs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;a/Rs: &#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">a_rs</span><span class="p">)</span>
+
+<span class="n">koi</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="mf">90.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;i (deg): &#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">i</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Stellar</span> <span class="n">mass</span> <span class="p">(</span><span class="n">Msun</span><span class="p">):</span>  <span class="mf">0.5691952380952375</span> <span class="n">Stellar</span> <span class="n">radius</span> <span class="p">(</span><span class="n">Rsun</span><span class="p">):</span>  <span class="mf">0.5488321428571431</span>
+<span class="n">Period</span> <span class="p">(</span><span class="n">Days</span><span class="p">):</span>  <span class="mf">8.11437482</span> <span class="n">Rp</span><span class="o">/</span><span class="n">Rs</span><span class="p">:</span>  <span class="mf">0.037204</span>
+<span class="n">a</span><span class="o">/</span><span class="n">Rs</span><span class="p">:</span>  <span class="mf">25.63672846518325</span>
+<span class="n">i</span> <span class="p">(</span><span class="n">deg</span><span class="p">):</span>  <span class="mf">90.0</span>
+</pre></div>
+</div>
+<p>Now, I’ll create a fake transit using <code class="docutils literal notranslate"><span class="pre">batman</span></code>. I’m creating a model
+with the period, Rp/Rs, a/Rs, and inclination specified by the Kepler
+catalog entry and the density constraints.</p>
+<p>I’ll create the transit model with an <span class="math notranslate nohighlight">\(e\)</span> and <span class="math notranslate nohighlight">\(w\)</span> of my
+choice. This will allow me to test whether <code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> accurately
+recovers the <span class="math notranslate nohighlight">\((e,w)\)</span> combination I have input. I’ll start with
+<span class="math notranslate nohighlight">\(e = 0.0\)</span> and <span class="math notranslate nohighlight">\(w = 90.0\)</span> degrees.</p>
+</section>
+<section id="test-case-1-e-0-0-omega-90-0">
+<h2>Test Case 1: <span class="math notranslate nohighlight">\(e = 0.0\)</span>, <span class="math notranslate nohighlight">\(\omega = 90.0\)</span><a class="headerlink" href="#test-case-1-e-0-0-omega-90-0" title="Permalink to this headline"></a></h2>
+<p>I define a cadence length (~30 minutes, in days) that matches the Kepler
+long-cadence integration time, so I can create a fake light curve that
+integrates over the same time as real Kepler light curves.</p>
+<p>I want to replicate the real Kepler light curve as closely as possible.
+So I am taking these parameters fromm the light curves</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the working directory</span>
+<span class="n">direct</span> <span class="o">=</span> <span class="s1">&#39;tutorial01/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nkoi</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/e_0.0_w_90.0/&#39;</span>
+</pre></div>
+</div>
+<p>First, reading in the light curves that I have saved for this planet.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">KICs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">muirhead_comb</span><span class="p">[</span><span class="s1">&#39;KIC&#39;</span><span class="p">])))</span>
+<span class="n">KOIs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">muirhead_comb</span><span class="p">[</span><span class="s1">&#39;KOI&#39;</span><span class="p">])))</span>
+
+<span class="n">files</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">get_lc_files</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">KIC</span><span class="p">,</span> <span class="n">KICs</span><span class="p">,</span> <span class="n">lcpath</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Stitching the light curves together, preserving the time stamps</span>
+<span class="n">koi</span><span class="o">.</span><span class="n">get_stitched_lcs</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+<span class="c1"># Getting the midpoint times</span>
+<span class="n">koi</span><span class="o">.</span><span class="n">get_midpoints</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">starttime</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">endtime</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 30 minute cadence</span>
+<span class="n">cadence</span> <span class="o">=</span> <span class="mf">0.02142857142857143</span>
+
+<span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">,</span> <span class="n">cadence</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define e and w, calculate flux from transit model</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">w</span> <span class="o">=</span> <span class="mf">90.0</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitParams</span><span class="p">()</span>       <span class="c1">#object to store transit parameters</span>
+<span class="n">params</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">epoch</span>                 <span class="c1">#time of inferior conjunction</span>
+<span class="n">params</span><span class="o">.</span><span class="n">per</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">period</span>               <span class="c1">#orbital period</span>
+<span class="n">params</span><span class="o">.</span><span class="n">rp</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">rprs</span>                  <span class="c1">#planet radius (in units of stellar radii)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">a_rs</span>                   <span class="c1">#semi-major axis (in units of stellar radii)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">inc</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">i</span>                    <span class="c1">#orbital inclination (in degrees)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">ecc</span> <span class="o">=</span> <span class="n">e</span>                        <span class="c1">#eccentricity</span>
+<span class="n">params</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span>                          <span class="c1">#longitude of periastron (in degrees)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">limb_dark</span> <span class="o">=</span> <span class="s2">&quot;nonlinear&quot;</span>        <span class="c1">#limb darkening model</span>
+<span class="n">params</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]</span>      <span class="c1">#limb darkening coefficients [u1, u2, u3, u4]</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitModel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">supersample_factor</span> <span class="o">=</span> <span class="mi">29</span><span class="p">,</span> <span class="n">exp_time</span> <span class="o">=</span> <span class="mf">0.0201389</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flux</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">light_curve</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">109</span><span class="p">,</span><span class="mf">109.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (BJD-2454900)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Normalized Flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Transit LC Model&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Transit LC Model&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_40_1.png" src="../../../_images/output_40_1.png" />
+<p>To create a light curve with a target signal to noise ratio, we need the
+transit duration, number of transits, and the number of points in each
+transit, and the transit depth.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tduration</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">dur</span><span class="o">/</span><span class="mf">24.0</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">ph</span><span class="o">.</span><span class="n">get_N_intransit</span><span class="p">(</span><span class="n">tduration</span><span class="p">,</span> <span class="n">cadence</span><span class="p">))</span>
+<span class="n">ntransits</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">midpoints</span><span class="p">)</span>
+<span class="n">depth</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">rprs</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+<p>The magnitude of each individual error bar:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">errbar</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">get_sigma_individual</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">ntransits</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Adding gaussian noise to produce a light curve with the target SNR:</p>
+<p>(NB: the noise is gaussian and uncorrelated, unlike the noise in real
+Kepler light curves)</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">errbar</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">))</span>
+<span class="n">nflux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">+</span><span class="n">noise</span>
+
+<span class="n">flux_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">errbar</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">nflux</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">time</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">nflux</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">flux_err</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">109</span><span class="p">,</span><span class="mf">109.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_47_1.png" src="../../../_images/output_47_1.png" />
+<section id="fitting-the-transit">
+<h3>Fitting the transit<a class="headerlink" href="#fitting-the-transit" title="Permalink to this headline"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> includes functionality to fit using <code class="docutils literal notranslate"><span class="pre">juliet</span></code> with
+<code class="docutils literal notranslate"><span class="pre">multinest</span></code>.</p>
+<p>First, I’ll fit the transit shape with <code class="docutils literal notranslate"><span class="pre">juliet</span></code>. <span class="math notranslate nohighlight">\(Rp/Rs\)</span>,
+<span class="math notranslate nohighlight">\(a/Rs\)</span>, <span class="math notranslate nohighlight">\(i\)</span>, and <span class="math notranslate nohighlight">\(w\)</span> are allowed to vary as free
+parameters.</p>
+<p>The transit fitter, <code class="docutils literal notranslate"><span class="pre">ph.planetlc_fitter</span></code>, fixes <span class="math notranslate nohighlight">\(e = 0.0\)</span>, even
+if the input eccentricity is not zero! This means that if e is not 0,
+the transit fitter will fit the “wrong” values for <span class="math notranslate nohighlight">\(a/Rs\)</span> and
+<span class="math notranslate nohighlight">\(i\)</span> – but they will be wrong in such a way that reveals the
+eccentricity of the orbit. More on that in the next section.</p>
+<p>I enter an initial guess based on what I estimate the fit parameters
+will be. For this one, I’ll enter values close to the Kepler archive
+parameters.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">koi</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">nflux</span>
+<span class="n">koi</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="n">flux_err</span>
+</pre></div>
+</div>
+<p>Let’s just do the first 7 transits.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">midpoints</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">midpoints</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">remove_oot_data</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">time_intransit</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">flux_intransit</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">koi</span><span class="o">.</span><span class="n">fluxerr_intransit</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_55_1.png" src="../../../_images/output_55_1.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlive</span><span class="o">=</span><span class="mi">1000</span>
+<span class="n">nsupersample</span><span class="o">=</span><span class="mi">29</span>
+<span class="n">exptimesupersample</span><span class="o">=</span><span class="mf">0.0201389</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">do_tfit_juliet</span><span class="p">(</span><span class="n">direct</span><span class="p">,</span> <span class="n">nsupersample</span><span class="o">=</span><span class="n">nsupersample</span><span class="p">,</span> <span class="n">exptimesupersample</span><span class="o">=</span><span class="n">exptimesupersample</span><span class="p">,</span> <span class="n">nlive</span><span class="o">=</span><span class="n">nlive</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysing</span> <span class="n">data</span> <span class="kn">from</span> <span class="nn">tutorial01</span><span class="o">/</span><span class="mf">818.01</span><span class="o">/</span><span class="n">e_0</span><span class="mf">.0</span><span class="n">_w_90</span><span class="mf">.0</span><span class="o">/</span><span class="n">jomnest_</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">direct</span> <span class="o">+</span> <span class="s1">&#39;posteriors.dat&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print transit fit results from Juliet</span>
+<span class="n">res</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># Parameter Name</th>
+      <th></th>
+      <th>Median</th>
+      <th>.1</th>
+      <th>Upper 68 CI</th>
+      <th>.2</th>
+      <th>Lower 68 CI</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>P_p1</td>
+      <td></td>
+      <td>8.11419</td>
+      <td></td>
+      <td>0.00069</td>
+      <td></td>
+      <td>0.00072</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>t0_p1</td>
+      <td></td>
+      <td>2455009.34043</td>
+      <td></td>
+      <td>0.00091</td>
+      <td></td>
+      <td>0.00091</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>p_p1</td>
+      <td></td>
+      <td>0.03726</td>
+      <td></td>
+      <td>0.00090</td>
+      <td></td>
+      <td>0.00087</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>b_p1</td>
+      <td></td>
+      <td>0.34351</td>
+      <td></td>
+      <td>0.21283</td>
+      <td></td>
+      <td>0.21383</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>q1_KEPLER</td>
+      <td></td>
+      <td>0.41629</td>
+      <td></td>
+      <td>0.33855</td>
+      <td></td>
+      <td>0.25182</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>q2_KEPLER</td>
+      <td></td>
+      <td>0.45065</td>
+      <td></td>
+      <td>0.34201</td>
+      <td></td>
+      <td>0.28467</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>a_p1</td>
+      <td></td>
+      <td>23.96618</td>
+      <td></td>
+      <td>2.29076</td>
+      <td></td>
+      <td>2.99624</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>mflux_KEPLER</td>
+      <td></td>
+      <td>-0.00018</td>
+      <td></td>
+      <td>0.00007</td>
+      <td></td>
+      <td>0.00007</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>sigma_w_KEPLER</td>
+      <td></td>
+      <td>3.47350</td>
+      <td></td>
+      <td>33.94203</td>
+      <td></td>
+      <td>3.13059</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save fit planet parameters to variables for convenience</span>
+<span class="n">per_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">t0_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">rprs_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">b_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">a_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="n">i_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">b_f</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">a_f</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mf">180.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Below, I plot the transit fit corner plot.</p>
+<p>Because I input <span class="math notranslate nohighlight">\(e = 0.0\)</span>, the transit fitter should return close
+to the same parameters I input (because the transit fitter always
+requires <span class="math notranslate nohighlight">\(e = 0.0\)</span>).</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the transit fit corner plot</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;P_p1&#39;</span><span class="p">]</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;t0_p1&#39;</span><span class="p">]</span>
+<span class="n">rprs</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;p_p1&#39;</span><span class="p">]</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;b_p1&#39;</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;a_p1&#39;</span><span class="p">]</span>
+<span class="n">inc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">b</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">a</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mf">180.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Period&#39;</span><span class="p">,</span> <span class="s1">&#39;t0&#39;</span><span class="p">,</span> <span class="s1">&#39;rprs&#39;</span><span class="p">,</span> <span class="s1">&#39;inc&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">]</span>
+
+<span class="n">fs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">rprs</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+<span class="n">fs</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">T</span>
+
+<span class="n">figure</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_62_0.png" src="../../../_images/output_62_0.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the data:</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">],</span> \
+             <span class="n">yerr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">errors_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">],</span> <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="c1"># Plot the model:</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (BJD)-2454900&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">])</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">])</span><span class="o">-</span><span class="mi">2454900</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.998</span><span class="p">,</span> <span class="mf">1.002</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Relative flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;KOI 818.01 Kepler LC with Transit Fit&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_63_0.png" src="../../../_images/output_63_0.png" />
+</section>
+<section id="determining-t14-and-t23">
+<h3>Determining T14 and T23<a class="headerlink" href="#determining-t14-and-t23" title="Permalink to this headline"></a></h3>
+<p>A crucial step to determining the <span class="math notranslate nohighlight">\((e, w)\)</span> distribution from the
+transit is calculating the total and full transit durations. T14 is the
+total transit duration (the time between first and fourth contact). T23
+is the full transit duration (i.e. the time during which the entire
+planet disk is in front of the star, the time between second and third
+contact.)</p>
+<p>Here, I’m using equations 14 and 15 from <a class="reference external" href="https://sites.astro.caltech.edu/~lah/review/transits_occultations.winn.pdf">this
+textbook</a>.
+We calculate T14 and T23 assuming the orbit must be circular, and using
+the fit parameters assuming the orbit is circular. (If the orbit is not
+circular, T14 and T23 will not be correct – but this is what we want,
+because they will differ from the true T14 and T23 in a way that reveals
+the eccentricity of the orbit.)</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">calc_durations</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total Transit Duration: &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">T14_dist</span><span class="p">),</span> <span class="s1">&#39;-/+&#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">T14_errs</span><span class="p">,</span> <span class="s1">&#39;hours&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Full Transit Duration: &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">T23_dist</span><span class="p">),</span> <span class="s1">&#39;-/+&#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">T23_errs</span><span class="p">,</span> <span class="s1">&#39;hours&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Total</span> <span class="n">Transit</span> <span class="n">Duration</span><span class="p">:</span>  <span class="mf">0.10485137003852651</span> <span class="o">-/+</span> <span class="p">(</span><span class="mf">0.006525117642141129</span><span class="p">,</span> <span class="mf">0.006687207067543222</span><span class="p">)</span> <span class="n">hours</span>
+<span class="n">Full</span> <span class="n">Transit</span> <span class="n">Duration</span><span class="p">:</span>  <span class="mf">0.09561957555025782</span> <span class="o">-/+</span> <span class="p">(</span><span class="mf">0.005883030475635945</span><span class="p">,</span> <span class="mf">0.006018819870806616</span><span class="p">)</span> <span class="n">hours</span>
+</pre></div>
+</div>
+</section>
+<section id="get-g">
+<h3>Get <span class="math notranslate nohighlight">\(g\)</span><a class="headerlink" href="#get-g" title="Permalink to this headline"></a></h3>
+<p>Finally, we can use all the values above to determine
+<span class="math notranslate nohighlight">\(\rho_{circ}\)</span>. <span class="math notranslate nohighlight">\(\rho_{circ}\)</span> is what we would calculate the
+stellar density to be if we knew that the orbit was definitely perfectly
+circular. We will compare <span class="math notranslate nohighlight">\(\rho_{circ}\)</span> to <span class="math notranslate nohighlight">\(\rho_{star}\)</span>
+(the true, observed stellar density we calculated from
+spectroscopy/Gaia), and get <span class="math notranslate nohighlight">\(g(e, w)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\rho_{\star}(e, \omega) = g(e, \omega)^{-3} \rho_{circ}\]</div>
+<p>which is also defined as</p>
+<div class="math notranslate nohighlight">
+\[g(e, \omega) = \frac{1 + e sin(\omega)}{\sqrt{1-e^2}}\]</div>
+<p>Thus, if the orbit is circular <span class="math notranslate nohighlight">\((e = 0)\)</span>, then <span class="math notranslate nohighlight">\(g\)</span> should
+equal 1. If the orbit is not circular <span class="math notranslate nohighlight">\((e != 0)\)</span>, then
+<span class="math notranslate nohighlight">\(\rho_{circ}\)</span> should differ from <span class="math notranslate nohighlight">\(\rho_{star}\)</span>, and
+<span class="math notranslate nohighlight">\(g\)</span> should be something other than 1. We can draw a <span class="math notranslate nohighlight">\((e, w)\)</span>
+distribution based on the value we calcaulte for <span class="math notranslate nohighlight">\(g(e,w)\)</span>!</p>
+<p><code class="docutils literal notranslate"><span class="pre">ph.get_g_distribution()</span></code> will help us determine the value of g. This
+function takes the observed <span class="math notranslate nohighlight">\(\rho_{star}\)</span> as well as the fit
+(circular) transit parameters and calculated transit durations, and
+calculates <span class="math notranslate nohighlight">\(\rho_{circ}\)</span> and <span class="math notranslate nohighlight">\(g(e,w)\)</span> based on equations 6
+and 7 in <a class="reference external" href="https://arxiv.org/pdf/1203.5537.pdf">Dawson &amp; Johnson
+2012</a>.</p>
+<p>Print <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(\sigma_{g}\)</span>:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">get_gs</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_mean</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">g_mean</span>
+<span class="n">g_sigma</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">g_sigma</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_mean</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.9898376567084125</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_sigma</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.14832653472072282</span>
+</pre></div>
+</div>
+<p>The mean of <span class="math notranslate nohighlight">\(g\)</span> is about 1.0, which means that <span class="math notranslate nohighlight">\(\rho_{circ}\)</span>
+agrees with <span class="math notranslate nohighlight">\(\rho_{star}\)</span> and the eccentricity of this transit
+must be zero, which is exactly what we input! We can take <span class="math notranslate nohighlight">\(g\)</span> and
+<span class="math notranslate nohighlight">\(\sigma_{g}\)</span> and use MCMC (<code class="docutils literal notranslate"><span class="pre">emcee</span></code>) to determine the surface of
+most likely <span class="math notranslate nohighlight">\((e,w)\)</span>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> has the probability function for <span class="math notranslate nohighlight">\((e,w)\)</span> from
+<span class="math notranslate nohighlight">\(g\)</span> built in to <code class="docutils literal notranslate"><span class="pre">ph.log_probability()</span></code>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">do_eccfit</span><span class="p">(</span><span class="n">direct</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">18743</span><span class="n">it</span> <span class="p">[</span><span class="mi">01</span><span class="p">:</span><span class="mi">53</span><span class="p">,</span> <span class="mf">164.43</span><span class="n">it</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="mi">15</span> <span class="o">|</span> <span class="n">bound</span><span class="p">:</span> <span class="mi">0</span> <span class="o">|</span> <span class="n">nc</span><span class="p">:</span> <span class="mi">1</span> <span class="o">|</span> <span class="n">ncall</span><span class="p">:</span> <span class="mi">88101</span> <span class="o">|</span> <span class="n">eff</span><span class="p">(</span><span class="o">%</span><span class="p">):</span> <span class="mf">21.274</span> <span class="o">|</span> <span class="n">loglstar</span><span class="p">:</span>   <span class="o">-</span><span class="n">inf</span> <span class="o">&lt;</span>  <span class="mf">1.908</span> <span class="o">&lt;</span>  <span class="mf">1.837</span> <span class="o">|</span> <span class="n">logz</span><span class="p">:</span>  <span class="mf">0.870</span> <span class="o">+/-</span>  <span class="mf">0.052</span> <span class="o">|</span> <span class="n">stop</span><span class="p">:</span>  <span class="mf">0.954</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">direct</span> <span class="o">+</span> <span class="s1">&#39;/kepewdres.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">ewdres</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">]</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">ewdres</span><span class="o">.</span><span class="n">samples</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span> <span class="n">truths</span><span class="o">=</span><span class="p">[</span><span class="n">w</span><span class="p">,</span> <span class="n">e</span><span class="p">],</span> <span class="n">plot_contours</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_83_0.png" src="../../../_images/output_83_0.png" />
+<p>And here is the corner plot for the most likely values of <span class="math notranslate nohighlight">\((e, w)\)</span>
+that correspond to <span class="math notranslate nohighlight">\(g = 1\)</span>. The <span class="math notranslate nohighlight">\(e\)</span> distribution peaks at 0!</p>
+</section>
+</section>
+<section id="test-case-2-e-0-3-omega-90-0">
+<h2>Test Case 2: <span class="math notranslate nohighlight">\(e = 0.3\)</span>, <span class="math notranslate nohighlight">\(\omega = 90.0\)</span><a class="headerlink" href="#test-case-2-e-0-3-omega-90-0" title="Permalink to this headline"></a></h2>
+<p>Now let’s repeat this example with an eccentricity of 0.3 at periapse.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the working directory</span>
+<span class="n">direct</span> <span class="o">=</span> <span class="s1">&#39;tutorial01/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nkoi</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/e_0.3_w_90.0/&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 30 minute cadence</span>
+<span class="n">cadence</span> <span class="o">=</span> <span class="mf">0.02142857142857143</span>
+
+<span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">,</span> <span class="n">cadence</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define e and w, calculate flux from transit model</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">w</span> <span class="o">=</span> <span class="mf">90.0</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitParams</span><span class="p">()</span>       <span class="c1">#object to store transit parameters</span>
+<span class="n">params</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">epoch</span>                 <span class="c1">#time of inferior conjunction</span>
+<span class="n">params</span><span class="o">.</span><span class="n">per</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">period</span>               <span class="c1">#orbital period</span>
+<span class="n">params</span><span class="o">.</span><span class="n">rp</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">rprs</span>                  <span class="c1">#planet radius (in units of stellar radii)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">a_rs</span>                   <span class="c1">#semi-major axis (in units of stellar radii)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">inc</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">i</span>                    <span class="c1">#orbital inclination (in degrees)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">ecc</span> <span class="o">=</span> <span class="n">e</span>                        <span class="c1">#eccentricity</span>
+<span class="n">params</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span>                          <span class="c1">#longitude of periastron (in degrees)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">limb_dark</span> <span class="o">=</span> <span class="s2">&quot;nonlinear&quot;</span>        <span class="c1">#limb darkening model</span>
+<span class="n">params</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]</span>      <span class="c1">#limb darkening coefficients [u1, u2, u3, u4]</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitModel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">supersample_factor</span> <span class="o">=</span> <span class="mi">29</span><span class="p">,</span> <span class="n">exp_time</span> <span class="o">=</span> <span class="mf">0.0201389</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flux</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">light_curve</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">109</span><span class="p">,</span><span class="mf">109.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (BJD-2454900)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Normalized Flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Transit LC Model&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Transit LC Model&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_91_1.png" src="../../../_images/output_91_1.png" />
+<p>To create a light curve with a target signal to noise ratio, we need the
+transit duration, number of transits, and the number of points in each
+transit, and the transit depth.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tduration</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">dur</span><span class="o">/</span><span class="mf">24.0</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">ph</span><span class="o">.</span><span class="n">get_N_intransit</span><span class="p">(</span><span class="n">tduration</span><span class="p">,</span> <span class="n">cadence</span><span class="p">))</span>
+<span class="n">ntransits</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">midpoints</span><span class="p">)</span>
+<span class="n">depth</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">rprs</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+<p>The magnitude of each individual error bar:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">errbar</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">get_sigma_individual</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">ntransits</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Adding gaussian noise to produce a light curve with the target SNR:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">errbar</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">))</span>
+<span class="n">nflux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">+</span><span class="n">noise</span>
+
+<span class="n">flux_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">errbar</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">nflux</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">time</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">nflux</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">flux_err</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">109</span><span class="p">,</span><span class="mf">109.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_98_1.png" src="../../../_images/output_98_1.png" />
+<section id="id2">
+<h3>Fitting the transit<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> includes functionality to fit using <code class="docutils literal notranslate"><span class="pre">juliet</span></code> with
+<code class="docutils literal notranslate"><span class="pre">multinest</span></code>.</p>
+<p>First, I’ll fit the transit shape with <code class="docutils literal notranslate"><span class="pre">juliet</span></code>. <span class="math notranslate nohighlight">\(Rp/Rs\)</span>,
+<span class="math notranslate nohighlight">\(a/Rs\)</span>, <span class="math notranslate nohighlight">\(i\)</span>, and <span class="math notranslate nohighlight">\(w\)</span> are allowed to vary as free
+parameters.</p>
+<p>The transit fitter, <code class="docutils literal notranslate"><span class="pre">ph.planetlc_fitter</span></code>, fixes <span class="math notranslate nohighlight">\(e = 0.0\)</span>, even
+if the input eccentricity is not zero! This means that if e is not 0,
+the transit fitter will fit the “wrong” values for <span class="math notranslate nohighlight">\(a/Rs\)</span> and
+<span class="math notranslate nohighlight">\(i\)</span> – but they will be wrong in such a way that reveals the
+eccentricity of the orbit. More on that in the next section.</p>
+<p>I enter an initial guess based on what I estimate the fit parameters
+will be. For this one, I’ll enter values close to the Kepler archive
+parameters.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">koi</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">nflux</span>
+<span class="n">koi</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="n">flux_err</span>
+</pre></div>
+</div>
+<p>Let’s just do the first 7 transits.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">midpoints</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">midpoints</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">remove_oot_data</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">time_intransit</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">flux_intransit</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">koi</span><span class="o">.</span><span class="n">fluxerr_intransit</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_106_1.png" src="../../../_images/output_106_1.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlive</span><span class="o">=</span><span class="mi">1000</span>
+<span class="n">nsupersample</span><span class="o">=</span><span class="mi">29</span>
+<span class="n">exptimesupersample</span><span class="o">=</span><span class="mf">0.0201389</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">do_tfit_juliet</span><span class="p">(</span><span class="n">direct</span><span class="p">,</span> <span class="n">nsupersample</span><span class="o">=</span><span class="n">nsupersample</span><span class="p">,</span> <span class="n">exptimesupersample</span><span class="o">=</span><span class="n">exptimesupersample</span><span class="p">,</span> <span class="n">nlive</span><span class="o">=</span><span class="n">nlive</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysing</span> <span class="n">data</span> <span class="kn">from</span> <span class="nn">tutorial01</span><span class="o">/</span><span class="mf">818.01</span><span class="o">/</span><span class="n">e_0</span><span class="mf">.3</span><span class="n">_w_90</span><span class="mf">.0</span><span class="o">/</span><span class="n">jomnest_</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">direct</span> <span class="o">+</span> <span class="s1">&#39;posteriors.dat&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print transit fit results from Juliet</span>
+<span class="n">res</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># Parameter Name</th>
+      <th></th>
+      <th>Median</th>
+      <th>.1</th>
+      <th>Upper 68 CI</th>
+      <th>.2</th>
+      <th>Lower 68 CI</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>P_p1</td>
+      <td></td>
+      <td>8.11447</td>
+      <td></td>
+      <td>0.00020</td>
+      <td></td>
+      <td>0.00020</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>t0_p1</td>
+      <td></td>
+      <td>2455009.34045</td>
+      <td></td>
+      <td>0.00050</td>
+      <td></td>
+      <td>0.00053</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>p_p1</td>
+      <td></td>
+      <td>0.03779</td>
+      <td></td>
+      <td>0.00074</td>
+      <td></td>
+      <td>0.00081</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>b_p1</td>
+      <td></td>
+      <td>0.25005</td>
+      <td></td>
+      <td>0.20836</td>
+      <td></td>
+      <td>0.16863</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>q1_KEPLER</td>
+      <td></td>
+      <td>0.24137</td>
+      <td></td>
+      <td>0.33555</td>
+      <td></td>
+      <td>0.16504</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>q2_KEPLER</td>
+      <td></td>
+      <td>0.20592</td>
+      <td></td>
+      <td>0.33467</td>
+      <td></td>
+      <td>0.14925</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>a_p1</td>
+      <td></td>
+      <td>34.01496</td>
+      <td></td>
+      <td>1.53172</td>
+      <td></td>
+      <td>2.81683</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>mflux_KEPLER</td>
+      <td></td>
+      <td>-0.00005</td>
+      <td></td>
+      <td>0.00001</td>
+      <td></td>
+      <td>0.00001</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>sigma_w_KEPLER</td>
+      <td></td>
+      <td>1.76799</td>
+      <td></td>
+      <td>10.52057</td>
+      <td></td>
+      <td>1.49476</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save fit planet parameters to variables for convenience</span>
+<span class="n">per_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">t0_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">rprs_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">b_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">a_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="n">i_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">b_f</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">a_f</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mf">180.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Below, I print the original parameters and fit parameters, and overlay
+the fit light curve on the input light curve.</p>
+<p>Because I input <span class="math notranslate nohighlight">\(e = 0.0\)</span>, the transit fitter should return the
+exact same parameters I input (because the transit fitter always
+requires <span class="math notranslate nohighlight">\(e = 0.0\)</span>).</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the transit fit corner plot</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;P_p1&#39;</span><span class="p">]</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;t0_p1&#39;</span><span class="p">]</span>
+<span class="n">rprs</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;p_p1&#39;</span><span class="p">]</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;b_p1&#39;</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;a_p1&#39;</span><span class="p">]</span>
+<span class="n">inc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">b</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">a</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mf">180.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Period&#39;</span><span class="p">,</span> <span class="s1">&#39;t0&#39;</span><span class="p">,</span> <span class="s1">&#39;rprs&#39;</span><span class="p">,</span> <span class="s1">&#39;inc&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">]</span>
+
+<span class="n">fs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">rprs</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+<span class="n">fs</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">T</span>
+
+<span class="n">figure</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_113_0.png" src="../../../_images/output_113_0.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the data:</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">],</span> \
+             <span class="n">yerr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">errors_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">],</span> <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="c1"># Plot the model:</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot portion of the lightcurve, axes, etc.:</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (BJD)-2454900&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">])</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">])</span><span class="o">-</span><span class="mi">2454900</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.998</span><span class="p">,</span> <span class="mf">1.002</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Relative flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;KOI 818.01 Kepler LC with Transit Fit&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_114_0.png" src="../../../_images/output_114_0.png" />
+</section>
+<section id="id3">
+<h3>Determining T14 and T23<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">calc_durations</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total Transit Duration: &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">T14_dist</span><span class="p">),</span> <span class="s1">&#39;-/+&#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">T14_errs</span><span class="p">,</span> <span class="s1">&#39;hours&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Full Transit Duration: &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">T23_dist</span><span class="p">),</span> <span class="s1">&#39;-/+&#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">T23_errs</span><span class="p">,</span> <span class="s1">&#39;hours&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Total</span> <span class="n">Transit</span> <span class="n">Duration</span><span class="p">:</span>  <span class="mf">0.07624977166072124</span> <span class="o">-/+</span> <span class="p">(</span><span class="mf">0.001938522023045397</span><span class="p">,</span> <span class="mf">0.0022380238235224087</span><span class="p">)</span> <span class="n">hours</span>
+<span class="n">Full</span> <span class="n">Transit</span> <span class="n">Duration</span><span class="p">:</span>  <span class="mf">0.0700019311019035</span> <span class="o">-/+</span> <span class="p">(</span><span class="mf">0.0018442657065528278</span><span class="p">,</span> <span class="mf">0.00209380377961145</span><span class="p">)</span> <span class="n">hours</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3>Get <span class="math notranslate nohighlight">\(g\)</span><a class="headerlink" href="#id4" title="Permalink to this headline"></a></h3>
+<p>Print <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(\sigma_{g}\)</span>:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">get_gs</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_mean</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">g_mean</span>
+<span class="n">g_sigma</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">g_sigma</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_mean</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">1.3096409093931336</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_sigma</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.09639732695175818</span>
+</pre></div>
+</div>
+<p>The mean of <span class="math notranslate nohighlight">\(g\)</span> is about 1.3, which means that <span class="math notranslate nohighlight">\(\rho_{circ}\)</span>
+agrees with <span class="math notranslate nohighlight">\(\rho_{star}\)</span> and the eccentricity of this transit
+must be non-zero. We can take <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(\sigma_{g}\)</span> and use
+nested sampling (<code class="docutils literal notranslate"><span class="pre">dynesty</span></code>) to determine the surface of most likely
+<span class="math notranslate nohighlight">\((e,w)\)</span>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> has the probability function for <span class="math notranslate nohighlight">\((e,w)\)</span> from
+<span class="math notranslate nohighlight">\(g\)</span> built in to <code class="docutils literal notranslate"><span class="pre">ph.log_probability()</span></code>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">do_eccfit</span><span class="p">(</span><span class="n">direct</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">18966</span><span class="n">it</span> <span class="p">[</span><span class="mi">01</span><span class="p">:</span><span class="mi">42</span><span class="p">,</span> <span class="mf">184.48</span><span class="n">it</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="mi">13</span> <span class="o">|</span> <span class="n">bound</span><span class="p">:</span> <span class="mi">0</span> <span class="o">|</span> <span class="n">nc</span><span class="p">:</span> <span class="mi">1</span> <span class="o">|</span> <span class="n">ncall</span><span class="p">:</span> <span class="mi">167069</span> <span class="o">|</span> <span class="n">eff</span><span class="p">(</span><span class="o">%</span><span class="p">):</span> <span class="mf">11.352</span> <span class="o">|</span> <span class="n">loglstar</span><span class="p">:</span>   <span class="o">-</span><span class="n">inf</span> <span class="o">&lt;</span>  <span class="mf">2.339</span> <span class="o">&lt;</span>  <span class="mf">2.218</span> <span class="o">|</span> <span class="n">logz</span><span class="p">:</span>  <span class="mf">0.239</span> <span class="o">+/-</span>  <span class="mf">0.065</span> <span class="o">|</span> <span class="n">stop</span><span class="p">:</span>  <span class="mf">0.978</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">direct</span> <span class="o">+</span> <span class="s1">&#39;/kepewdres.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">ewdres</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">]</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">ewdres</span><span class="o">.</span><span class="n">samples</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span> <span class="n">truths</span><span class="o">=</span><span class="p">[</span><span class="n">w</span><span class="p">,</span> <span class="n">e</span><span class="p">],</span> <span class="n">plot_contours</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_127_0.png" src="../../../_images/output_127_0.png" />
+<p>And here is the corner plot for the most likely values of <span class="math notranslate nohighlight">\((e, w)\)</span>
+that correspond to <span class="math notranslate nohighlight">\(g = 1.3\)</span>. The <span class="math notranslate nohighlight">\(e\)</span> distribution peaks at
+<span class="math notranslate nohighlight">\(e = 0.3\)</span>!</p>
+</section>
+</section>
+<section id="test-case-3-e-0-3-omega-270-0">
+<h2>Test Case 3: <span class="math notranslate nohighlight">\(e = 0.3\)</span>, <span class="math notranslate nohighlight">\(\omega = 270.0\)</span><a class="headerlink" href="#test-case-3-e-0-3-omega-270-0" title="Permalink to this headline"></a></h2>
+<p>Now let’s repeat this example with an eccentricity of 0.3 at apoapse.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the working directory</span>
+<span class="n">direct</span> <span class="o">=</span> <span class="s1">&#39;tutorial01/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nkoi</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/e_0.3_w_270.0/&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 30 minute cadence</span>
+<span class="n">cadence</span> <span class="o">=</span> <span class="mf">0.02142857142857143</span>
+
+<span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">,</span> <span class="n">cadence</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define e and w, calculate flux from transit model</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">w</span> <span class="o">=</span> <span class="mf">270.0</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitParams</span><span class="p">()</span>       <span class="c1">#object to store transit parameters</span>
+<span class="n">params</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">epoch</span>                        <span class="c1">#time of inferior conjunction</span>
+<span class="n">params</span><span class="o">.</span><span class="n">per</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">period</span>                       <span class="c1">#orbital period</span>
+<span class="n">params</span><span class="o">.</span><span class="n">rp</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">rprs</span>                       <span class="c1">#planet radius (in units of stellar radii)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">a_rs</span>                        <span class="c1">#semi-major axis (in units of stellar radii)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">inc</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">i</span>                      <span class="c1">#orbital inclination (in degrees)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">ecc</span> <span class="o">=</span> <span class="n">e</span>                       <span class="c1">#eccentricity</span>
+<span class="n">params</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span>                        <span class="c1">#longitude of periastron (in degrees)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">limb_dark</span> <span class="o">=</span> <span class="s2">&quot;nonlinear&quot;</span>        <span class="c1">#limb darkening model</span>
+<span class="n">params</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]</span>      <span class="c1">#limb darkening coefficients [u1, u2, u3, u4]</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitModel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">supersample_factor</span> <span class="o">=</span> <span class="mi">29</span><span class="p">,</span> <span class="n">exp_time</span> <span class="o">=</span> <span class="mf">0.0201389</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flux</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">light_curve</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">109</span><span class="p">,</span><span class="mf">109.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (BJD-2454900)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Normalized Flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Transit LC Model&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Transit LC Model&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_135_1.png" src="../../../_images/output_135_1.png" />
+<p>To create a light curve with a target signal to noise ratio, we need the
+transit duration, number of transits, and the number of points in each
+transit, and the transit depth.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tduration</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">dur</span><span class="o">/</span><span class="mf">24.0</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">ph</span><span class="o">.</span><span class="n">get_N_intransit</span><span class="p">(</span><span class="n">tduration</span><span class="p">,</span> <span class="n">cadence</span><span class="p">))</span>
+<span class="n">ntransits</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">midpoints</span><span class="p">)</span>
+<span class="n">depth</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">rprs</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+<p>The magnitude of each individual error bar:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">errbar</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">get_sigma_individual</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">ntransits</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Adding gaussian noise to produce a light curve with the target SNR:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">errbar</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">))</span>
+<span class="n">nflux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">+</span><span class="n">noise</span>
+
+<span class="n">flux_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">errbar</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">nflux</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">time</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">nflux</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">flux_err</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">109</span><span class="p">,</span><span class="mf">109.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_142_1.png" src="../../../_images/output_142_1.png" />
+<section id="id5">
+<h3>Fitting the transit<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">koi</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">nflux</span>
+<span class="n">koi</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="n">flux_err</span>
+</pre></div>
+</div>
+<p>Let’s just do the first 7 transits.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">midpoints</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">midpoints</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">remove_oot_data</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">time_intransit</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">flux_intransit</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">koi</span><span class="o">.</span><span class="n">fluxerr_intransit</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Transit LC Model with Noise&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_148_1.png" src="../../../_images/output_148_1.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlive</span><span class="o">=</span><span class="mi">1000</span>
+<span class="n">nsupersample</span><span class="o">=</span><span class="mi">29</span>
+<span class="n">exptimesupersample</span><span class="o">=</span><span class="mf">0.0201389</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">do_tfit_juliet</span><span class="p">(</span><span class="n">direct</span><span class="p">,</span> <span class="n">nsupersample</span><span class="o">=</span><span class="n">nsupersample</span><span class="p">,</span> <span class="n">exptimesupersample</span><span class="o">=</span><span class="n">exptimesupersample</span><span class="p">,</span> <span class="n">nlive</span><span class="o">=</span><span class="n">nlive</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysing</span> <span class="n">data</span> <span class="kn">from</span> <span class="nn">tutorial01</span><span class="o">/</span><span class="mf">818.01</span><span class="o">/</span><span class="n">e_0</span><span class="mf">.3</span><span class="n">_w_270</span><span class="mf">.0</span><span class="o">/</span><span class="n">jomnest_</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">direct</span> <span class="o">+</span> <span class="s1">&#39;posteriors.dat&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print transit fit results from Juliet</span>
+<span class="n">res</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># Parameter Name</th>
+      <th></th>
+      <th>Median</th>
+      <th>.1</th>
+      <th>Upper 68 CI</th>
+      <th>.2</th>
+      <th>Lower 68 CI</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>P_p1</td>
+      <td></td>
+      <td>8.11407</td>
+      <td></td>
+      <td>0.00024</td>
+      <td></td>
+      <td>0.00023</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>t0_p1</td>
+      <td></td>
+      <td>2455009.34021</td>
+      <td></td>
+      <td>0.00057</td>
+      <td></td>
+      <td>0.00057</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>p_p1</td>
+      <td></td>
+      <td>0.03688</td>
+      <td></td>
+      <td>0.00069</td>
+      <td></td>
+      <td>0.00065</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>b_p1</td>
+      <td></td>
+      <td>0.36570</td>
+      <td></td>
+      <td>0.17872</td>
+      <td></td>
+      <td>0.22039</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>q1_KEPLER</td>
+      <td></td>
+      <td>0.35974</td>
+      <td></td>
+      <td>0.26895</td>
+      <td></td>
+      <td>0.17441</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>q2_KEPLER</td>
+      <td></td>
+      <td>0.29702</td>
+      <td></td>
+      <td>0.31601</td>
+      <td></td>
+      <td>0.18794</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>a_p1</td>
+      <td></td>
+      <td>17.29780</td>
+      <td></td>
+      <td>1.10237</td>
+      <td></td>
+      <td>1.78141</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>mflux_KEPLER</td>
+      <td></td>
+      <td>-0.00037</td>
+      <td></td>
+      <td>0.00002</td>
+      <td></td>
+      <td>0.00002</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>sigma_w_KEPLER</td>
+      <td></td>
+      <td>3.34227</td>
+      <td></td>
+      <td>24.49567</td>
+      <td></td>
+      <td>3.00753</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save fit planet parameters to variables for convenience</span>
+<span class="n">per_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">t0_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">rprs_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">b_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">a_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="n">i_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">b_f</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">a_f</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mf">180.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Below, I print the original parameters and fit parameters, and overlay
+the fit light curve on the input light curve.</p>
+<p>Because I input <span class="math notranslate nohighlight">\(e = 0.0\)</span>, the transit fitter should return the
+exact same parameters I input (because the transit fitter always
+requires <span class="math notranslate nohighlight">\(e = 0.0\)</span>).</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the transit fit corner plot</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;P_p1&#39;</span><span class="p">]</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;t0_p1&#39;</span><span class="p">]</span>
+<span class="n">rprs</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;p_p1&#39;</span><span class="p">]</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;b_p1&#39;</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">posteriors</span><span class="p">[</span><span class="s1">&#39;posterior_samples&#39;</span><span class="p">][</span><span class="s1">&#39;a_p1&#39;</span><span class="p">]</span>
+<span class="n">inc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">b</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">a</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="mf">180.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Period&#39;</span><span class="p">,</span> <span class="s1">&#39;t0&#39;</span><span class="p">,</span> <span class="s1">&#39;rprs&#39;</span><span class="p">,</span> <span class="s1">&#39;inc&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">]</span>
+
+<span class="n">fs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">rprs</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
+<span class="n">fs</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">T</span>
+
+<span class="n">figure</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_155_0.png" src="../../../_images/output_155_0.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the data:</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">],</span> \
+             <span class="n">yerr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">errors_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">],</span> <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="c1"># Plot the model:</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot portion of the lightcurve, axes, etc.:</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (BJD)-2454900&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">])</span><span class="o">-</span><span class="mi">2454900</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">times_lc</span><span class="p">[</span><span class="s1">&#39;KEPLER&#39;</span><span class="p">])</span><span class="o">-</span><span class="mi">2454900</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.998</span><span class="p">,</span> <span class="mf">1.002</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Relative flux&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;KOI 818.01 Kepler LC with Transit Fit&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_156_0.png" src="../../../_images/output_156_0.png" />
+</section>
+<section id="id6">
+<h3>Determining T14 and T23<a class="headerlink" href="#id6" title="Permalink to this headline"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">calc_durations</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total Transit Duration: &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">T14_dist</span><span class="p">),</span> <span class="s1">&#39;-/+&#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">T14_errs</span><span class="p">,</span> <span class="s1">&#39;hours&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Full Transit Duration: &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">koi</span><span class="o">.</span><span class="n">T23_dist</span><span class="p">),</span> <span class="s1">&#39;-/+&#39;</span><span class="p">,</span> <span class="n">koi</span><span class="o">.</span><span class="n">T23_errs</span><span class="p">,</span> <span class="s1">&#39;hours&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Total</span> <span class="n">Transit</span> <span class="n">Duration</span><span class="p">:</span>  <span class="mf">0.1453917067458673</span> <span class="o">-/+</span> <span class="p">(</span><span class="mf">0.0024099101024557534</span><span class="p">,</span> <span class="mf">0.0029148854669333313</span><span class="p">)</span> <span class="n">hours</span>
+<span class="n">Full</span> <span class="n">Transit</span> <span class="n">Duration</span><span class="p">:</span>  <span class="mf">0.1328974496125958</span> <span class="o">-/+</span> <span class="p">(</span><span class="mf">0.002286337605429317</span><span class="p">,</span> <span class="mf">0.002373614271698049</span><span class="p">)</span> <span class="n">hours</span>
+</pre></div>
+</div>
+</section>
+<section id="id7">
+<h3>Get <span class="math notranslate nohighlight">\(g\)</span><a class="headerlink" href="#id7" title="Permalink to this headline"></a></h3>
+<p>Print <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(\sigma_{g}\)</span>:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">get_gs</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_mean</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">g_mean</span>
+<span class="n">g_sigma</span> <span class="o">=</span> <span class="n">koi</span><span class="o">.</span><span class="n">g_sigma</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_mean</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.7138312721212587</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_sigma</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.056832865957797074</span>
+</pre></div>
+</div>
+<p>The mean of <span class="math notranslate nohighlight">\(g\)</span> is about 1.0, which means that <span class="math notranslate nohighlight">\(\rho_{circ}\)</span>
+agrees with <span class="math notranslate nohighlight">\(\rho_{star}\)</span> and the eccentricity of this transit
+must be zero, which is exactly what we input! We can take <span class="math notranslate nohighlight">\(g\)</span> and
+<span class="math notranslate nohighlight">\(\sigma_{g}\)</span> and use nested sampling (<code class="docutils literal notranslate"><span class="pre">dynesty</span></code>) to determine
+the surface of most likely <span class="math notranslate nohighlight">\((e,w)\)</span>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">photoeccentric</span></code> has the probability function for <span class="math notranslate nohighlight">\((e,w)\)</span> from
+<span class="math notranslate nohighlight">\(g\)</span> built in to <code class="docutils literal notranslate"><span class="pre">ph.log_probability()</span></code>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">koi</span><span class="o">.</span><span class="n">do_eccfit</span><span class="p">(</span><span class="n">direct</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">22184</span><span class="n">it</span> <span class="p">[</span><span class="mi">02</span><span class="p">:</span><span class="mi">18</span><span class="p">,</span> <span class="mf">160.69</span><span class="n">it</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="mi">15</span> <span class="o">|</span> <span class="n">bound</span><span class="p">:</span> <span class="mi">0</span> <span class="o">|</span> <span class="n">nc</span><span class="p">:</span> <span class="mi">1</span> <span class="o">|</span> <span class="n">ncall</span><span class="p">:</span> <span class="mi">262862</span> <span class="o">|</span> <span class="n">eff</span><span class="p">(</span><span class="o">%</span><span class="p">):</span>  <span class="mf">8.439</span> <span class="o">|</span> <span class="n">loglstar</span><span class="p">:</span>   <span class="o">-</span><span class="n">inf</span> <span class="o">&lt;</span>  <span class="mf">2.868</span> <span class="o">&lt;</span>  <span class="mf">2.745</span> <span class="o">|</span> <span class="n">logz</span><span class="p">:</span>  <span class="mf">0.281</span> <span class="o">+/-</span>  <span class="mf">0.074</span> <span class="o">|</span> <span class="n">stop</span><span class="p">:</span>  <span class="mf">0.795</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">direct</span> <span class="o">+</span> <span class="s1">&#39;/kepewdres.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">ewdres</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">]</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">ewdres</span><span class="o">.</span><span class="n">samples</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span> <span class="n">truths</span><span class="o">=</span><span class="p">[</span><span class="n">w</span><span class="p">,</span> <span class="n">e</span><span class="p">],</span> <span class="n">plot_contours</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/output_169_0.png" src="../../../_images/output_169_0.png" />
+<p>And here is the corner plot for the most likely values of <span class="math notranslate nohighlight">\((e, w)\)</span>
+that correspond to <span class="math notranslate nohighlight">\(g = 0.7\)</span>. This <span class="math notranslate nohighlight">\(e\)</span> distribution peaks at
+0.3 too!</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../../api.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Sagear.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

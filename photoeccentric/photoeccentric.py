@@ -279,7 +279,7 @@ class KOI(KeplerStar):
         self.midpoints = midpoints
 
 
-    def remove_oot_data(self, nbuffer, linearfit=False, nlinfit=None, include_nans=False, delete_nan_transits=False, simultaneous_midpoints=None):
+    def remove_oot_data(self, nbuffer, linearfit=False, nlinfit=None, include_nans=False, delete_nan_transits=False, nan_limit=10, simultaneous_midpoints=None, simultaneous_threshold=None, return_intransit=True, cadence=0.0201389):
         """Removes out-of-transit segments of Kepler light curves.
         Fits a linear model to out-of-transit points immediately surrounding each transit.
         Subtracts the linear model from each transit cutout.
@@ -310,34 +310,45 @@ class KOI(KeplerStar):
         mpintransit = []
 
         for i in range(len(self.midpoints)):
-
             try:
                 if simultaneous_midpoints is not None:
+                    assert simultaneous_threshold is not None, "If removing simultaneous transits, you need to define 'simultaneous_threshold'"
                     near_sim_mpt = find_nearest(simultaneous_midpoints, self.midpoints[i])
-                    if abs(self.midpoints[i] - near_sim_mpt) < 3*0.0416667: # If transit midpoint is close to a simultaneous transit, then don't include that transit.
+                    if abs(self.midpoints[i] - near_sim_mpt) < simultaneous_threshold: # If transit midpoint is close to a simultaneous transit, then don't include that transit.
+                        print('Simultaneous')
                         continue
 
                 if linearfit==True:
                     assert nlinfit is not None, "If performing a linear fit, you must define nlinfit."
-                    m, b, t1bjd, t1, fnorm, fe1 = do_linfit(self.time, self.flux, self.flux_err, self.midpoints[i], nbuffer, nlinfit)
+
+                    m, b, t1bjd, t1, fnorm, fe1 = do_linfit(self.time, self.flux, self.flux_err, self.midpoints[i], nbuffer, nlinfit, cadence=cadence)
                     if np.isnan(m) and np.isnan(t1) and np.isnan(fnorm):
                         print('Gap midpoint')
                         continue
                 elif linearfit==False:
                     t1bjd, t1, fnorm, fe1 = cutout_no_linfit(self.time, self.flux, self.flux_err, self.midpoints[i], nbuffer)
+                    if return_intransit==False:
+                        midind = int((len(t1bjd) - 1)/2)
+                        dur = int(nbuffer-nlinfit)
+                        t1bjd = np.delete(t1bjd, [range(midind-dur,midind+dur+1)])
+                        t1 = np.delete(t1, [range(midind-dur,midind+dur+1)])
+                        fnorm = np.delete(fnorm, [range(midind-dur,midind+dur+1)])
+                        fe1 = np.delete(fe1, [range(midind-dur,midind+dur+1)])
+
 
                 if include_nans==False:
 
-                    if np.isnan(fnorm).any() == False:
+                    if np.count_nonzero(np.isnan(fnorm)) <= nan_limit:
                         tbjd.append(list(t1bjd))
                         tnorm.append(list(t1))
                         fl.append(list(fnorm))
                         fr.append(list(fe1))
                         mpintransit.append(self.midpoints[i])
 
-                    if np.isnan(fnorm).any() == True:
+                    if np.count_nonzero(np.isnan(fnorm)) > nan_limit:
 
                         if delete_nan_transits == True:
+                            print('Deleted')
                             continue
 
                         elif delete_nan_transits == False:
@@ -361,6 +372,7 @@ class KOI(KeplerStar):
                     mpintransit.append(self.midpoints[i])
 
             except TypeError:
+                print('TypeError')
                 continue
 
         self.time_intransit = np.array([x for y in tbjd for x in y])
@@ -448,11 +460,11 @@ class KOI(KeplerStar):
 
             return w, e
 
-
         dsampler = dynesty.DynamicNestedSampler(loglike, prior_transform, ndim=2, bound=bound, sample=sample)
         dsampler.run_nested()
 
         ewdres = dsampler.results
+        self.ewdres = dsampler.results
 
         edist  = random.choices(ewdres.samples[:,1], k=arrlen)
         wdist  = random.choices(ewdres.samples[:,0], k=arrlen)
