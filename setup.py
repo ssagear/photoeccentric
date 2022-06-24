@@ -11,9 +11,9 @@ setup(name='photoeccentric',
       packages=['photoeccentric'],
       zip_safe=False,
       # install_requires=[
-      #     'Django',
-      #     # 'Sphinx',
-      #     # ^^^ Not sure if this is needed on readthedocs.org
-      #     # 'something else?',
-      #     ],
+      #     'batman-package',
+          # 'Sphinx',
+          # ^^^ Not sure if this is needed on readthedocs.org
+          # 'something else?',
+          ],
       )
