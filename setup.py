@@ -9,11 +9,11 @@ setup(name='photoeccentric',
       author_email='ssagear@ufl.edu',
       license='MIT',
       packages=['photoeccentric'],
-      zip_safe=False,
+      zip_safe=False
       # install_requires=[
       #     'batman-package',
           # 'Sphinx',
           # ^^^ Not sure if this is needed on readthedocs.org
           # 'something else?',
-          ],
+          #],
       )
