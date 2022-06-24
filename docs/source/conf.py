@@ -1,5 +1,11 @@
 # Configuration file for the Sphinx documentation builder.
 
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../'))
+
+import photoeccentric
+
 # -- Project information
 
 project = 'photoeccentric'
@@ -27,6 +33,14 @@ intersphinx_disabled_domains = ['std']
 
 templates_path = ['_templates']
 
+# The master toctree document.
+master_doc = 'index'
+
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+# This pattern also affects html_static_path and html_extra_path.
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
 # -- Options for HTML output
 
 html_theme = 'sphinx_rtd_theme'
@@ -35,13 +49,13 @@ html_theme = 'sphinx_rtd_theme'
 epub_show_urls = 'footnote'
 
 
-import sys
-from unittest.mock import MagicMock
-
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        return MagicMock()
-
-MOCK_MODULES = ['extension-helpers']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+# import sys
+# from unittest.mock import MagicMock
+#
+# class Mock(MagicMock):
+#     @classmethod
+#     def __getattr__(cls, name):
+#         return MagicMock()
+#
+# MOCK_MODULES = ['extension-helpers']
+# sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
