@@ -6,6 +6,7 @@ from .utils import *
 from .stellardensity import *
 
 
+
 def tfit_log_likelihood(theta, time, ptime, flux, flux_err):
     """
     Transit fit emcee function
@@ -125,6 +126,124 @@ def do_linfit(time, flux, flux_err, transitmid, nbuffer, nlinfit, cadence=0.0201
     return m, b, t1bjd, t1, fnorm, fe1
 
 
+def do_cubfit(time, flux, flux_err, transitmid, nbuffer, nlinfit, cadence=0.0201389, odd=False, custom_data=None, midpoint=1):
+
+    """For a segment of a Kepler light curve with a transit,
+    fit a cubic polynomial to the out-of-transit data and subtract.
+
+    Parameters:
+    ----------
+    time: np.array
+        Time array of entire light curve
+    flux: np.array
+        Flux array of entire light curve (normalized to 1)
+    flux_err: np.array
+        Flux error array of entire light curve (normalized to 1)
+    transitmid: float
+        Mid-time of transit (same units as time: BJD, BJD-X, etc.)
+    nbuffer: int
+        Number of out-of-transit data points to keep before and after transit
+    nlinfit: int
+        Number of out-of-transit data points to use in cubic fit (from each end of cutout light curve)
+    custom_data: custom data to fit to. should have same time array.
+
+    Returns:
+    -------
+    t1bjd: np.array
+        Time cutout in BJD
+    fnorm: np.array
+        Flux cutout - linear fit
+    fe1: np.array
+        Flux error cutout
+
+    """
+
+    nbuffer = int(nbuffer)
+    nlinfit = int(nlinfit)
+
+    if custom_data is None:
+
+        # Find closest Kepler time stamp to transit mid-timess
+        tindex = int(np.where(time == find_nearest(time, transitmid))[0])
+        # Time array of cutout: phase 0 at tmid
+        t1 = np.array(time[int(tindex-nbuffer):int(tindex+nbuffer+1)]) - transitmid
+        # Time array of cutout: BJD
+        t1bjd = np.array(time[int(tindex-nbuffer):int(tindex+nbuffer+1)])
+
+
+        # Flux array of cutout
+        f1 = np.array(flux[int(tindex-nbuffer):int(tindex+nbuffer+1)])
+        # Flux error array of cutout
+        fe1 = np.array(flux_err[int(tindex-nbuffer):int(tindex+nbuffer+1)])
+
+
+        if np.any(np.array([j-i for i, j in zip(t1bjd[:-1], t1bjd[1:])]) > 5*cadence): # If the midpoint lies during a gap in the data
+            return np.nan, np.nan, np.nan, np.nan, np.nan
+
+        if odd==False:
+            # Do linear fit to OOT data
+            idx = np.isfinite(t1) & np.isfinite(f1)
+            z = np.polyfit(np.concatenate((t1[idx][:nlinfit], t1[idx][-nlinfit:])), np.concatenate((f1[idx][:nlinfit], f1[idx][-nlinfit:])), 3)
+
+        if odd==True:
+            # Do linear fit to OOT data
+            idx = np.isfinite(t1) & np.isfinite(f1)
+            z = np.polyfit(np.concatenate((t1[idx][:nlinfit-1], t1[idx][-nlinfit:])), np.concatenate((f1[idx][:nlinfit-1], f1[idx][-nlinfit:])), 3)
+
+        # Subtract linear fit from LC
+        cubfit = np.poly1d(z)
+        fnorm = f1/cubfit(t1)
+
+    else:
+
+        # Find closest Kepler time stamp to transit mid-timess
+        tindex = int(np.where(time == find_nearest(time, transitmid))[0])
+        # Time array of cutout: phase 0 at tmid
+        t1 = np.array(time[int(tindex-nbuffer):int(tindex+nbuffer+1)]) - transitmid
+        # Time array of cutout: BJD
+        t1bjd = np.array(time[int(tindex-nbuffer):int(tindex+nbuffer+1)])
+
+
+        # Flux array of cutout
+        f1 = np.array(flux[int(tindex-nbuffer):int(tindex+nbuffer+1)])
+        c1 = np.array(custom_data[int(tindex-nbuffer):int(tindex+nbuffer+1)])
+        # Flux error array of cutout
+        fe1 = np.array(flux_err[int(tindex-nbuffer):int(tindex+nbuffer+1)])
+
+
+        if np.any(np.array([j-i for i, j in zip(t1bjd[:-1], t1bjd[1:])]) > 4*cadence): # If the midpoint lies during a gap in the data
+            return np.nan, np.nan, np.nan, np.nan, np.nan
+
+        if odd==False:
+            # Do linear fit to OOT data
+            idx = np.isfinite(t1) & np.isfinite(f1)
+            z = np.polyfit(np.concatenate((t1[idx][:nlinfit], t1[idx][-nlinfit:])), np.concatenate((c1[idx][:nlinfit], c1[idx][-nlinfit:])), 3)
+
+        if odd==True:
+            # Do linear fit to OOT data
+            idx = np.isfinite(t1) & np.isfinite(f1)
+            z = np.polyfit(np.concatenate((t1[idx][:nlinfit-1], t1[idx][-nlinfit:])), np.concatenate((c1[idx][:nlinfit-1], c1[idx][-nlinfit:])), 3)
+
+
+        # Subtract linear fit from LC
+        cubfit = np.poly1d(z)
+        fnorm = f1/cubfit(t1)
+
+        # plt.cla()
+        # plt.errorbar(t1, f1, yerr=fe1, fmt='.')
+        # plt.scatter(t1, c1, c='r')
+        # plt.plot(t1, cubfit(t1))
+        # plt.savefig('/Users/ssagear/Dropbox (UFL)/Research/MetallicityProject/workingdirectory/0SEC-TransitFitting/CubicFitTest/961MedCubePlots/' + str(midpoint) + '.png')
+        #
+        # plt.cla()
+        # plt.errorbar(t1, fnorm, yerr=fe1, fmt='.')
+        # plt.savefig('/Users/ssagear/Dropbox (UFL)/Research/MetallicityProject/workingdirectory/0SEC-TransitFitting/CubicFitTest/961MedCubePlots/' + str(midpoint) + '_norm.png')
+
+
+
+    return z, t1bjd, t1, fnorm, fe1
+
+
 
 
 def cutout_no_linfit(time, flux, flux_err, transitmid, nbuffer, cadence=0.0208333):
@@ -153,22 +272,31 @@ def cutout_no_linfit(time, flux, flux_err, transitmid, nbuffer, cadence=0.020833
 
     """
 
+    #print('Cutout start')
+    nbuffer = int(nbuffer)
+
     # Find closest Kepler time stamp to transit mid-timess
     tindex = int(np.where(time == find_nearest(time, transitmid))[0])
-    #if abs(transitmid-find_nearest(time, transitmid)) < 1.*cadence: # if the nearest time stamp is more than a cadence away from the midpoint, the midpoint lies in a gap.
-    #    return np.nan, np.nan, np.nan, np.nan
-
-
     # Time array of cutout: phase 0 at tmid
-    t1 = np.array(time[tindex-nbuffer:tindex+nbuffer+1]) - transitmid
+    t1 = np.array(time[int(tindex-nbuffer):int(tindex+nbuffer+1)]) - transitmid
     # Time array of cutout: BJD
-    t1bjd = np.array(time[tindex-nbuffer:tindex+nbuffer+1])
+    t1bjd = np.array(time[int(tindex-nbuffer):int(tindex+nbuffer+1)])
 
 
+    #print('Between time and flux')
     # Flux array of cutout
-    f1 = np.array(flux[tindex-nbuffer:tindex+nbuffer+1])
+    f1 = np.array(flux[int(tindex-nbuffer):int(tindex+nbuffer+1)])
     # Flux error array of cutout
-    fe1 = np.array(flux_err[tindex-nbuffer:tindex+nbuffer+1])
+    fe1 = np.array(flux_err[int(tindex-nbuffer):int(tindex+nbuffer+1)])
+
+
+    if np.any(np.array([j-i for i, j in zip(t1bjd[:-1], t1bjd[1:])]) > 4*cadence): # If the midpoint lies during a gap in the data
+        #print('Gap')
+        return np.nan, np.nan, np.nan, np.nan
+
+    #print(t1, f1)
+
+    #print('cutout end')
 
     return t1bjd, t1, f1, fe1
 

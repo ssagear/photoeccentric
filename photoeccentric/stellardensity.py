@@ -4,6 +4,108 @@ import pandas as pd
 
 from .utils import *
 
+### Mann Relations ###
+
+def abs_mag(m, parallax):
+    M = m + 5*(np.log10(parallax) + 1)
+    return M
+
+def Mann_radius(Mks, FeH):
+    a = 1.9305
+    b = -0.3466
+    c = 0.01647
+    f = -0.04458
+    Rs = (a + b*Mks + c*Mks**2)*(1 + f*FeH)
+    return Rs
+
+def Benedict_mass(Mks):
+    C0 = 0.2311
+    C1 = -0.1352
+    C2 = 0.0400
+    C3 = 0.0038
+    C4 = -0.0032
+    X0 = 7.5
+    Mstar = C0 + C1*(Mks-X0) + C2*((Mks-X0)**2) + C3*((Mks-X0)**3) + C4*((Mks-X0))**4
+    return Mstar
+
+def Mann_mass(Mks):
+    """Eqn 10 from Mann et al 2019"""
+    a = 0.5858
+    b = 0.3872
+    c = -0.1217
+    d = 0.0106
+    e = -0.00027262
+    Mstar = a + b*(Mks) + c*(Mks**2) + d*(Mks**3) + e*(Mks**4)
+    return Mstar
+
+
+def get_rho_prior(P, rprs, a_rs, inc, e, w):
+    """P in days. inc and w in degrees.
+    Returns rho_starin solar densities."""
+
+
+    import scipy.constants as c
+
+    inc = inc*(np.pi/180)
+    w = w*(np.pi/180)
+    delt = rprs**2
+
+    P = P*86400.
+
+    T14term1 = (P/np.pi)*((1-e**2)**(3./2.)/(1+e*np.sin(w))**2)
+    T14term2num = np.sqrt((1+delt**(1./2.))**2 - a_rs**2*((1-e**2)/(1+e*np.sin(w)))**2*np.cos(inc)**2)
+    T14term2den = a_rs*((1-e**2)/(1+e*np.sin(w)))*np.sin(inc)
+    T14term2 = np.arcsin(T14term2num/T14term2den)
+    T14 = T14term1*T14term2
+
+    T23term1 = (P/np.pi)*((1-e**2)**(3./2.)/(1+e*np.sin(w))**2)
+    T23term2num = np.sqrt((1-delt**(1./2.))**2 - a_rs**2*((1-e**2)/(1+e*np.sin(w)))**2*np.cos(inc)**2)
+    T23term2den = a_rs*((1-e**2)/(1+e*np.sin(w)))*np.sin(inc)
+    T23term2 = np.arcsin(T23term2num/T23term2den)
+    T23 = T23term1*T23term2
+
+    g = (1+e*np.sin(w))/(np.sqrt(1-e**2))
+
+    rho_circ = ((2*delt**(1./4.))/(np.sqrt(T14**2 - T23**2)))**3 * ((3*P)/(c.G*np.pi**2))
+    rho_star = g**(-3)*rho_circ
+
+    return rho_star/1408
+
+def get_ars_from_rho(P, rho):
+
+    import scipy.constants as c
+
+    P = P*86400.
+    rho = rho
+
+    ars3 = (rho*c.G*P**2)/(3*np.pi)
+    return np.cbrt(ars3)
+
+
+def get_e(sesinw, secosw):
+    
+    e = []
+    for i in range(len(sesinw)):
+        e.append(sesinw[i]**2 + secosw[i]**2)
+    return e
+
+def randomInc(n):
+
+    randNums = np.random.rand(n)
+    incs = np.arccos(2*randNums - 1)
+
+    return incs
+
+def lds(u1, u2):
+    
+    q1 = (u1+u2)**2
+    q2 = 0.5*u1*(u1+u2)**(-1)
+    return q1, q2
+
+
+
+### Mann Relations ###
+
 def get_kepID(hdul):
     """Pulls KIC IDs from Kepler-Gaia dataset.
 
@@ -527,13 +629,13 @@ def get_cdf(dist, nbins=100):
     return bin_edges[1:], cdf
 
 
-def find_nearest_index(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    if len(np.where(array == array[idx])[0]) == 1:
-        return int(np.where(array == array[idx])[0])
-    else:
-        return int(np.where(array == array[idx])[0][0])
+# def find_nearest_index(array, value):
+#     array = np.asarray(array)
+#     idx = (np.abs(array - value)).argmin()
+#     if len(np.where(array == array[idx])[0]) == 1:
+#         return int(np.where(array == array[idx])[0])
+#     else:
+#         return int(np.where(array == array[idx])[0][0])
 
 
 def find_sigma(x, cdf, sign):

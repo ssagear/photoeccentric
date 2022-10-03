@@ -22,7 +22,7 @@ def get_b_from_i(inc, a_rs, e, w):
     b = a_rs*np.cos(inc*(np.pi/180))*g
 
     return b
-#edit
+
 def get_i_from_b(b, a_rs, e, w):
 
     g = (1+e*np.sin(w*(np.pi/180)))/(1-e**2)
