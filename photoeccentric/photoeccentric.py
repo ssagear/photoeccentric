@@ -535,7 +535,6 @@ class KOI(KeplerStar):
         trace:
             pymc3 trace object
 
-
         """
         import pymc3 as pm
         import pymc3_ext as pmx
