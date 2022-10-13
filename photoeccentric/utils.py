@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 def from_exoarchive(KOI=0, KIC=0, KepName=0):
+    """Downloads data from exoplanet archive"""
     
     from urllib.request import urlopen
     from io import StringIO
@@ -67,13 +68,7 @@ def from_exoarchive(KOI=0, KIC=0, KepName=0):
 def mast_query(request):
     """ From https://mast.stsci.edu/api/v0/MastApiTutorial.html
     
-    Perform a MAST query.
-    
-        Parameters
-        ----------
-        request (dictionary): The MAST request json object
-        
-        Returns head,content where head is the response HTTP headers, and content is the returned data"""
+    Perform a MAST query for Kepler light curves."""
 
     import sys
     import json
@@ -107,6 +102,8 @@ def mast_query(request):
 
 
 def kepler_from_mast(object_of_interest):
+
+    """Perform a MAST query for Kepler light curves."""
 
     import sys
     import json
