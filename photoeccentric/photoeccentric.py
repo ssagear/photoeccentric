@@ -9,38 +9,6 @@ from .lcfitter import *
 from .eccentricity import *
 
 
-def run_fit_juliet(nkoi, isodf, spectplanets, muirhead_comb, muirheadKOIs, lcpath, direct, nbuffer, nlinfit, nlive=1000, nsupersample=29, exptimesupersample=0.0201389, show_plot=False, juliet_phase=False, std=1, lim=0.12):
-    """One step transit + eccentricity fitting for Kepler light curves."""
-
-    import os
-
-    star = KeplerStar(int(np.floor(float(nkoi))))
-    #star.get_stellar_params(isodf)
-    koi = KOI(nkoi, int(np.floor(float(nkoi))), isodf)
-    koi.get_KIC(muirhead_comb)
-    koi.planet_params_from_archive(spectplanets)
-    koi.calc_a(koi.mstar, koi.rstar)
-
-    KICs = np.sort(np.unique(np.array(muirhead_comb['KIC'])))
-    KOIs = np.sort(np.unique(np.array(muirhead_comb['KOI'])))
-
-    files = get_lc_files(koi.KIC, KICs, lcpath)
-
-    koi.get_stitched_lcs(files)
-    koi.get_midpoints()
-    koi.remove_oot_data(nbuffer, nlinfit)
-
-
-    if juliet_phase==True:
-        koi.phase_intransit = juliet.utils.get_phases(koi.time_intransit-2454900, koi.period, koi.epoch-2454900)
-
-    dataset, results = koi.do_tfit_juliet(direct, nsupersample=nsupersample, exptimesupersample=exptimesupersample, nlive=nlive)
-    koi.calc_durations()
-    koi.get_gs()
-    koi.do_eccfit(direct)
-
-    return dataset, results, koi.e_dist, koi.w_dist
-
 class KeplerStar:
 
     def __init__(self, StarKOI):
@@ -53,9 +21,9 @@ class KeplerStar:
         self.mstar, self.mstar_err, self.rstar, self.rstar_err = read_stellar_params(self.isodf)
         self.rho_star_dist, self.mass, self.radius, self.rho_star = get_rho_star(self.mstar, self.mstar_err, self.rstar, self.rstar_err, arrlen=1000)
 
-    # def get_KIC(self, muirhead_comb):
-    #     """Gets KIC number for KOI (star)."""
-    #     self.KIC = muirhead_comb[muirhead_comb['KOI'] == float(str(self.StarKOI) + '.01')].KIC.item()
+    def get_KIC(self, muirhead_comb):
+        """Gets KIC number for KOI (star)."""
+        self.KIC = muirhead_comb[muirhead_comb['KOI'] == float(str(self.StarKOI) + '.01')].KIC.item()
 
 
 class KOI(KeplerStar):
@@ -79,12 +47,11 @@ class KOI(KeplerStar):
         else:
             self.kepoiname = None
 
+        self.lightcurvefiles = False
+
     
     def download_planet_params(self):
-        """Get stellar parameters for the host of a KOI from exoplanet archive (downloaded data).
-
-        Parameters
-        ----------
+        """Download stellar parameters for a KOI from the Exoplanet Archive.
 
         """
         url, content = from_exoarchive(KOI=self.kepoiname)
@@ -205,6 +172,7 @@ class KOI(KeplerStar):
         return a
 
     def download_lightcurves(self):
+        """Download Kepler lightcurves from MAST for a KOI."""
     
         table = kepler_from_mast('KIC ' + str(int(self.KIC)))
         lcs = get_timeseries_files('mastDownload.tar.gz')
@@ -217,29 +185,24 @@ class KOI(KeplerStar):
 
         Parameters:
         ----------
-        files: List
-
+        files: list
+            List of FITS file paths containing light curves
         KIC: float
             KOI of target
-
         cadence_combine: boolean
-            True if light curve files include both short- and long-cadence data. False otherwise.
+            True if light curve files include both short- a nd long-cadence data. False otherwise.
+        record_bounds: boolean
+            True if recording start and end times of each light curve segment is desired. False otherwise.
 
         Returns:
         -------
-        hdus: list
-            List of FITS hdus
-        time:
-        flux:
-        flux_err:
-        startimes:
-        stoptimes:
+        None
 
         """
 
         from astropy.io import fits
 
-        if self.lightcurvefiles is not None:
+        if self.lightcurvefiles != False:
             files = self.lightcurvefiles
 
         if cadence_combine==False:
@@ -319,7 +282,7 @@ class KOI(KeplerStar):
 
 
     def normalize_flux(self):
-        """Normalizes flux array."""
+        """Normalizes self.flux array."""
 
         fmed = np.nanmedian(self.flux)
         self.flux = self.flux/fmed
@@ -339,7 +302,8 @@ class KOI(KeplerStar):
         self.midpoints = midpoints
 
     def sigma_clip_quarters(self, sigma=6, maxiters=1):
-        """Sigma clips light curve by quarter."""
+        """Sigma clips light curve by quarter.
+        Number of sigmas and max # of iterations allowed can be specified"""
 
         t = []
         f = []
@@ -370,7 +334,7 @@ class KOI(KeplerStar):
 
 
     def delete_nans(self):
-        """Deletes nans from time, flux, fluxerr"""
+        """Deletes nans from self.time, self.flux, and self.fluxerr"""
 
         naninds = np.where(np.isnan(self.flux))
         self.time = np.delete(self.time, naninds)
@@ -379,6 +343,7 @@ class KOI(KeplerStar):
 
 
     def get_simultaneous_transits(self, KOIS, files=None):
+        """Gets a list of all transit midpoints for other transits in a system (specified as a list with KOIS)"""
 
         if self.lightcurvefiles is not None:
             files = self.lightcurvefiles
@@ -408,13 +373,27 @@ class KOI(KeplerStar):
         nbuffer: int
             Number of flux points before and after transit midpoint to include in transit cut-out.
             e.g. if nbuffer = 7, function will preserve 7 flux points before and after each transit midpoint and discard the rest of light curve.
+        linearfit: boolean
+            True if subtracting a linear fit to baseline. False otherwise
+        cubicfit: boolean
+            True if subtracting a cubic fit to baseline. False otherwise
         nlinfit: int
             Number of flux points from each end of transit cutout to use in linear fit.
             e.g. if nbuffer = 7 and nlinfit = 5, function will use the 10 outermost flux points for linear fit.
         include_nans: boolean, default False
             Include nans in in-transit data?
         delete_nan_transits: boolean, default False
-            Delete entire transit if includes nan flux value?
+            Delete entire transit if includes nan flux values > nan_limit?
+        nan_limit: int
+            Number of nans to allow in-transit before deleting entire transit.
+        simultaneous_midpoints: list
+            Transit midpoints for other planets in system.
+        simultaneous_threshold: float
+            Overlap threshold for removing simultaneous transits. If any transit midpoint is closer than [simultaneous_threshold] to a member of [simultaneous_midpoints], that transit is discarded.
+        return_intransit: boolean
+            Save the in-transit midpoint times?
+        cadence: float
+            Cadence of the light curve data
 
         Returns
         -------

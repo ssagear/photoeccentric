@@ -17,6 +17,7 @@ from .lcfitter import *
 
 
 def get_b_from_i(inc, a_rs, e, w):
+    """Inclination in degrees"""
 
     g = (1-e**2)/(1+e*np.sin(w*(np.pi/180)))
     b = a_rs*np.cos(inc*(np.pi/180))*g
