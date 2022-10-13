@@ -629,15 +629,6 @@ def get_cdf(dist, nbins=100):
     return bin_edges[1:], cdf
 
 
-# def find_nearest_index(array, value):
-#     array = np.asarray(array)
-#     idx = (np.abs(array - value)).argmin()
-#     if len(np.where(array == array[idx])[0]) == 1:
-#         return int(np.where(array == array[idx])[0])
-#     else:
-#         return int(np.where(array == array[idx])[0][0])
-
-
 def find_sigma(x, cdf, sign):
     med = x[find_nearest_index(cdf, 0.5)]
     if sign == "-":
