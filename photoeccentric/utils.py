@@ -412,3 +412,20 @@ def calc_r(a_rs, e, w):
     wrad = w*(np.pi/180.)
     r_rs = (a_rs*(1-e**2))/(1+e*np.cos(wrad-(np.pi/2.)))
     return r_rs
+
+
+def reverse_ld_coeffs(ld_law, q1, q2):
+    """This function adapted from the juliet package at https://github.com/nespinoza/juliet/blob/master/juliet/utils.py"""
+    
+    if ld_law == 'quadratic':
+        coeff1 = 2. * np.sqrt(q1) * q2
+        coeff2 = np.sqrt(q1) * (1. - 2. * q2)
+    elif ld_law == 'squareroot':
+        coeff1 = np.sqrt(q1) * (1. - 2. * q2)
+        coeff2 = 2. * np.sqrt(q1) * q2
+    elif ld_law == 'logarithmic':
+        coeff1 = 1. - np.sqrt(q1) * q2
+        coeff2 = 1. - np.sqrt(q1)
+    elif ld_law == 'linear':
+        return q1, q2
+    return coeff1, coeff2

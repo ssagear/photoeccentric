@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import juliet
 
 from .utils import *
 from .stellardensity import *
@@ -543,9 +542,6 @@ class KOI(KeplerStar):
         import aesara_theano_fallback.tensor as tt
         from functools import partial
 
-        # Right now this depends on juliet because of the reverse_ld_coefficients function. Todo: remove this dependency
-        import juliet
-
         u1 = self.ld1
         u2 = self.ld2
 
@@ -568,7 +564,7 @@ class KOI(KeplerStar):
             b = pm.Uniform("b", lower=-1.0, upper=1.0, testval=self.b)
 
             q = [pm.Normal("q1", mu=q1, sd=q1err), pm.Normal("q2", mu=q2, sd=q2err)]
-            u = [juliet.utils.reverse_ld_coeffs("quadratic", q[0], q[1])[0], juliet.utils.reverse_ld_coeffs("quadratic", q[0], q[1])[1]]
+            u = [reverse_ld_coeffs("quadratic", q[0], q[1])[0], reverse_ld_coeffs("quadratic", q[0], q[1])[1]]
 
             rho_star = pm.Normal("rho_star", mu=self.rho_star*1.408, sd=self.rho_star_err*1.408)
             r_star = self.rstar

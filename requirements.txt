@@ -6,4 +6,3 @@ tqdm
 emcee
 corner
 batman-package
-juliet
