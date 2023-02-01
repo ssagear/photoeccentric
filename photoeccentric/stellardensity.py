@@ -296,23 +296,23 @@ def remove_nans(nan_indices, stellar_prop):
     stellar_prop_nonans = np.delete(stellar_prop, nan_i)
     return stellar_prop_nonans
 
-def density(mass, radius):
-    """Get density of sphere given mass and radius.
+# def density(mass, radius):
+#     """Get density of sphere given mass and radius.
 
-    Parameters
-    ----------
-    mass: float
-        Mass of sphere (kg)
-    radius: float
-        Radius of sphere (m)
+#     Parameters
+#     ----------
+#     mass: float
+#         Mass of sphere (kg)
+#     radius: float
+#         Radius of sphere (m)
 
-    Returns
-    rho: float
-        Density of sphere (kg*m^-3)
-    """
+#     Returns
+#     rho: float
+#         Density of sphere (kg*m^-3)
+#     """
 
-    rho = mass/((4.0/3.0)*np.pi*radius**3)
-    return rho
+#     rho = mass/((4.0/3.0)*np.pi*radius**3)
+#     return rho
 
 
 def asymmetric_gaussian(mean, sigma_minus, sigma_plus, nvals):
