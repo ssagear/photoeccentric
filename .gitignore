@@ -46,3 +46,7 @@ photoeccentric.egg-info/*
 dist/*
 build/*
 docs/tutorials/.ipynb_checkpoints/
+
+# Large files #
+###################
+*trace.nc
