@@ -1,4 +1,8 @@
-#__init__.py
+"""
+This is the __init__.py file for photoeccentric
+"""
+
+__version__ = "0.2.1"
 
 import numpy as np
 import matplotlib.pyplot as plt

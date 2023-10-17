@@ -3,6 +3,3 @@ astropy
 h5py
 matplotlib
 tqdm
-emcee
-corner
-batman-package

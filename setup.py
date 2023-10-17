@@ -2,7 +2,7 @@ from setuptools import setup
 #setup(use_scm_version=True)
 
 setup(name='photoeccentric',
-      version='0.1',
+      version='0.2.1',
       description="Photoeccentric",
       long_description="",
       author='Sheila Sagear',

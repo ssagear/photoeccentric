@@ -1,13 +1,5 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-
 import scipy.constants as c
 import scipy.special as sc
-import batman
-
-import emcee
-import corner
 
 from .utils import *
 from .stellardensity import *

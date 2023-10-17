@@ -5,4 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "photoeccentric"
 authors = [{name = "Sheila Sagear", email = "ssagear@ufl.edu"}]
+readme = "README.rst"
+dependencies = ['numpy', 'astropy', 'h5py', 'matplotlib', 'tqdm', 'pandas', 'scipy']
+license = {text = "MIT License"}
 dynamic = ["version", "description"]
