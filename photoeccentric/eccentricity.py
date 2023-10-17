@@ -81,8 +81,6 @@ def get_T14(p, rprs, a_rs, i, e, w):
         Semi-major axis (in stellar radii) (a/Rs)
     i: np.array
         Inclination (degrees)
-    ecc: boolean
-        Eccentricity taken into account? Default False
     e: float
         Eccentricity if ecc=True, default None
     w: float
@@ -97,7 +95,7 @@ def get_T14(p, rprs, a_rs, i, e, w):
 
     rs_a = 1.0/a_rs # Rs/a - rstar in units of semimajor axis
     b = get_b_from_i(i, a_rs, e, w)
-    print(b)
+
 
     T14_circ = (p/np.pi)*np.arcsin(rs_a*(np.sqrt(((1+rprs)**2)-b**2))/np.sin(i*(np.pi/180.0))) #Equation 14 in exoplanet textbook
     chidot = np.sqrt(1-e**2)/(1+e*np.sin(w*(np.pi/180.0))) #Equation 16 in exoplanet textbook
@@ -121,8 +119,6 @@ def get_T23(p, rprs, a_rs, i, e, w):
         Semi-major axis (in stellar radii) (a/Rs)
     i: np.array
         Inclination (degrees)
-    ecc: boolean
-        Eccentricity taken into account? Default False
     e: float
         Eccentricity if ecc=True, default None
     w: float

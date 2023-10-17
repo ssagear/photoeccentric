@@ -456,7 +456,6 @@ class KOI(KeplerStar):
                     if np.count_nonzero(np.isnan(fnorm)) > nan_limit:
 
                         if delete_nan_transits == True:
-                            #print('Deleted')
                             continue
 
                         elif delete_nan_transits == False:

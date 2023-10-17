@@ -220,7 +220,6 @@ def cutout_no_linfit(time, flux, flux_err, transitmid, nbuffer, cadence=0.020833
 
     """
 
-    #print('Cutout start')
     nbuffer = int(nbuffer)
 
     # Find closest Kepler time stamp to transit mid-timess
@@ -231,7 +230,6 @@ def cutout_no_linfit(time, flux, flux_err, transitmid, nbuffer, cadence=0.020833
     t1bjd = np.array(time[int(tindex-nbuffer):int(tindex+nbuffer+1)])
 
 
-    #print('Between time and flux')
     # Flux array of cutout
     f1 = np.array(flux[int(tindex-nbuffer):int(tindex+nbuffer+1)])
     # Flux error array of cutout
@@ -239,12 +237,8 @@ def cutout_no_linfit(time, flux, flux_err, transitmid, nbuffer, cadence=0.020833
 
 
     if np.any(np.array([j-i for i, j in zip(t1bjd[:-1], t1bjd[1:])]) > 4*cadence): # If the midpoint lies during a gap in the data
-        #print('Gap')
         return np.nan, np.nan, np.nan, np.nan
 
-    #print(t1, f1)
-
-    #print('cutout end')
 
     return t1bjd, t1, f1, fe1
 
