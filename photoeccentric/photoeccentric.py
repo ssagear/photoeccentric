@@ -258,9 +258,9 @@ class KOI(KeplerStar):
 
         self.hdus = hdus
 
-        self.time_quarters = np.array(time)
-        self.flux_quarters = np.array(flux)
-        self.flux_err_quarters = np.array(flux_err)
+        self.time_quarters = time #np.array(time)
+        self.flux_quarters = flux #np.array(flux)
+        self.flux_err_quarters = flux_err #np.array(flux_err)
 
         self.time = np.array([element for sublist in time for element in sublist])-2454900.
         self.flux = np.array([element for sublist in flux for element in sublist])
